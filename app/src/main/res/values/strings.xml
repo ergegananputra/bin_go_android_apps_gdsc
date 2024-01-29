@@ -8,4 +8,7 @@
     <string name="title_beranda">Beranda</string>
     <string name="title_komunitas">Komunitas</string>
     <string name="title_profil">Profil</string>
+    <string name="bin_points">Bin-Points</string>
+    <string name="_0">0</string>
+    <string name="postingan_terbaru">Postingan Terbaru</string>
 </resources>

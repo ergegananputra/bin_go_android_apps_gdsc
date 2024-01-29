@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/component_card_komunitas_container"
+    app:strokeWidth="0dp"
+    app:cardBackgroundColor="?attr/colorTertiaryContainer"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp">
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/component_card_komunitas_card_profil_placeholder_image"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            app:cardCornerRadius="1000dp"
+            app:layout_constraintBottom_toBottomOf="@+id/component_card_komunitas_button_more"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/component_card_komunitas_button_more"
+            app:strokeWidth="0dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/component_card_komunitas_card_profil_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:src="@tools:sample/avatars" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <LinearLayout
+            android:id="@+id/component_card_komunitas_linear_layout_text_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@+id/component_card_komunitas_button_more"
+            app:layout_constraintEnd_toStartOf="@+id/component_card_komunitas_button_more"
+            app:layout_constraintStart_toEndOf="@+id/component_card_komunitas_card_profil_placeholder_image"
+            app:layout_constraintTop_toTopOf="@+id/component_card_komunitas_button_more">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/component_card_komunitas_text_view_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="marquee"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnTertiaryContainer"
+                android:text="username" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/component_card_komunitas_text_view_date_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="marquee"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnTertiaryContainer"
+                android:text="post date, time" />
+
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/component_card_komunitas_button_more"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            app:icon="@drawable/more_vertical_24"
+            app:iconTint="?attr/colorOnTertiaryContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/component_card_komunitas_image_view_post"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:maxHeight="244dp"
+            android:layout_marginTop="16dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="1.4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/component_card_komunitas_button_more"
+            tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/component_card_komunitas_text_view_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="marquee"
+            android:maxLines="3"
+            android:text="Title Caption"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textColor="?attr/colorOnTertiaryContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/component_card_komunitas_image_view_post" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/component_card_komunitas_button_like"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            app:icon="@drawable/ic_favorite_border_24"
+            app:iconGravity="textStart"
+            app:iconSize="24dp"
+            app:iconTint="?attr/colorPrimary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/component_card_komunitas_text_view_title" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/component_card_komunitas_button_comment"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_marginEnd="4dp"
+            app:icon="@drawable/ic_chat_bubble_outline_24"
+            app:iconGravity="textStart"
+            app:iconSize="24dp"
+            app:iconTint="?attr/colorSecondary"
+            app:layout_constraintEnd_toStartOf="@+id/component_card_komunitas_button_like"
+            app:layout_constraintTop_toTopOf="@+id/component_card_komunitas_button_like" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/component_card_komunitas_text_view_comment_like_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text="x comments, x likes"
+            android:maxLines="1"
+            android:ellipsize="marquee"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?attr/colorOnTertiaryContainer"
+            app:layout_constraintBottom_toBottomOf="@+id/component_card_komunitas_button_comment"
+            app:layout_constraintEnd_toStartOf="@+id/component_card_komunitas_button_comment"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/component_card_komunitas_text_view_title"
+            app:layout_constraintTop_toTopOf="@+id/component_card_komunitas_button_comment" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -9,7 +9,11 @@
         android:id="@+id/navigation_beranda"
         android:name="com.gdsc.bingo.ui.beranda.BerandaFragment"
         android:label="fragment_beranda"
-        tools:layout="@layout/fragment_beranda" />
+        tools:layout="@layout/fragment_beranda" >
+        <action
+            android:id="@+id/action_navigation_beranda_to_pointsHistoryFragment"
+            app:destination="@id/pointsHistoryFragment" />
+    </fragment>
     <fragment
         android:id="@+id/navigation_komunitas"
         android:name="com.gdsc.bingo.ui.komunitas.KomunitasFragment"
@@ -19,6 +23,15 @@
         android:id="@+id/navigation_profil"
         android:name="com.gdsc.bingo.ui.profil.ProfilFragment"
         android:label="fragment_profil"
-        tools:layout="@layout/fragment_profil" />
+        tools:layout="@layout/fragment_profil" >
+        <action
+            android:id="@+id/action_navigation_profil_to_pointsHistoryFragment"
+            app:destination="@id/pointsHistoryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pointsHistoryFragment"
+        android:name="com.gdsc.bingo.ui.points_history.PointsHistoryFragment"
+        android:label="fragment_points_history"
+        tools:layout="@layout/fragment_points_history" />
 
 </navigation>

@@ -1,15 +1,19 @@
 package com.gdsc.bingo
 
 import android.os.Bundle
+import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.gdsc.bingo.databinding.ActivityMainBinding
+import com.gdsc.bingo.ui.points_history.PointsHistoryFragment
+import com.gdsc.bingo.ui.profil.ProfilFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,4 +35,16 @@ class MainActivity : AppCompatActivity() {
             mainBottomNavigation.setupWithNavController(navController)
         }
     }
+
+    fun setBottomNavigationVisibility(fragment: Fragment) {
+        when (fragment) {
+            is PointsHistoryFragment -> {
+                binding.mainBottomNavigation.visibility = View.GONE
+            }
+            else -> {
+                binding.mainBottomNavigation.visibility = View.VISIBLE
+            }
+        }
+    }
+
 }

@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.gdsc.bingo.MainActivity
 import com.gdsc.bingo.R
 import com.gdsc.bingo.databinding.FragmentBerandaBinding
 
@@ -20,6 +21,11 @@ class BerandaFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        (activity as MainActivity).setBottomNavigationVisibility(this)
     }
 
 }

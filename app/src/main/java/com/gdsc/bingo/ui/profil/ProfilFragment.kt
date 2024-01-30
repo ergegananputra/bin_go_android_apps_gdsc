@@ -1,11 +1,14 @@
 package com.gdsc.bingo.ui.profil
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.navigation.fragment.findNavController
+import com.gdsc.bingo.MainActivity
 import com.gdsc.bingo.databinding.FragmentProfilBinding
 
 
@@ -65,6 +68,7 @@ class ProfilFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (activity as MainActivity).setBottomNavigationVisibility(this)
 
         setupCardProfil()
         setupCardProfilPicture()
@@ -72,9 +76,11 @@ class ProfilFragment : Fragment() {
     }
 
     private fun setupBinPoints() {
-        // TODO : aksi klik untuk history point
+        val destination = ProfilFragmentDirections.actionNavigationProfilToPointsHistoryFragment()
+
         binding.profilIncludeBinPoints.componentCardBinPoints.setOnClickListener {
-            Toast.makeText(requireContext(), "Todo: Aksi klik untuk history point", Toast.LENGTH_SHORT).show()
+            Log.v("ProfilFragment", "setupBinPoints: Clicked")
+            findNavController().navigate(destination)
         }
     }
 

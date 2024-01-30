@@ -15,4 +15,7 @@
     <string name="lokasi">Lokasi :</string>
     <string name="cek_tempat_sampah_terdekat">Cek tempat sampah terdekat!</string>
     <string name="komunitas_bin_go">Komunitas Bin-Go</string>
+    <string name="reward_bin_points">Reward Bin-Points</string>
+    <string name="riwayat_bin_points">Riwayat Bin-Points</string>
+    <string name="navigate_back">Navigate Back</string>
 </resources>

@@ -18,7 +18,11 @@
         android:id="@+id/navigation_komunitas"
         android:name="com.gdsc.bingo.ui.komunitas.KomunitasFragment"
         android:label="fragment_komunitas"
-        tools:layout="@layout/fragment_komunitas" />
+        tools:layout="@layout/fragment_komunitas" >
+        <action
+            android:id="@+id/action_navigation_komunitas_to_formPostFragment"
+            app:destination="@id/formPostFragment" />
+    </fragment>
     <fragment
         android:id="@+id/navigation_profil"
         android:name="com.gdsc.bingo.ui.profil.ProfilFragment"
@@ -33,5 +37,10 @@
         android:name="com.gdsc.bingo.ui.points_history.PointsHistoryFragment"
         android:label="fragment_points_history"
         tools:layout="@layout/fragment_points_history" />
+    <fragment
+        android:id="@+id/formPostFragment"
+        android:name="com.gdsc.bingo.ui.form_post.FormPostFragment"
+        android:label="fragment_form_post"
+        tools:layout="@layout/fragment_form_post" />
 
 </navigation>

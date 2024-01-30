@@ -22,12 +22,12 @@ class PointsHistoryFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         // Inflate the layout for this fragment
+        (activity as MainActivity).setBottomNavigationVisibility(this)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as MainActivity).setBottomNavigationVisibility(this)
 
         setupBackButton()
         setupRecyclerView()

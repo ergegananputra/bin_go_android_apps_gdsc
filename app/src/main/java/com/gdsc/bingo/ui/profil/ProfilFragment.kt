@@ -23,6 +23,7 @@ class ProfilFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         // Inflate the layout for this fragment
+        (activity as MainActivity).setBottomNavigationVisibility(this)
         preLoad()
         return binding.root
     }
@@ -68,7 +69,6 @@ class ProfilFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as MainActivity).setBottomNavigationVisibility(this)
 
         setupCardProfil()
         setupCardProfilPicture()

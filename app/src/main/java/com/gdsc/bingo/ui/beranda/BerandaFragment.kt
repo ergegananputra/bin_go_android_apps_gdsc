@@ -5,9 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.gdsc.bingo.MainActivity
 import com.gdsc.bingo.R
 import com.gdsc.bingo.databinding.FragmentBerandaBinding
+import com.gdsc.bingo.ui.profil.ProfilFragmentDirections
 
 class BerandaFragment : Fragment() {
 
@@ -26,6 +28,17 @@ class BerandaFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (activity as MainActivity).setBottomNavigationVisibility(this)
+
+        setupBinPoints()
+    }
+
+
+    private fun setupBinPoints() {
+        val destination = BerandaFragmentDirections.actionNavigationBerandaToPointsHistoryFragment()
+
+        binding.include.componentCardBinPoints.setOnClickListener {
+            findNavController().navigate(destination)
+        }
     }
 
 }

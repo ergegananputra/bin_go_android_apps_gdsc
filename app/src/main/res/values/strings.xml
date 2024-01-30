@@ -11,4 +11,8 @@
     <string name="bin_points">Bin-Points</string>
     <string name="_0">0</string>
     <string name="postingan_terbaru">Postingan Terbaru</string>
+    <string name="beranda_prefix_greeting">Selamat datang,</string>
+    <string name="lokasi">Lokasi :</string>
+    <string name="cek_tempat_sampah_terdekat">Cek tempat sampah terdekat!</string>
+    <string name="komunitas_bin_go">Komunitas Bin-Go</string>
 </resources>

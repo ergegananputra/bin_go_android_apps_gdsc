@@ -46,7 +46,7 @@ class ProfilFragment : Fragment() {
 
     private fun setTextPoint(point: String) {
         // TODO : Format point
-        binding.profilCardBinPointsTextViewPoints.text = point
+        binding.profilIncludeBinPoints.componentCardBinPointsTextViewPoints.text = point
     }
 
     private fun setTextPoint(point: Int) {
@@ -73,7 +73,7 @@ class ProfilFragment : Fragment() {
 
     private fun setupBinPoints() {
         // TODO : aksi klik untuk history point
-        binding.profilCardBinPoints.setOnClickListener {
+        binding.profilIncludeBinPoints.componentCardBinPoints.setOnClickListener {
             Toast.makeText(requireContext(), "Todo: Aksi klik untuk history point", Toast.LENGTH_SHORT).show()
         }
     }

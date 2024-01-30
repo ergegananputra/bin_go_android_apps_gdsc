@@ -128,54 +128,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/profil_card_bin_points"
+        <include
+            android:id="@+id/profil_include_bin_points"
+            layout="@layout/component_card_bin_point"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            app:cardBackgroundColor="?attr/colorSurfaceContainerHigh"
-            app:cardCornerRadius="16dp"
             app:layout_constraintEnd_toEndOf="@+id/profil_card_profil_container"
             app:layout_constraintStart_toStartOf="@+id/profil_card_profil_container"
-            app:layout_constraintTop_toBottomOf="@+id/profil_card_profil_container"
-            app:strokeWidth="0dp">
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingVertical="24dp">
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/materialTextView2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="@string/bin_points"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="?attr/colorPrimary"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/profil_card_bin_points_text_view_points"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="22dp"
-                    android:drawableRight="@drawable/ic_stars_24"
-                    android:drawablePadding="8dp"
-                    android:text="@string/_0"
-                    android:textAppearance="?attr/textAppearanceBodyLarge"
-                    android:textColor="?attr/colorPrimary"
-                    app:drawableTint="?attr/colorPrimary"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="RtlHardcoded" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </com.google.android.material.card.MaterialCardView>
+            app:layout_constraintTop_toBottomOf="@+id/profil_card_profil_container" />
 
 
         <com.google.android.material.textview.MaterialTextView
@@ -189,7 +150,7 @@
             android:textAppearance="?attr/textAppearanceBodyLarge"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/profil_card_bin_points" />
+            app:layout_constraintTop_toBottomOf="@+id/profil_include_bin_points" />
 
         <include
             android:id="@+id/profil_include_compponent_card_komunitas"

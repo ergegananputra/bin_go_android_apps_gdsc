@@ -5,6 +5,7 @@
     android:id="@+id/component_card_komunitas_container"
     app:strokeWidth="0dp"
     app:cardBackgroundColor="?attr/colorTertiaryContainer"
+    android:layout_marginBottom="24dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 

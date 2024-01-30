@@ -79,7 +79,6 @@ class ProfilFragment : Fragment() {
         val destination = ProfilFragmentDirections.actionNavigationProfilToPointsHistoryFragment()
 
         binding.profilIncludeBinPoints.componentCardBinPoints.setOnClickListener {
-            Log.v("ProfilFragment", "setupBinPoints: Clicked")
             findNavController().navigate(destination)
         }
     }

@@ -17,7 +17,7 @@ import com.gdsc.bingo.ui.profil.ProfilFragment
 
 class MainActivity : AppCompatActivity() {
 
-    private val binding by lazy {
+    val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
     }
 

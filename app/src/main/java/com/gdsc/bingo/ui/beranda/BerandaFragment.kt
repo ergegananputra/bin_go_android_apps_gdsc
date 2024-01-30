@@ -30,6 +30,13 @@ class BerandaFragment : Fragment() {
         (activity as MainActivity).setBottomNavigationVisibility(this)
 
         setupBinPoints()
+        setupKomunitasBinGo()
+    }
+
+    private fun setupKomunitasBinGo() {
+        binding.berandaButtonGoToKomunitas.setOnClickListener {
+            (activity as MainActivity).binding.mainBottomNavigation.selectedItemId = R.id.navigation_komunitas
+        }
     }
 
 

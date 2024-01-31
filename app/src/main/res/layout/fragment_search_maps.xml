@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:context=".ui.pinpoint.search.SearchMapsFragment" />
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/search_maps_text_input_layout_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
+        app:boxBackgroundColor="?attr/colorSurfaceContainer"
+        app:boxCornerRadiusTopEnd="28dp"
+        app:boxCornerRadiusTopStart="28dp"
+        app:boxCornerRadiusBottomEnd="28dp"
+        app:boxCornerRadiusBottomStart="28dp"
+        app:hintEnabled="false"
+        app:endIconMode="clear_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Cari TPU ..."
+            android:textColor="?attr/colorOnSurface"
+            android:drawableStart="@drawable/ic_search_24"
+            android:drawablePadding="16dp"
+            android:maxLines="1"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

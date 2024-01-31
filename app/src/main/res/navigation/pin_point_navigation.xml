@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pin_point_navigation"
+    app:startDestination="@id/pintPointFrontFragment">
+
+    <fragment
+        android:id="@+id/pintPointFrontFragment"
+        android:name="com.gdsc.bingo.ui.pinpoint.front.PintPointFrontFragment"
+        android:label="fragment_pint_point_front"
+        tools:layout="@layout/fragment_pint_point_front" />
+</navigation>

@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_navigation_beranda_to_pointsHistoryFragment"
             app:destination="@id/pointsHistoryFragment" />
+        <action
+            android:id="@+id/action_navigation_beranda_to_pinPointActivity"
+            app:destination="@id/pinPointActivity" />
     </fragment>
     <fragment
         android:id="@+id/navigation_komunitas"
@@ -42,5 +45,10 @@
         android:name="com.gdsc.bingo.ui.form_post.FormPostFragment"
         android:label="fragment_form_post"
         tools:layout="@layout/fragment_form_post" />
+    <activity
+        android:id="@+id/pinPointActivity"
+        android:name="com.gdsc.bingo.ui.pinpoint.PinPointActivity"
+        android:label="activity_pin_point"
+        tools:layout="@layout/activity_pin_point" />
 
 </navigation>

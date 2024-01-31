@@ -31,6 +31,14 @@ class BerandaFragment : Fragment() {
 
         setupBinPoints()
         setupKomunitasBinGo()
+        setupBerandaPinPoint()
+    }
+
+    private fun setupBerandaPinPoint() {
+        binding.berandaCardBerandaContainer.setOnClickListener {
+            val destination = BerandaFragmentDirections.actionNavigationBerandaToPinPointActivity()
+            findNavController().navigate(destination)
+        }
     }
 
     private fun setupKomunitasBinGo() {

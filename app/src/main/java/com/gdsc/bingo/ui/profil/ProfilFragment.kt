@@ -10,9 +10,14 @@ import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.gdsc.bingo.MainActivity
 import com.gdsc.bingo.databinding.FragmentProfilBinding
+import com.gdsc.bingo.services.preferences.AppPreferences
+import com.google.firebase.auth.FirebaseAuth
 
 
 class ProfilFragment : Fragment() {
+    private val appPreferences by lazy {
+        AppPreferences(requireContext())
+    }
 
     private val binding by lazy {
         FragmentProfilBinding.inflate(layoutInflater)
@@ -100,9 +105,13 @@ class ProfilFragment : Fragment() {
     }
 
     private fun setupCardProfil() {
+        val destination = ProfilFragmentDirections.actionNavigationProfilToNavigationProfilDetail()
         binding.profilCardProfilContainer.setOnClickListener {
-            // TODO: aksi login atau logout atau form edit profil
-            Toast.makeText(requireContext(), "Todo: Aksi login atau logout", Toast.LENGTH_SHORT).show()
+            if (appPreferences.isTokenExist()) {
+                Toast.makeText(requireContext(), "Todo: Aksi edit profil atau Log Out", Toast.LENGTH_SHORT).show()
+            } else {
+                findNavController().navigate(destination)
+            }
         }
     }
 

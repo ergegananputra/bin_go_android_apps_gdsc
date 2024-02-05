@@ -6,7 +6,7 @@ plugins {
     id("com.google.devtools.ksp")
 
     // Room
-//    id("androidx.room")
+    id("androidx.room")
 
     // Navigation
     id("androidx.navigation.safeargs.kotlin")
@@ -49,9 +49,9 @@ android {
     buildFeatures {
         viewBinding = true
     }
-//    room {
-//        schemaDirectory("$projectDir/schemas")
-//    }
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 }
 
 dependencies {
@@ -65,9 +65,12 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
     // Room
-//    implementation("androidx.room:room-ktx:2.6.1")
-//    implementation("androidx.room:room-runtime:2.6.1")
-//    ksp("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("com.google.firebase:firebase-firestore:24.10.1")
+    implementation("com.google.firebase:firebase-auth:22.3.1")
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    ksp("androidx.room:room-compiler:2.6.1")
 
     // Coil
     implementation("io.coil-kt:coil:2.5.0")
@@ -78,6 +81,9 @@ dependencies {
     // Google Maps
     implementation("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:1.3.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+
+    //gson
+    implementation("com.google.code.gson:gson:2.8.9")
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")

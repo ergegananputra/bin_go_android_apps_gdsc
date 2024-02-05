@@ -14,6 +14,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.gdsc.bingo.databinding.ActivityMainBinding
 import com.gdsc.bingo.ui.points_history.PointsHistoryFragment
 import com.gdsc.bingo.ui.profil.ProfilFragment
+import com.gdsc.bingo.ui.profil.detail.ProfilDetailFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,6 +40,9 @@ class MainActivity : AppCompatActivity() {
     fun setBottomNavigationVisibility(fragment: Fragment) {
         when (fragment) {
             is PointsHistoryFragment -> {
+                binding.mainBottomNavigation.visibility = View.GONE
+            }
+            is ProfilDetailFragment -> {
                 binding.mainBottomNavigation.visibility = View.GONE
             }
             else -> {

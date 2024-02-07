@@ -14,12 +14,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.util.PatternsCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import coil.load
 import coil.transform.CircleCropTransformation
 import com.gdsc.bingo.MainActivity
 import com.gdsc.bingo.R
 import com.gdsc.bingo.databinding.FragmentProfilDetailBinding
 import com.gdsc.bingo.model.User
+import com.gdsc.bingo.services.preferences.AppPreferences
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -185,7 +187,8 @@ class ProfilDetailFragment : Fragment() {
                     )
                     firestore.collection(newUser.table).document(uid).set(newUser)
 
-                    Toast.makeText(requireContext(), "Register Berhasil", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Register Berhasil, mohon Login untuk melanjutkan", Toast.LENGTH_LONG).show()
+                    switchToLogin()
 
                 } else {
                     val errMsg = it.exception?.message
@@ -198,7 +201,43 @@ class ProfilDetailFragment : Fragment() {
     }
 
     private fun login() {
-        Toast.makeText(requireContext(), "Login", Toast.LENGTH_SHORT).show()
+        val username = binding.profilDetailTextInputLayoutUsername.editText!!.text.toString().trim()
+        val email = binding.profilDetailTextInputLayoutEmail.editText!!.text.toString().trim()
+        val password = binding.profilDetailTextInputLayoutPassword.editText!!.text.toString().trim()
+
+        if (username.isEmpty()) {
+            val errMsg = getString(R.string.username_tidak_valid)
+            binding.profilDetailTextInputLayoutUsername.error = errMsg
+            return
+        }
+        if (email.isEmpty() || PatternsCompat.EMAIL_ADDRESS.matcher(email).matches().not() ) {
+            val errMsg = getString(R.string.email_tidak_valid)
+            binding.profilDetailTextInputLayoutEmail.error = errMsg
+            return
+        }
+        if (password.isEmpty() || password.length < 8) {
+            val errMsg = getString(R.string.password_tidak_valid)
+            binding.profilDetailTextInputLayoutPassword.error = errMsg
+            return
+        }
+
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    Toast.makeText(requireContext(), "Login Berhasil", Toast.LENGTH_SHORT).show()
+
+                    AppPreferences(requireContext()).apply {
+                        userId = auth.currentUser!!.uid
+                        userName = username
+                        userEmail = email
+                    }
+
+                    findNavController().navigateUp()
+                } else {
+                    val errMsg = it.exception?.message
+                    binding.profilDetailTextInputLayoutEmail.error = errMsg
+                }
+            }
     }
 
     private fun setupSwitchButton() {

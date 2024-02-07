@@ -15,7 +15,9 @@ plugins {
     id("com.google.devtools.ksp") version "1.9.22-1.0.17" apply false
 
     // Room
-    id("androidx.room") version "2.6.0" apply false
+    id("androidx.room") version "2.6.1" apply false
+
+    // Google
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version "2.0.1" apply false
 
 }

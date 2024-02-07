@@ -20,4 +20,12 @@
     <string name="navigate_back">Navigate Back</string>
     <string name="title">Judul</string>
     <string name="cari_tpu">Cari TPU</string>
+    <string name="belum_punya_akun_daftar">Belum punya akun? Daftar</string>
+    <string name="sudah_punya_akun_login">Sudah punya akun? Login</string>
+    <string name="login">Login</string>
+    <string name="daftar">Daftar</string>
+    <string name="username_tidak_valid">Username tidak valid</string>
+    <string name="email_tidak_valid">Email tidak valid</string>
+    <string name="password_tidak_valid">Password tidak valid, dengan minimal 8 karakter</string>
+    <string name="password_tidak_sama">Konfirmasi kata sandi tidak sesuai</string>
 </resources>

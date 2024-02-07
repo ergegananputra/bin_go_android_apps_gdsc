@@ -6,7 +6,7 @@ plugins {
     id("com.google.devtools.ksp")
 
     // Room
-//    id("androidx.room")
+    id("androidx.room")
 
     // Navigation
     id("androidx.navigation.safeargs.kotlin")
@@ -49,9 +49,26 @@ android {
     buildFeatures {
         viewBinding = true
     }
-//    room {
-//        schemaDirectory("$projectDir/schemas")
-//    }
+    room {
+        schemaDirectory("$projectDir/schemas")
+//        schemaDirectory("src/main/schemas")
+    }
+
+    sourceSets {
+        // Adds exported schema location as test app assets.
+        // follow this instruction: https://developer.android.com/training/data-storage/room/migrating-db-versions#kotlin_1
+        // TODO: build test case
+        getByName("androidTest").assets.srcDirs("$projectDir/schemas")
+    }
+
+
+    packaging {
+        resources{
+            excludes.add("**/LICENSE.md")
+            excludes.add("**/LICENSE-notice.md")
+        }
+
+    }
 }
 
 dependencies {
@@ -65,9 +82,18 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
 
     // Room
-//    implementation("androidx.room:room-ktx:2.6.1")
-//    implementation("androidx.room:room-runtime:2.6.1")
-//    ksp("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.room:room-runtime:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
+
+    // Security
+    implementation("androidx.security:security-crypto:1.0.0")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-storage")
 
     // Coil
     implementation("io.coil-kt:coil:2.5.0")
@@ -79,6 +105,10 @@ dependencies {
     implementation("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:1.3.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
 
+    //gson
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")

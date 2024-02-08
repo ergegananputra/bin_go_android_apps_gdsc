@@ -1,18 +1,21 @@
 package com.gdsc.bingo.model
 
 import com.google.firebase.Timestamp
-import com.google.gson.annotations.SerializedName
 
 data class Komentar(
-    @SerializedName("komentar")
     var komentar : String? = null,
-
-    @SerializedName("profile_picture_path")
     var profilePicturePath : String? = null,
-
-    @SerializedName("username")
     var username : String? = null,
-
-    @SerializedName("created_at")
     var createdAt : Timestamp? = null,
-)
+) : FireModel {
+    override val table: String
+        get() = "komentar"
+
+    override fun toFirebaseModel() = hashMapOf(
+        "komentar" to komentar,
+        "profile_picture_path" to profilePicturePath,
+        "username" to username,
+        "created_at" to createdAt
+        )
+
+}

@@ -4,10 +4,10 @@ data class User(
     var username : String? = null,
     var score : Long = 0,
     var profilePicturePath : String? = null,
-) {
-    val table : String
+) : FireModel {
+    override val table : String
         get() = "user"
-    fun toFirebaseModel() = hashMapOf(
+    override fun toFirebaseModel() = hashMapOf(
             "username" to username,
             "score" to score,
             "profile_picture_path" to profilePicturePath

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "468989882818",
+    "project_id": "bin-go-413209",
+    "storage_bucket": "bin-go-413209.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:468989882818:android:91af077b650c78a026a65b",
+        "android_client_info": {
+          "package_name": "com.gdsc.bingo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "468989882818-2mln33aiihgkoiouv53l58suaro9cue5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAr_v51q-awghPrKIfiFsJgAO2whg4DkIw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "468989882818-2mln33aiihgkoiouv53l58suaro9cue5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

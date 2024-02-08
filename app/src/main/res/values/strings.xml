@@ -30,4 +30,9 @@
     <string name="password_tidak_sama">Konfirmasi kata sandi tidak sesuai</string>
     <string name="anda_belum_login">Anda belum login</string>
     <string name="klik_disini_untuk_login">Klik untuk login</string>
+    <string name="error_title_required">Judul tidak boleh kosong</string>
+    <string name="error_caption_required">Caption tidak boleh kosong</string>
+    <string name="error_upload_file">Gagal mengupload file</string>
+    <string name="komentar">komentar</string>
+    <string name="suka">menyukai</string>
 </resources>

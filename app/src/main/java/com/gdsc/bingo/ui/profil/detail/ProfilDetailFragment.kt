@@ -182,6 +182,7 @@ class ProfilDetailFragment : Fragment() {
 
                     val uid = auth.currentUser!!.uid
                     val newUser = User(
+                        referencePath = firestore.collection(User().table).document(uid),
                         username = username,
                         profilePicturePath = path,
                     )

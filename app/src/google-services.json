@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "208614705456",
-    "project_id": "bingo-fdbdb",
-    "storage_bucket": "bingo-fdbdb.appspot.com"
+    "project_number": "468989882818",
+    "project_id": "bin-go-413209",
+    "storage_bucket": "bin-go-413209.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:208614705456:android:daef5f577c6111f413e0f5",
+        "mobilesdk_app_id": "1:468989882818:android:91af077b650c78a026a65b",
         "android_client_info": {
           "package_name": "com.gdsc.bingo"
         }
       },
       "oauth_client": [
         {
-          "client_id": "208614705456-lr7fd2ggb1kr08pjb8jbtnphtgfgsngn.apps.googleusercontent.com",
+          "client_id": "468989882818-2mln33aiihgkoiouv53l58suaro9cue5.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB8V9WteN-TI4hDGgThS-8ffsn5IU_yl74"
+          "current_key": "AIzaSyAr_v51q-awghPrKIfiFsJgAO2whg4DkIw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "208614705456-lr7fd2ggb1kr08pjb8jbtnphtgfgsngn.apps.googleusercontent.com",
+              "client_id": "468989882818-2mln33aiihgkoiouv53l58suaro9cue5.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

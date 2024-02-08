@@ -28,4 +28,6 @@
     <string name="email_tidak_valid">Email tidak valid</string>
     <string name="password_tidak_valid">Password tidak valid, dengan minimal 8 karakter</string>
     <string name="password_tidak_sama">Konfirmasi kata sandi tidak sesuai</string>
+    <string name="anda_belum_login">Anda belum login</string>
+    <string name="klik_disini_untuk_login">Klik untuk login</string>
 </resources>

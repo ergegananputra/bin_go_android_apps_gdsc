@@ -85,7 +85,6 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-common:2.6.1")
-    implementation("com.google.firebase:firebase-analytics-ktx:20.0.0")
     ksp("androidx.room:room-compiler:2.6.1")
 
     // Security
@@ -93,9 +92,9 @@ dependencies {
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
-    implementation("com.google.firebase:firebase-firestore-ktx:23.0.3")
-    implementation("com.google.firebase:firebase-auth-ktx:21.0.1")
-    implementation("com.google.firebase:firebase-storage-ktx:20.0.0")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-storage")
 
     // Coil
     implementation("io.coil-kt:coil:2.5.0")
@@ -109,9 +108,6 @@ dependencies {
 
     // Gson
     implementation("com.google.code.gson:gson:2.10.1")
-
-    // Boom
-    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
 
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.core:core-ktx:1.12.0")

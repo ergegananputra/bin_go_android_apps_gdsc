@@ -16,6 +16,7 @@ import com.gdsc.bingo.R
 import com.gdsc.bingo.databinding.FragmentProfilBinding
 import com.gdsc.bingo.model.User
 import com.gdsc.bingo.services.preferences.AppPreferences
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
@@ -81,12 +82,10 @@ class ProfilFragment : Fragment() {
     }
 
     private fun setupTextEmail(email: String) {
-        // TODO : ambil email dari shared preference
         binding.profileCardProfileTextViewEmail.text = email
     }
 
     private fun setupTextName(nama: String) {
-        // TODO : ambil nama dari shared preference
         binding.profilCardProfilTextViewName.text = nama
     }
 
@@ -181,7 +180,27 @@ class ProfilFragment : Fragment() {
             setupTextName(name)
             setupTextEmail(email)
             loadOrRefreshPicture()
+
+            val dialog = MaterialAlertDialogBuilder(requireActivity())
+                .setTitle("Apakah anda yakin ingin log out?")
+                .setPositiveButton("Ya, log out") { _, _ ->
+                    auth.signOut()
+                    appPreferences.clear()
+                    setupCardProfil()
+                }
+                .setNegativeButton("Tidak") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .create()
+
+            binding.profilCardProfilContainer.setOnClickListener {
+                dialog.show()
+            }
+
         } else {
+            setupTextName(getString(R.string.anda_belum_login))
+            setupTextEmail(getString(R.string.klik_disini_untuk_login))
+
             val destination = ProfilFragmentDirections.actionNavigationProfilToNavigationProfilDetail()
             binding.profilCardProfilContainer.setOnClickListener {
                 findNavController().navigate(destination)

@@ -33,6 +33,10 @@ class AppPreferences(private val context: Context) {
         get() = sharedPreferences.getInt(Keys.KEY_SCORE, 0)
         set(value) = sharedPreferences.edit().putInt(Keys.KEY_SCORE, value).apply()
 
+    fun clear() {
+        sharedPreferences.edit().clear().apply()
+    }
+
     private object Keys {
         const val KEY_USER_ID = "user_id"
         const val KEY_USER_NAME = "user_name"

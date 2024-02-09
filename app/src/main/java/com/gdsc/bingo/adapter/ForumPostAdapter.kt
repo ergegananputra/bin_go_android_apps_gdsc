@@ -18,6 +18,11 @@ import com.gdsc.bingo.model.User
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.time.ZoneId
 
 class ForumPostAdapter(
@@ -34,7 +39,7 @@ class ForumPostAdapter(
         }
 
         override fun areContentsTheSame(oldItem: Forums, newItem: Forums): Boolean {
-            return oldItem.toString() == newItem.toString()
+            return oldItem.toFirebaseModel().toString() == newItem.toFirebaseModel().toString()
         }
 
     }
@@ -43,17 +48,23 @@ class ForumPostAdapter(
         private val binding : ComponentCardKomunitasBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(forums: Forums) {
-            Log.i("ForumPostAdapter", "Bind data to viewholder: \n\t${forums.toString()}")
+            Log.i("ForumPostAdapter", "Bind data to viewholder: \n\t${forums}")
 
-            setupProfile(forums.author!!)
-            setupPostTimestamp(forums.createdAt!!)
-            setupThumbnail(forums.thumbnailPhotosUrl)
-            setupPostTitle(forums.title!!)
-            setupCommentAndLikeCount(forums.commentCount, forums.likeCount)
-            setupCommentButton(forums)
-            setupLikeButton(forums)
-            setupVerticalButton(forums)
-            setupOpenDetail(forums)
+            CoroutineScope(Dispatchers.Main).launch {
+                withContext(Dispatchers.Main) {
+                    setupPostTimestamp(forums.createdAt!!)
+                    setupPostTitle(forums.title!!)
+                    setupCommentAndLikeCount(forums.commentCount, forums.likeCount)
+                    setupCommentButton(forums)
+                    setupLikeButton(forums)
+                    setupVerticalButton(forums)
+                    setupOpenDetail(forums)
+                }
+                withContext(Dispatchers.IO) {
+                    setupProfile(forums.author!!)
+                    setupThumbnail(forums.thumbnailPhotosUrl)
+                }
+            }
         }
 
         private fun setupOpenDetail(forums: Forums) {
@@ -103,41 +114,45 @@ class ForumPostAdapter(
          * Tidak semua post memiliki thumbnail, jika tidak ada thumbnail maka view akan dihilangkan
          */
         private fun setupThumbnail(thumbnailPhotosUrl: String?) {
-            binding.componentCardKomunitasImageViewPost.visibility = if (thumbnailPhotosUrl == null) View.GONE else View.VISIBLE
-            if (thumbnailPhotosUrl == null) return
+            CoroutineScope(Dispatchers.Main).launch {
+                binding.componentCardKomunitasImageViewPost.visibility = if (thumbnailPhotosUrl == null) View.GONE else View.VISIBLE
+                if (thumbnailPhotosUrl == null) return@launch
 
-            storage.getReference(thumbnailPhotosUrl).downloadUrl.addOnSuccessListener {
-                binding.componentCardKomunitasImageViewPost.load(thumbnailPhotosUrl) {
-                    crossfade(true)
-                    placeholder(R.drawable.ic_info_outline_48)
-                    error(R.drawable.ic_info_outline_48)
+                val thumbnail = withContext(Dispatchers.IO) {
+                    storage.getReference(thumbnailPhotosUrl).downloadUrl.await()
                 }
-            }.addOnFailureListener {
-                Log.e("ForumPostAdapter", "Error getting thumbnail", it)
+
+                binding.componentCardKomunitasImageViewPost.load(thumbnail)
             }
+
+
+
+
         }
 
         private fun setupPostTimestamp(createdAt: Timestamp) {
             val date = createdAt.toDate()
 
             val zonedDateTime = date.toInstant().atZone(ZoneId.systemDefault())
-            val text = "${zonedDateTime.dayOfMonth} ${zonedDateTime.month} ${zonedDateTime.year}, ${zonedDateTime.hour}:${zonedDateTime.minute}"
+            val month = "${zonedDateTime.month}".lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+            val text = "${zonedDateTime.dayOfMonth} $month ${zonedDateTime.year}, ${zonedDateTime.hour}:${zonedDateTime.minute}"
             binding.componentCardKomunitasTextViewDateTime.text = text
 
         }
 
         private fun setupProfile(authorReference: DocumentReference) {
-            authorReference.get().addOnSuccessListener {
-                val user = it.toObject(User::class.java) ?: run {
-                    Log.e("ForumPostAdapter", "User data is null")
-                    return@addOnSuccessListener
+            CoroutineScope(Dispatchers.Main).launch {
+                val user = withContext(Dispatchers.IO) {
+                    val snapshot = authorReference.get().await()
+                    snapshot.toObject(User::class.java)
                 }
 
-                loadUsername(user.username!!)
-                loadProfilePicture(user.profilePicturePath)
-
-            }.addOnFailureListener {
-                Log.e("ForumPostAdapter", "Error getting user data in setupProfile", it)
+                if (user != null) {
+                    loadUsername(user.username!!)
+                    loadProfilePicture(user.profilePicturePath)
+                } else {
+                    Log.e("ForumPostAdapter", "User data is null")
+                }
             }
         }
 
@@ -153,7 +168,6 @@ class ForumPostAdapter(
             storage.getReference(profilePicturePath).downloadUrl.addOnSuccessListener {
                 Log.i("ForumPostAdapter", "Profile picture loaded : $it")
                 binding.componentCardKomunitasCardProfilImage.load(it) {
-                    crossfade(true)
                     transformations(CircleCropTransformation())
                     placeholder(R.drawable.ic_person_24)
                     error(R.drawable.ic_person_24)

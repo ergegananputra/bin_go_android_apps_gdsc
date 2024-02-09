@@ -1,12 +1,12 @@
 package com.gdsc.bingo.ui.komunitas
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gdsc.bingo.MainActivity
@@ -15,13 +15,13 @@ import com.gdsc.bingo.databinding.FragmentKomunitasBinding
 import com.gdsc.bingo.model.Forums
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 
 class KomunitasFragment : Fragment() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
+    private lateinit var komunitasViewModel: KomunitasViewModel
 
     private val binding by lazy {
         FragmentKomunitasBinding.inflate(layoutInflater)
@@ -46,6 +46,7 @@ class KomunitasFragment : Fragment() {
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
         storage = FirebaseStorage.getInstance()
+        komunitasViewModel = ViewModelProvider(this)[KomunitasViewModel::class.java]
         setupRecyclerView()
         return binding.root
     }
@@ -56,8 +57,16 @@ class KomunitasFragment : Fragment() {
 
 
         setupCreateKomunitasExtendedFloatingActionButton()
-        refreshRecyclerData(true)
+        komunitasViewModel.refreshRecyclerData()
+        setupSwipeRefresh()
 
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.komunitasSwipeRefreshLayout.setOnRefreshListener {
+            komunitasViewModel.refreshRecyclerData()
+            binding.komunitasSwipeRefreshLayout.isRefreshing = false
+        }
     }
 
     private fun setupRecyclerView() {
@@ -65,22 +74,13 @@ class KomunitasFragment : Fragment() {
             adapter = forumPostAdapter
             layoutManager = LinearLayoutManager(requireActivity())
         }
+
+        komunitasViewModel.forum.observe(viewLifecycleOwner) {
+            forumPostAdapter.submitList(it)
+        }
     }
 
-    private fun refreshRecyclerData(forceUpdate : Boolean = false) {
-        val source = if (forceUpdate) Source.SERVER else Source.DEFAULT
-        val tempObj = Forums()
 
-        firestore.collection(tempObj.table).get(source)
-            .addOnSuccessListener { result ->
-                val forums = tempObj.toModel(result)
-                forumPostAdapter.submitList(forums)
-                Log.i("KomunitasFragment", "Data refreshed with ${forums.size} items")
-            }
-            .addOnFailureListener { exception ->
-                Toast.makeText(requireContext(), "Error: ${exception.message}", Toast.LENGTH_SHORT).show()
-            }
-    }
 
     private fun actionOpenDetail(forum: Forums) {
         // TODO : navigate to detail forum

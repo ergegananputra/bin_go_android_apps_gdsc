@@ -83,6 +83,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/component_card_komunitas_image_view_post"
+            android:visibility="gone"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:maxHeight="244dp"
@@ -105,6 +106,7 @@
             android:maxLines="3"
             android:text="Title Caption"
             android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textStyle="bold"
             android:textColor="?attr/colorOnTertiaryContainer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

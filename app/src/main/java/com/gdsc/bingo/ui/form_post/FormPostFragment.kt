@@ -129,6 +129,8 @@ class FormPostFragment : Fragment() {
 
             firestore.collection(forums.table).add(forums.toFirebaseModel())
                 .addOnSuccessListener { forumPostRef ->
+                    forums.referencePath = forumPostRef
+                    forumPostRef.update(forums.toFirebaseModel())
 
                     // Create KomentarHub and fill up empty fields
                     val komentarHub = KomentarHub(createdAt = Timestamp.now())
@@ -140,7 +142,6 @@ class FormPostFragment : Fragment() {
 
                             // update forums for komentarHub and referencePath
                             forums.komentarHub = komentarHubPostRef
-                            forums.referencePath = forumPostRef
                             forumPostRef.update(forums.toFirebaseModel())
                                 .addOnSuccessListener {
                                     Log.d("FormPostFragment", "uploadForums: success")

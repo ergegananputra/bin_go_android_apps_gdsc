@@ -1,11 +1,16 @@
 package com.gdsc.bingo.ui.profil
 
+import android.app.Activity.RESULT_OK
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -17,6 +22,7 @@ import com.gdsc.bingo.databinding.FragmentProfilBinding
 import com.gdsc.bingo.model.User
 import com.gdsc.bingo.services.preferences.AppPreferences
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Source
@@ -24,6 +30,7 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+
 
 
 class ProfilFragment : Fragment() {
@@ -37,6 +44,50 @@ class ProfilFragment : Fragment() {
 
     private val binding by lazy {
         FragmentProfilBinding.inflate(layoutInflater)
+    }
+
+
+    private val openImageLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            uploadPicture(result.data?.data!!)
+            Log.d("ProfilFragment", "Launcher : Gambar berhasil diubah")
+        } else {
+            Toast.makeText(requireContext(), "Gambar gagal diubah", Toast.LENGTH_SHORT).show()
+            Log.e("ProfilFragment", "Launcher : Gambar gagal diubah")
+        }
+    }
+
+    private fun uploadPicture(file: Uri) {
+        // validate the Uri file
+        if (file.scheme == null || file.scheme != "content") {
+            Log.e("ProfilFragment", "Invalid file uri")
+            return
+        }
+
+        val profilePictureStorageRef = storage.reference.child("profile_pictures/${appPreferences.userId}")
+        val userProfilRef = profilePictureStorageRef.child(file.lastPathSegment!!)
+
+        val uploadTask = userProfilRef.putFile(file)
+
+        uploadTask.addOnSuccessListener {
+            Log.d("ProfilFragment", "Upload picture success")
+            firestore.collection(User().table).document(appPreferences.userId)
+                .update("profilePicturePath", userProfilRef.path)
+                .addOnSuccessListener {
+                    Snackbar.make(
+                        binding.root,
+                        "Perubahan foto dapat memerlukan waktu beberapa saat untuk diterapkan",
+                        Snackbar.LENGTH_LONG
+                    ).show()
+
+                    loadOrRefreshPicture(true)
+                }
+
+        }.addOnFailureListener {
+            Log.e("ProfilFragment", "Upload picture failed", it)
+        }
     }
 
     override fun onCreateView(
@@ -106,12 +157,13 @@ class ProfilFragment : Fragment() {
     }
 
     private fun setupCardProfilPicture() {
-        // TODO : load gambar dari storage dan aksi edit ketika klik
-
         loadOrRefreshPicture()
+        val mediaStoreIntent = Intent(Intent.ACTION_PICK).apply {
+            setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
+        }
+
         binding.profilCardProfilPlaceholderImage.setOnClickListener {
-            // TODO : aksi edit gambar
-            Toast.makeText(requireContext(), "Todo: Aksi edit gambar", Toast.LENGTH_SHORT).show()
+            openImageLauncher.launch(mediaStoreIntent)
         }
     }
 

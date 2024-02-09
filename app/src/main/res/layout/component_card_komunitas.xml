@@ -34,6 +34,20 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/component_card_komunitas_linear_layout_shimmer_text_container"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            style="@style/ShimmerEffect"
+            app:layout_constraintBottom_toBottomOf="@+id/component_card_komunitas_linear_layout_text_container"
+            app:layout_constraintEnd_toEndOf="@+id/component_card_komunitas_linear_layout_text_container"
+            app:layout_constraintStart_toStartOf="@+id/component_card_komunitas_linear_layout_text_container"
+            app:layout_constraintTop_toTopOf="@+id/component_card_komunitas_linear_layout_text_container">
+
+            <View style="@style/ShimmerBox" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
 
         <LinearLayout
             android:id="@+id/component_card_komunitas_linear_layout_text_container"
@@ -53,8 +67,7 @@
                 android:maxLines="1"
                 android:ellipsize="marquee"
                 android:textAppearance="?attr/textAppearanceTitleMedium"
-                android:textColor="?attr/colorOnTertiaryContainer"
-                android:text="username" />
+                android:textColor="?attr/colorOnTertiaryContainer"/>
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/component_card_komunitas_text_view_date_time"
@@ -63,8 +76,7 @@
                 android:maxLines="1"
                 android:ellipsize="marquee"
                 android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="?attr/colorOnTertiaryContainer"
-                android:text="post date, time" />
+                android:textColor="?attr/colorOnTertiaryContainer"/>
 
 
         </LinearLayout>
@@ -83,6 +95,7 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/component_card_komunitas_image_view_post"
+            android:visibility="gone"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:maxHeight="244dp"
@@ -94,6 +107,20 @@
             app:layout_constraintTop_toBottomOf="@+id/component_card_komunitas_button_more"
             tools:srcCompat="@tools:sample/backgrounds/scenic" />
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/component_card_komunitas_shimmer_title"
+            style="@style/ShimmerEffect"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/component_card_komunitas_text_view_title"
+            app:layout_constraintEnd_toEndOf="@+id/component_card_komunitas_text_view_title"
+            app:layout_constraintStart_toStartOf="@+id/component_card_komunitas_text_view_title"
+            app:layout_constraintTop_toTopOf="@+id/component_card_komunitas_text_view_title">
+
+            <View style="@style/ShimmerBox" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/component_card_komunitas_text_view_title"
             android:layout_width="0dp"
@@ -103,9 +130,9 @@
             android:layout_marginEnd="16dp"
             android:ellipsize="marquee"
             android:maxLines="3"
-            android:text="Title Caption"
             android:textAppearance="?attr/textAppearanceBodyLarge"
             android:textColor="?attr/colorOnTertiaryContainer"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/component_card_komunitas_image_view_post" />
@@ -137,14 +164,27 @@
             app:layout_constraintEnd_toStartOf="@+id/component_card_komunitas_button_like"
             app:layout_constraintTop_toTopOf="@+id/component_card_komunitas_button_like" />
 
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/component_card_komunitas_shimmer_comment_like_count"
+            style="@style/ShimmerEffect"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/component_card_komunitas_text_view_comment_like_count"
+            app:layout_constraintEnd_toEndOf="@+id/component_card_komunitas_text_view_comment_like_count"
+            app:layout_constraintStart_toStartOf="@+id/component_card_komunitas_text_view_comment_like_count"
+            app:layout_constraintTop_toTopOf="@+id/component_card_komunitas_text_view_comment_like_count">
+
+            <View style="@style/ShimmerBox" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/component_card_komunitas_text_view_comment_like_count"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="x comments, x likes"
-            android:maxLines="1"
             android:ellipsize="marquee"
+            android:maxLines="1"
             android:textAppearance="?attr/textAppearanceLabelLarge"
             android:textColor="?attr/colorOnTertiaryContainer"
             app:layout_constraintBottom_toBottomOf="@+id/component_card_komunitas_button_comment"

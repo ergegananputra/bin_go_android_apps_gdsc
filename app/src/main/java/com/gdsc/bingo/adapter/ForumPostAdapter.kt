@@ -134,15 +134,24 @@ class ForumPostAdapter(
                 }
 
                 loadUsername(user.username!!)
-                loadProfilePicture(user.profilePicturePath!!)
+                loadProfilePicture(user.profilePicturePath)
 
             }.addOnFailureListener {
                 Log.e("ForumPostAdapter", "Error getting user data in setupProfile", it)
             }
         }
 
-        private fun loadProfilePicture(profilePicturePath: String) {
+        private fun loadProfilePicture(profilePicturePath: String?) {
+            if (profilePicturePath == null) {
+                Log.e("ForumPostAdapter", "Profile picture path is null")
+                binding.componentCardKomunitasCardProfilImage.load(R.drawable.ic_person_24) {
+                    transformations(CircleCropTransformation())
+                }
+                return
+            }
+
             storage.getReference(profilePicturePath).downloadUrl.addOnSuccessListener {
+                Log.i("ForumPostAdapter", "Profile picture loaded : $it")
                 binding.componentCardKomunitasCardProfilImage.load(it) {
                     crossfade(true)
                     transformations(CircleCropTransformation())

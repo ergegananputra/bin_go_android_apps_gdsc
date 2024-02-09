@@ -46,6 +46,12 @@ class ProfilDetailFragment : Fragment() {
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             imageUri = result.data?.data
+            if (imageUri?.scheme == null || imageUri!!.scheme != "content") {
+                Log.e("ProfilFragment", "Invalid file uri")
+                Toast.makeText(requireContext(), "Invalid file uri", Toast.LENGTH_SHORT).show()
+                return@registerForActivityResult
+            }
+
             loadProfilImage(imageUri.toString())
 
             Toast.makeText(requireContext(), "Foto Profil Berhasil Diubah", Toast.LENGTH_SHORT).show()
@@ -163,12 +169,16 @@ class ProfilDetailFragment : Fragment() {
             .addOnCompleteListener {
                 if (it.isSuccessful) {
 
+                    // FIXME: Profile Picture is not uploaded to Firebase Storage
+
                     val path = imageUri?.let {
                         val profilePictureStorageRef = storage.reference.child("profile_pictures/${auth.currentUser!!.uid}")
                         val file = imageUri
                         val userProfilRef = profilePictureStorageRef.child(file!!.lastPathSegment!!)
 
                         val uploadTask = userProfilRef.putFile(file)
+
+                        Log.i("ProfilDetailFragment", "register: imageUri is \n\t$file:\n\t ${userProfilRef.path}")
 
                         uploadTask.addOnFailureListener {
                             Toast.makeText(requireContext(), "Upload Foto Profil Gagal", Toast.LENGTH_SHORT).show()
@@ -177,6 +187,9 @@ class ProfilDetailFragment : Fragment() {
                         }
 
                         userProfilRef.path
+                    } ?: run {
+                        Log.e("ProfilDetailFragment", "register: imageUri is null")
+                        return@run null
                     }
 
 

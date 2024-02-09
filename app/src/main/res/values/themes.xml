@@ -28,4 +28,21 @@
         <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
     </style>
+
+    <style name="ShimmerEffect">
+        <item name="shimmer_colored">true</item>
+        <item name="shimmer_base_color">?attr/colorSurfaceContainerLowest</item>
+        <item name="shimmer_base_alpha">0.3</item>
+        <item name="shimmer_highlight_color">?attr/colorSurfaceContainerLowest</item>
+        <item name="shimmer_highlight_alpha">0.6</item>
+    </style>
+
+    <style name="ShimmerBox">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/rectangle_rounded</item>
+        <item name="background">@drawable/rectangle_rounded</item>
+        <item name="android:backgroundTint">@android:color/darker_gray</item>
+        <item name="backgroundTint">@android:color/darker_gray</item>
+    </style>
 </resources>

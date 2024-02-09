@@ -50,6 +50,8 @@ class ForumPostAdapter(
         fun bind(forums: Forums) {
             Log.i("ForumPostAdapter", "Bind data to viewholder: \n\t${forums}")
 
+            startAllShimmer()
+
             CoroutineScope(Dispatchers.Main).launch {
                 withContext(Dispatchers.Main) {
                     setupPostTimestamp(forums.createdAt!!)
@@ -64,6 +66,14 @@ class ForumPostAdapter(
                     setupProfile(forums.author!!)
                     setupThumbnail(forums.thumbnailPhotosUrl)
                 }
+            }
+        }
+
+        private fun startAllShimmer() {
+            with(binding) {
+                componentCardKomunitasLinearLayoutShimmerTextContainer.startShimmer()
+                componentCardKomunitasShimmerTitle.startShimmer()
+                componentCardKomunitasShimmerCommentLikeCount.startShimmer()
             }
         }
 
@@ -100,11 +110,19 @@ class ForumPostAdapter(
             val suka = context.resources.getString(R.string.suka)
             val text = "$commentCount $komen, $likeCount $suka"
             binding.componentCardKomunitasTextViewCommentLikeCount.text = text
+            binding.componentCardKomunitasShimmerCommentLikeCount.apply {
+                stopShimmer()
+                visibility = View.GONE
+            }
         }
 
 
         private fun setupPostTitle(title: String) {
             binding.componentCardKomunitasTextViewTitle.text = title
+            binding.componentCardKomunitasShimmerTitle.apply {
+                stopShimmer()
+                visibility = View.GONE
+            }
         }
 
         /**
@@ -130,15 +148,7 @@ class ForumPostAdapter(
 
         }
 
-        private fun setupPostTimestamp(createdAt: Timestamp) {
-            val date = createdAt.toDate()
 
-            val zonedDateTime = date.toInstant().atZone(ZoneId.systemDefault())
-            val month = "${zonedDateTime.month}".lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-            val text = "${zonedDateTime.dayOfMonth} $month ${zonedDateTime.year}, ${zonedDateTime.hour}:${zonedDateTime.minute}"
-            binding.componentCardKomunitasTextViewDateTime.text = text
-
-        }
 
         private fun setupProfile(authorReference: DocumentReference) {
             CoroutineScope(Dispatchers.Main).launch {
@@ -179,6 +189,21 @@ class ForumPostAdapter(
 
         private fun loadUsername(username: String) {
             binding.componentCardKomunitasTextViewName.text = username
+        }
+
+        private fun setupPostTimestamp(createdAt: Timestamp) {
+            val date = createdAt.toDate()
+
+            val zonedDateTime = date.toInstant().atZone(ZoneId.systemDefault())
+            val month = "${zonedDateTime.month}".lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+            val text = "${zonedDateTime.dayOfMonth} $month ${zonedDateTime.year}, ${zonedDateTime.hour}:${zonedDateTime.minute}"
+            binding.componentCardKomunitasTextViewDateTime.text = text
+
+            binding.componentCardKomunitasLinearLayoutShimmerTextContainer.apply {
+                stopShimmer()
+                visibility = View.GONE
+            }
+
         }
 
     }

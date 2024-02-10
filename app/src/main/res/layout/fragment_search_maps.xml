@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -20,49 +19,34 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/search_maps_text_input_layout_search"
+        style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
-        style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
         app:boxBackgroundColor="?attr/colorSurfaceContainer"
-        app:boxCornerRadiusTopEnd="28dp"
-        app:boxCornerRadiusTopStart="28dp"
         app:boxCornerRadiusBottomEnd="28dp"
         app:boxCornerRadiusBottomStart="28dp"
-        app:hintEnabled="false"
+        app:boxCornerRadiusTopEnd="28dp"
+        app:boxCornerRadiusTopStart="28dp"
         app:endIconMode="clear_text"
+        app:hintEnabled="false"
+        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
+             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Cari TPU ..."
-            android:textColor="?attr/colorOnSurface"
             android:drawableStart="@drawable/ic_search_24"
             android:drawablePadding="16dp"
+            android:hint="Cari TPU ..."
             android:maxLines="1"
-            />
+            android:textColor="?attr/colorOnSurface" />
 
     </com.google.android.material.textfield.TextInputLayout>
-
-
-    <!-- Floating Action Button untuk Compass -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabCompass"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:src="@drawable/ic_assistant_navigation_24"
-        app:backgroundTint="?attr/colorPrimary"
-        app:elevation="6dp"
-        app:layout_constraintBottom_toTopOf="@+id/fabMyLocation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.160" />
 
     <!-- Floating Action Button untuk Lokasi -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -48,6 +48,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     room {
         schemaDirectory("$projectDir/schemas")
@@ -105,6 +106,8 @@ dependencies {
     // Google Maps
     implementation("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:1.3.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.google.android.libraries.places:places:3.3.0")
+
 
     // Gson
     implementation("com.google.code.gson:gson:2.10.1")

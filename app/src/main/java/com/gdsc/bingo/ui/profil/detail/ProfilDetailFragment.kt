@@ -199,7 +199,7 @@ class ProfilDetailFragment : Fragment() {
                         username = username,
                         profilePicturePath = path,
                     )
-                    firestore.collection(newUser.table).document(uid).set(newUser)
+                    firestore.collection(newUser.table).document(uid).set(newUser.toFirebaseModel())
 
                     Toast.makeText(requireContext(), "Register Berhasil, mohon Login untuk melanjutkan", Toast.LENGTH_LONG).show()
                     switchToLogin()

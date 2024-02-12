@@ -23,7 +23,7 @@ class KomunitasViewModel : ViewModel() {
 
             firestore.collection(tempObj.table).get(source)
                 .addOnSuccessListener { result ->
-                    val forums = tempObj.toModel(result)
+                    val forums = tempObj.toModels(result)
                     _forum.value = forums
                     Log.i("KomunitasViewModel", "Data refreshed with ${forums.size} items")
                 }

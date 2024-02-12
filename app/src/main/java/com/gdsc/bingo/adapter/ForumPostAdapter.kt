@@ -154,7 +154,7 @@ class ForumPostAdapter(
             CoroutineScope(Dispatchers.Main).launch {
                 val user = withContext(Dispatchers.IO) {
                     val snapshot = authorReference.get().await()
-                    snapshot.toObject(User::class.java)
+                    User().toModel(snapshot)
                 }
 
                 if (user != null) {

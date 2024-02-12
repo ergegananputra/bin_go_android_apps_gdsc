@@ -2,6 +2,7 @@ package com.gdsc.bingo.model
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 
 /**
@@ -45,7 +46,7 @@ data class Komentar(
         FireModel.Keys.createdAt to createdAt
         )
 
-    override fun toModel(querySnapshot: QuerySnapshot): List<Komentar> {
+    override fun toModels(querySnapshot: QuerySnapshot): List<Komentar> {
         return querySnapshot.documents.map {
             Komentar(
                 referencePath = it[FireModel.Keys.referencePath] as DocumentReference,
@@ -55,6 +56,16 @@ data class Komentar(
                 createdAt = it[FireModel.Keys.createdAt] as Timestamp
             )
         }
+    }
+
+    override fun toModel(documentSnapshot: DocumentSnapshot): Komentar {
+        return Komentar(
+            referencePath = documentSnapshot.getDocumentReference(FireModel.Keys.referencePath),
+            komentar = documentSnapshot.getString(Keys.komentar),
+            profilePicturePath = documentSnapshot.getString(Keys.profilePicturePath),
+            username = documentSnapshot.getString(Keys.username),
+            createdAt = documentSnapshot.getTimestamp(FireModel.Keys.createdAt)
+        )
     }
 
 }

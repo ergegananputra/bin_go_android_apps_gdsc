@@ -1,6 +1,8 @@
 package com.gdsc.bingo.model
 
+import android.util.Log
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 
 data class User(
@@ -25,13 +27,29 @@ data class User(
             Keys.profilePicturePath to profilePicturePath
             )
 
-    override fun toModel(querySnapshot: QuerySnapshot): List<User> {
+    override fun toModels(querySnapshot: QuerySnapshot): List<User> {
         return querySnapshot.documents.map {
             User(
                 referencePath = it[FireModel.Keys.referencePath] as DocumentReference,
                 username = it[Keys.username] as String,
                 score = it[Keys.score] as Long,
                 profilePicturePath = it[Keys.profilePicturePath] as String
+            )
+        }
+    }
+
+    override fun toModel(documentSnapshot: DocumentSnapshot): User {
+        return User(
+            referencePath = documentSnapshot.getDocumentReference(FireModel.Keys.referencePath),
+            username = documentSnapshot.getString(Keys.username),
+            score = documentSnapshot.getLong(Keys.score)!!,
+            profilePicturePath = documentSnapshot.getString(Keys.profilePicturePath)
+        ).also {
+            Log.i("ArtikelFragment", "NavArgs" +
+                    "\n\tReferencePath: ${it.referencePath}" +
+                    "\n\tUsername: ${it.username}" +
+                    "\n\tScore: ${it.score}" +
+                    "\n\tProfilePicturePath: ${it.profilePicturePath}"
             )
         }
     }

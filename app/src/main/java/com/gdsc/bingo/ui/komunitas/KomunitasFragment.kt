@@ -83,8 +83,25 @@ class KomunitasFragment : Fragment() {
 
 
     private fun actionOpenDetail(forum: Forums) {
-        // TODO : navigate to detail forum
-        Toast.makeText(requireContext(), "Open detail on ${forum.title}", Toast.LENGTH_SHORT).show()
+        val destination = with(forum){
+            KomunitasFragmentDirections
+                .actionNavigationKomunitasToArtikelFragment(
+                    referenecePathDocumentString = referencePath?.path!!,
+                    title = title!!,
+                    text = text,
+                    isUsingTextFile = isUsingTextFile,
+                    textFilePathDocumentString = textFilePath,
+                    videoLink = videoLink,
+                    likeCount = likeCount,
+                    dislikeCount = dislikeCount,
+                    commentCount = commentCount,
+                    thumbnailPhotosUrl = thumbnailPhotosUrl,
+                    authorDocumentString = author?.path!!,
+                    komentarHubDocumentString = komentarHub?.path,
+                    createAtSeconds = createdAt?.toDate()?.time ?: 0
+                )
+        }
+        findNavController().navigate(destination)
     }
 
     private fun actionVerticalButton(forum: Forums) {

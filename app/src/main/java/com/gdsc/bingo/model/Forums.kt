@@ -2,10 +2,22 @@ package com.gdsc.bingo.model
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 
 /**
  * [Forums] Version 1.0
+ *
+ *
+ * Petunjuk Penggunaan untuk NavArgs:
+ *
+ *
+ *      -   Untuk recreate timestamp dari seconds Long gunakan:
+ *          val timestamp = Timestamp(*seconds, 0)
+ *
+ *
+ *      -   Untuk recreate referencePath gunakan:
+ *          val reference = FirebaseFirestore.getInstance().document(*StringPath)
  *
  *
  * Rules:
@@ -63,7 +75,7 @@ data class Forums(
         FireModel.Keys.createdAt to createdAt
         )
 
-    override fun toModel(querySnapshot: QuerySnapshot): List<Forums> {
+    override fun toModels(querySnapshot: QuerySnapshot): List<Forums> {
         return querySnapshot.mapNotNull {data ->
             Forums(
                 referencePath = data[FireModel.Keys.referencePath] as? DocumentReference,
@@ -81,5 +93,23 @@ data class Forums(
                 createdAt = data[FireModel.Keys.createdAt] as? Timestamp
             )
         }
+    }
+
+    override fun toModel(documentSnapshot: DocumentSnapshot): Forums {
+        return Forums(
+            referencePath = documentSnapshot.getDocumentReference(FireModel.Keys.referencePath),
+            title = documentSnapshot.getString(Keys.title),
+            text = documentSnapshot.getString(Keys.text),
+            isUsingTextFile = documentSnapshot.getBoolean(Keys.isUsingTextFile) ?: false,
+            textFilePath = documentSnapshot.getString(Keys.textFilePath),
+            videoLink = documentSnapshot.getString(Keys.videoLink),
+            likeCount = documentSnapshot.getLong(Keys.likeCount) ?: 0,
+            dislikeCount = documentSnapshot.getLong(Keys.dislikeCount) ?: 0,
+            commentCount = documentSnapshot.getLong(Keys.commentCount) ?: 0,
+            thumbnailPhotosUrl = documentSnapshot.getString(Keys.thumbnailPhotosUrl),
+            author = documentSnapshot.getDocumentReference(Keys.author),
+            komentarHub = documentSnapshot.getDocumentReference(Keys.komentarHub),
+            createdAt = documentSnapshot.getTimestamp(FireModel.Keys.createdAt)
+        )
     }
 }

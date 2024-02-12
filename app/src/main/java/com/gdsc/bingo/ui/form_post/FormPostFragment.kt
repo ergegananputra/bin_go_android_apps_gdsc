@@ -78,13 +78,12 @@ class FormPostFragment : Fragment() {
                 binding.formPostTextInputLayoutTitle.error = errMsg
                 return@withContext
                 }
-            val recaption = binding.formPostTextInputLayoutCaption.getTrimEditText() ?: run {
+            val caption = binding.formPostTextInputLayoutCaption.getTrimEditText() ?: run {
                 val errMsg = getString(R.string.error_caption_required)
                 binding.formPostTextInputLayoutCaption.error = errMsg
                 return@withContext
                 }
 
-            val caption = recaption + randomString
             val videoLink = binding.formPostTextInputLayoutVideoLink.getTrimEditText()
 
             val forums = Forums(
@@ -121,8 +120,6 @@ class FormPostFragment : Fragment() {
             .joinToString("")
     }
 
-
-    val randomString = generateRandomString(500_006)
 
     private fun uploadForums(forums: Forums) {
         CoroutineScope(Dispatchers.IO).launch {

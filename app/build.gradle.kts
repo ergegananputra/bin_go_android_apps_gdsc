@@ -107,6 +107,8 @@ dependencies {
     implementation("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:1.3.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.libraries.places:places:3.3.0")
+    implementation ("com.github.delight-im:Android-SimpleLocation:v1.1.0")
+
 
 
     // Gson
@@ -114,6 +116,15 @@ dependencies {
 
     // Shimmer from facebook
     implementation("com.facebook.shimmer:shimmer:0.5.0")
+
+
+    // Retrofit
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.github.akarnokd:rxjava3-retrofit-adapter:3.0.0")
+
+    // Location & Polyline
+    implementation ("com.github.delight-im:Android-SimpleLocation:v1.1.0")
 
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.core:core-ktx:1.12.0")

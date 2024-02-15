@@ -34,6 +34,7 @@ data class Forums(
     var likeCount : Long = 0,
     var dislikeCount : Long = 0,
     var commentCount : Long = 0,
+    var likesReference: DocumentReference? = null,
     var thumbnailPhotosUrl : String? = null,
     var author : DocumentReference? = null,
     var komentarHub : DocumentReference? = null,
@@ -45,7 +46,7 @@ data class Forums(
 
     val textLimit = 500_000
 
-    private object Keys {
+    object Keys {
         const val title = "title"
         const val text = "text"
         const val isUsingTextFile = "is_using_text_file"
@@ -53,6 +54,7 @@ data class Forums(
         const val videoLink = "video_link"
         const val likeCount = "like_count"
         const val dislikeCount = "dislike_count"
+        const val likesReference = "likes_reference"
         const val commentCount = "comment_count"
         const val thumbnailPhotosUrl = "thumbnail_photos_url"
         const val author = "author"
@@ -68,6 +70,7 @@ data class Forums(
         Keys.videoLink to videoLink,
         Keys.likeCount to likeCount,
         Keys.dislikeCount to dislikeCount,
+        Keys.likesReference to likesReference,
         Keys.commentCount to commentCount,
         Keys.thumbnailPhotosUrl to thumbnailPhotosUrl,
         Keys.author to author,
@@ -86,6 +89,7 @@ data class Forums(
                 videoLink = data[Keys.videoLink] as? String,
                 likeCount = data[Keys.likeCount] as? Long ?: 0,
                 dislikeCount = data[Keys.dislikeCount] as? Long ?: 0,
+                likesReference = data[Keys.likesReference] as? DocumentReference,
                 commentCount = data[Keys.commentCount] as? Long ?: 0,
                 thumbnailPhotosUrl = data[Keys.thumbnailPhotosUrl] as? String,
                 author = data[Keys.author] as? DocumentReference,
@@ -105,6 +109,7 @@ data class Forums(
             videoLink = documentSnapshot.getString(Keys.videoLink),
             likeCount = documentSnapshot.getLong(Keys.likeCount) ?: 0,
             dislikeCount = documentSnapshot.getLong(Keys.dislikeCount) ?: 0,
+            likesReference = documentSnapshot.getDocumentReference(Keys.likesReference),
             commentCount = documentSnapshot.getLong(Keys.commentCount) ?: 0,
             thumbnailPhotosUrl = documentSnapshot.getString(Keys.thumbnailPhotosUrl),
             author = documentSnapshot.getDocumentReference(Keys.author),

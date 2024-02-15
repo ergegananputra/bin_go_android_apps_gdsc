@@ -14,6 +14,7 @@ import com.gdsc.bingo.R
 import com.gdsc.bingo.databinding.FragmentFormPostBinding
 import com.gdsc.bingo.model.Forums
 import com.gdsc.bingo.model.KomentarHub
+import com.gdsc.bingo.model.Likes
 import com.gdsc.bingo.model.User
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
@@ -65,8 +66,6 @@ class FormPostFragment : Fragment() {
         binding.formPostHeaderButtonSave.setOnClickListener {
             lifecycleScope.launch {
                 submitForm()
-
-                findNavController().navigateUp()
             }
         }
     }
@@ -78,13 +77,12 @@ class FormPostFragment : Fragment() {
                 binding.formPostTextInputLayoutTitle.error = errMsg
                 return@withContext
                 }
-            val recaption = binding.formPostTextInputLayoutCaption.getTrimEditText() ?: run {
+            val caption = binding.formPostTextInputLayoutCaption.getTrimEditText() ?: run {
                 val errMsg = getString(R.string.error_caption_required)
                 binding.formPostTextInputLayoutCaption.error = errMsg
                 return@withContext
                 }
 
-            val caption = recaption + randomString
             val videoLink = binding.formPostTextInputLayoutVideoLink.getTrimEditText()
 
             val forums = Forums(
@@ -122,38 +120,32 @@ class FormPostFragment : Fragment() {
     }
 
 
-    val randomString = generateRandomString(500_006)
-
     private fun uploadForums(forums: Forums) {
         CoroutineScope(Dispatchers.IO).launch {
 
             firestore.collection(forums.table).add(forums.toFirebaseModel())
                 .addOnSuccessListener { forumPostRef ->
-                    forums.referencePath = forumPostRef
+                    val documentId = forumPostRef.id
+                    forums.apply {
+                        referencePath = forumPostRef
+                        likesReference = firestore.collection(Likes().table).document(documentId)
+                        komentarHub = firestore.collection(KomentarHub().table).document(documentId)
+                    }
                     forumPostRef.update(forums.toFirebaseModel())
 
                     // Create KomentarHub and fill up empty fields
-                    val komentarHub = KomentarHub(createdAt = Timestamp.now())
-                    firestore.collection(komentarHub.table).add(komentarHub.toFirebaseModel())
-                        .addOnSuccessListener { komentarHubPostRef ->
-                            // update referencePath for komentarHub (ID)
-                            komentarHub.referencePath = komentarHubPostRef
-                            komentarHubPostRef.update(komentarHub.toFirebaseModel())
-
-                            // update forums for komentarHub and referencePath
-                            forums.komentarHub = komentarHubPostRef
-                            forumPostRef.update(forums.toFirebaseModel())
-                                .addOnSuccessListener {
-                                    Log.d("FormPostFragment", "uploadForums: success")
-                                }
-                                .addOnFailureListener {
-                                    Log.e("FormPostFragment", "uploadForums: ${it.message}")
-                                    executeFailure()
-                                }
-                        }
-                        .addOnFailureListener {
+                    val komentarHub = KomentarHub(
+                        referencePath = forums.komentarHub,
+                        createdAt = Timestamp.now()
+                    )
+                    forums.komentarHub?.set(komentarHub.toFirebaseModel())
+                        ?.addOnFailureListener {
                             Log.e("FormPostFragment", "uploadForums: ${it.message}")
                             executeFailure()
+                        }
+                        ?.addOnSuccessListener {
+                            Log.i("FormPostFragment", "uploadForums: KomentarHub created")
+                            findNavController().navigateUp()
                         }
                 }
                 .addOnFailureListener {

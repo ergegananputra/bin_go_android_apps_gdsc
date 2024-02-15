@@ -1,6 +1,7 @@
 package com.gdsc.bingo.model
 
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 
 interface FireModel {
@@ -8,7 +9,8 @@ interface FireModel {
     val table : String
     fun toFirebaseModel() : Map<String, Any?>
 
-    fun toModel(querySnapshot: QuerySnapshot) : List<FireModel>
+    fun toModels(querySnapshot: QuerySnapshot) : List<FireModel>
+    fun toModel(documentSnapshot: DocumentSnapshot) : FireModel?
 
     object Keys {
         const val referencePath = "reference_path"

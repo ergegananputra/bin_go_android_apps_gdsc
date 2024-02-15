@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.util.PatternsCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -25,9 +26,7 @@ import com.gdsc.bingo.services.preferences.AppPreferences
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.ktx.storage
 
 
 class ProfilDetailFragment : Fragment() {
@@ -84,7 +83,7 @@ class ProfilDetailFragment : Fragment() {
         (activity as MainActivity).setBottomNavigationVisibility(this)
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
-        storage = Firebase.storage("gs://bingo-fdbdb.appspot.com")
+        storage = FirebaseStorage.getInstance()
 
         switchToLogin()
         return binding.root
@@ -169,20 +168,28 @@ class ProfilDetailFragment : Fragment() {
             .addOnCompleteListener {
                 if (it.isSuccessful) {
 
-                    // FIXME: Profile Picture is not uploaded to Firebase Storage
-
                     val path = imageUri?.let {
-                        val profilePictureStorageRef = storage.reference.child("profile_pictures/${auth.currentUser!!.uid}")
+
                         val file = imageUri
-                        val userProfilRef = profilePictureStorageRef.child(file!!.lastPathSegment!!)
+
+                        if (file == null || file.scheme == null || file.scheme != "content") {
+                            Log.e("ProfilFragment", "Invalid file uri")
+                            return@let null
+                        }
+
+                        val profilePictureStorageRef = storage.reference
+                            .child("profile_pictures/${auth.currentUser!!.uid}")
+                        val userProfilRef = profilePictureStorageRef.child(file.lastPathSegment!!)
 
                         val uploadTask = userProfilRef.putFile(file)
 
                         Log.i("ProfilDetailFragment", "register: imageUri is \n\t$file:\n\t ${userProfilRef.path}")
 
                         uploadTask.addOnFailureListener {
+                            Log.e("ProfilDetailFragment", "register: Upload Foto Profil Gagal", it)
                             Toast.makeText(requireContext(), "Upload Foto Profil Gagal", Toast.LENGTH_SHORT).show()
                         }.addOnSuccessListener {
+                            Log.i("ProfilDetailFragment", "register: Upload Foto Profil Berhasil")
                             Toast.makeText(requireContext(), "Upload Foto Profil Berhasil", Toast.LENGTH_SHORT).show()
                         }
 
@@ -199,7 +206,7 @@ class ProfilDetailFragment : Fragment() {
                         username = username,
                         profilePicturePath = path,
                     )
-                    firestore.collection(newUser.table).document(uid).set(newUser)
+                    firestore.collection(newUser.table).document(uid).set(newUser.toFirebaseModel())
 
                     Toast.makeText(requireContext(), "Register Berhasil, mohon Login untuk melanjutkan", Toast.LENGTH_LONG).show()
                     switchToLogin()

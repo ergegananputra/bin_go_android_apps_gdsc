@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.gdsc.bingo.MainActivity
 import com.gdsc.bingo.adapter.ForumPostAdapter
 import com.gdsc.bingo.databinding.FragmentKomunitasBinding
@@ -48,6 +49,7 @@ class KomunitasFragment : Fragment() {
         storage = FirebaseStorage.getInstance()
         komunitasViewModel = ViewModelProvider(this)[KomunitasViewModel::class.java]
         setupRecyclerView()
+        setupEndOfList()
         return binding.root
     }
 
@@ -59,7 +61,34 @@ class KomunitasFragment : Fragment() {
         setupCreateKomunitasExtendedFloatingActionButton()
         komunitasViewModel.refreshRecyclerData()
         setupSwipeRefresh()
+        setupPaginationAndScrollingBehaviour()
+    }
 
+    private fun setupEndOfList() {
+        komunitasViewModel.loadEndOfList()
+    }
+
+    private fun setupPaginationAndScrollingBehaviour() {
+        binding.komunitasRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (dy > 0) {
+                    binding.komunitasExtendedFloatingActionButton.shrink()
+                } else if (dy < 0) {
+                    binding.komunitasExtendedFloatingActionButton.extend()
+                }
+
+
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
+                val totalItemCount = layoutManager.itemCount
+
+                if (lastVisiblePosition >= totalItemCount - 2) {
+                    komunitasViewModel.loadMoreRecyclerData()
+                }
+            }
+        })
     }
 
     private fun setupSwipeRefresh() {
@@ -76,6 +105,7 @@ class KomunitasFragment : Fragment() {
         }
 
         komunitasViewModel.forum.observe(viewLifecycleOwner) {
+            binding.komunitasRecyclerProgressBar.visibility = View.GONE
             forumPostAdapter.submitList(it)
         }
     }
@@ -83,8 +113,26 @@ class KomunitasFragment : Fragment() {
 
 
     private fun actionOpenDetail(forum: Forums) {
-        // TODO : navigate to detail forum
-        Toast.makeText(requireContext(), "Open detail on ${forum.title}", Toast.LENGTH_SHORT).show()
+        val destination = with(forum){
+            KomunitasFragmentDirections
+                .actionNavigationKomunitasToArtikelFragment(
+                    referenecePathDocumentString = referencePath?.path!!,
+                    title = title!!,
+                    text = text,
+                    isUsingTextFile = isUsingTextFile,
+                    textFilePathDocumentString = textFilePath,
+                    videoLink = videoLink,
+                    likeCount = likeCount,
+                    dislikeCount = dislikeCount,
+                    likesReference = likesReference?.path!!,
+                    commentCount = commentCount,
+                    thumbnailPhotosUrl = thumbnailPhotosUrl,
+                    authorDocumentString = author?.path!!,
+                    komentarHubDocumentString = komentarHub?.path,
+                    createAtSeconds = createdAt?.toDate()?.time ?: 0
+                )
+        }
+        findNavController().navigate(destination)
     }
 
     private fun actionVerticalButton(forum: Forums) {

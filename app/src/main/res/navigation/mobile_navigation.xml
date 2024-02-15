@@ -25,6 +25,9 @@
         <action
             android:id="@+id/action_navigation_komunitas_to_formPostFragment"
             app:destination="@id/formPostFragment" />
+        <action
+            android:id="@+id/action_navigation_komunitas_to_artikelFragment"
+            app:destination="@id/artikelFragment" />
     </fragment>
     <fragment
         android:id="@+id/navigation_profil"
@@ -58,5 +61,62 @@
         android:name="com.gdsc.bingo.ui.profil.detail.ProfilDetailFragment"
         android:label="fragment_profil_detail"
         tools:layout="@layout/fragment_profil_detail" />
+    <fragment
+        android:id="@+id/artikelFragment"
+        android:name="com.gdsc.bingo.ui.artikel.ArtikelFragment"
+        android:label="fragment_artikel"
+        tools:layout="@layout/fragment_artikel" >
+        <argument
+            android:name="referenece_path_document_string"
+            app:argType="string" />
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="text"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="is_using_text_file"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="text_file_path_document_string"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="video_link"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="like_count"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="dislike_count"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="comment_count"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="thumbnail_photos_url"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="author_document_string"
+            app:argType="string" />
+        <argument
+            android:name="komentar_hub_document_string"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="create_at_seconds"
+            app:argType="long" />
+        <argument
+            android:name="likes_reference"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

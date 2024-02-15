@@ -14,9 +14,13 @@ import coil.transform.CircleCropTransformation
 import com.gdsc.bingo.R
 import com.gdsc.bingo.databinding.ComponentCardKomunitasBinding
 import com.gdsc.bingo.model.Forums
+import com.gdsc.bingo.model.Like
 import com.gdsc.bingo.model.User
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +35,7 @@ class ForumPostAdapter(
     var actionComment : (Forums) -> Unit = {},
     var actionLike : (Forums) -> Unit = {},
     var actionVerticalButton : (Forums) -> Unit = {},
-    var actionOpenDetail : (Forums) -> Unit = {}
+    var actionOpenDetail : (Forums) -> Unit = {},
 ) : ListAdapter<Forums, ForumPostAdapter.ForumPostViewHolder>(ForumsPostDiffUtil()) {
     class ForumsPostDiffUtil : DiffUtil.ItemCallback<Forums>() {
         override fun areItemsTheSame(oldItem: Forums, newItem: Forums): Boolean {
@@ -56,7 +60,7 @@ class ForumPostAdapter(
                 withContext(Dispatchers.Main) {
                     setupPostTimestamp(forums.createdAt!!)
                     setupPostTitle(forums.title!!)
-                    setupCommentAndLikeCount(forums.commentCount, forums.likeCount)
+                    setupCommentAndLikeCount(forums.commentCount, forums.dislikeCount, forums.likeCount)
                     setupCommentButton(forums)
                     setupLikeButton(forums)
                     setupVerticalButton(forums)
@@ -92,10 +96,105 @@ class ForumPostAdapter(
         }
 
         private fun setupLikeButton(forums: Forums) {
-            binding.componentCardKomunitasButtonLike.setOnClickListener {
-                actionLike(forums)
-                forums.logClickAction("setupLikeButton")
+            val auth = FirebaseAuth.getInstance()
+
+            if (auth.uid == null) {
+                Log.e("ForumPostAdapter", "User is not logged in")
+                binding.componentCardKomunitasButtonLike.visibility = View.GONE
+                return
+            } else {
+                binding.componentCardKomunitasButtonLike.visibility = View.VISIBLE
             }
+
+            var initialState = true
+            val fireStore = FirebaseFirestore.getInstance()
+
+            forums.likesReference!!.collection(Like().table)
+                .document(auth.uid!!)
+                .get()
+                .addOnSuccessListener { documentReference ->
+                    if (documentReference.exists()) {
+                        likeUI()
+                        initialState = true
+                        return@addOnSuccessListener
+                    } else {
+                        unlikeUI()
+                        initialState = false
+                    }
+                }
+
+            val forumRef = forums.referencePath!!
+            val likeCount = forums.likeCount
+            val dislikeCount = forums.dislikeCount
+            val user = fireStore.collection(User().table).document(auth.uid!!)
+            val author = forums.author!!
+
+            if (user.path != author.path) {
+                binding.componentCardKomunitasButtonLike.setOnCheckedChangeListener { _, isChecked ->
+
+                    val like = Like(
+                        referencePath = forumRef,
+                        owner = user,
+                        objectPerson = author,
+                        createAt = Timestamp.now()
+                    )
+
+
+                    forums.likesReference!!
+                        .collection(like.table)
+                        .document(user.id)
+                        .get(Source.SERVER)
+                        .addOnSuccessListener { documentReference ->
+                            if (isChecked) {
+                                documentReference.reference.set(like.toFirebaseModel())
+                                    .addOnSuccessListener {
+
+                                        val newLike = if (initialState) likeCount else likeCount + 1
+
+                                        forumRef.update("like_count", newLike)
+                                        setupCommentAndLikeCount(
+                                            likeCount = newLike,
+                                            dislikeCount = forums.dislikeCount,
+                                            commentCount = forums.commentCount
+                                        )
+                                    }
+                                return@addOnSuccessListener
+                            } else {
+                                documentReference.reference.delete()
+                                    .addOnSuccessListener {
+
+                                        val newLike = if (initialState) likeCount - 1 else likeCount
+
+                                        forumRef.update("like_count", newLike)
+                                        setupCommentAndLikeCount(
+                                            likeCount = newLike,
+                                            dislikeCount = forums.dislikeCount,
+                                            commentCount = forums.commentCount
+                                        )
+                                    }
+                            }
+
+
+                        }
+
+                }
+            } else {
+                binding.componentCardKomunitasButtonLike.setOnCheckedChangeListener { _, isChecked ->
+                    if (isChecked) {
+                        binding.componentCardKomunitasButtonLike.isChecked = false
+                    }
+                }
+            }
+
+
+        }
+
+        private fun unlikeUI() {
+            binding.componentCardKomunitasButtonLike.isChecked = false
+        }
+
+        private fun likeUI() {
+            binding.componentCardKomunitasButtonLike.isChecked = true
         }
 
         private fun setupCommentButton(forums: Forums) {
@@ -105,7 +204,7 @@ class ForumPostAdapter(
             }
         }
 
-        private fun setupCommentAndLikeCount(commentCount: Long, likeCount: Long) {
+        private fun setupCommentAndLikeCount(commentCount: Long, dislikeCount: Long ,likeCount: Long) {
             val komen = context.resources.getString(R.string.komentar)
             val suka = context.resources.getString(R.string.suka)
             val text = "$commentCount $komen, $likeCount $suka"
@@ -154,7 +253,7 @@ class ForumPostAdapter(
             CoroutineScope(Dispatchers.Main).launch {
                 val user = withContext(Dispatchers.IO) {
                     val snapshot = authorReference.get().await()
-                    snapshot.toObject(User::class.java)
+                    User().toModel(snapshot)
                 }
 
                 if (user != null) {
@@ -174,6 +273,8 @@ class ForumPostAdapter(
                 }
                 return
             }
+
+            Log.i("ForumPostAdapter", "Profile picture path : $profilePicturePath")
 
             storage.getReference(profilePicturePath).downloadUrl.addOnSuccessListener {
                 Log.i("ForumPostAdapter", "Profile picture loaded : $it")

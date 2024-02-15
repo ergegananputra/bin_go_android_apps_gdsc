@@ -66,7 +66,8 @@ class ProfilFragment : Fragment() {
             return
         }
 
-        val profilePictureStorageRef = storage.reference.child("profile_pictures/${appPreferences.userId}")
+        val profilePictureStorageRef = storage.reference
+            .child("profile_pictures/${appPreferences.userId}")
         val userProfilRef = profilePictureStorageRef.child(file.lastPathSegment!!)
 
         val uploadTask = userProfilRef.putFile(file)
@@ -74,7 +75,7 @@ class ProfilFragment : Fragment() {
         uploadTask.addOnSuccessListener {
             Log.d("ProfilFragment", "Upload picture success")
             firestore.collection(User().table).document(appPreferences.userId)
-                .update("profilePicturePath", userProfilRef.path)
+                .update(User.Keys.profilePicturePath, userProfilRef.path)
                 .addOnSuccessListener {
                     Snackbar.make(
                         binding.root,
@@ -181,41 +182,37 @@ class ProfilFragment : Fragment() {
         firestore.collection(User().table).document(appPreferences.userId).get(source)
             .addOnSuccessListener {
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val user = it.toObject(User::class.java)
-                    if (user != null) {
-                        val profilePicturePath = user.profilePicturePath
-                        if (profilePicturePath.isNullOrEmpty().not()) {
-                            val pictureRef = storage.reference.child(profilePicturePath!!)
-                            val localFile = File(requireContext().cacheDir, "user_personal_profile_picture.jpg")
+                    val user = User().toModel(it)
+                    val profilePicturePath = user.profilePicturePath
+                    if (profilePicturePath.isNullOrEmpty().not()) {
+                        val pictureRef = storage.reference.child(profilePicturePath!!)
+                        val localFile = File(requireContext().cacheDir, "user_personal_profile_picture.jpg")
 
-                            if (localFile.exists().not() || forceUpdate) {
-                                pictureRef.getFile(localFile).addOnSuccessListener {
-                                    Log.d("ProfilFragment", "Picture loaded : $localFile")
-                                    binding.profilCardProfilImage.load(localFile) {
-                                        crossfade(true)
-                                        transformations(CircleCropTransformation())
-                                        placeholder(R.drawable.nav_ic_profil)
-                                        error(R.drawable.nav_ic_profil)
-                                    }
-
-                                }.addOnFailureListener {
-                                    Log.e("ProfilFragment", "Error when loading picture", it)
-                                }
-                            } else {
+                        if (localFile.exists().not() || forceUpdate) {
+                            pictureRef.getFile(localFile).addOnSuccessListener {
+                                Log.d("ProfilFragment", "Picture loaded : $localFile")
                                 binding.profilCardProfilImage.load(localFile) {
                                     crossfade(true)
                                     transformations(CircleCropTransformation())
                                     placeholder(R.drawable.nav_ic_profil)
                                     error(R.drawable.nav_ic_profil)
                                 }
+
+                            }.addOnFailureListener {
+                                Log.e("ProfilFragment", "Error when loading picture", it)
                             }
-
-
-
-
+                        } else {
+                            binding.profilCardProfilImage.load(localFile) {
+                                crossfade(true)
+                                transformations(CircleCropTransformation())
+                                placeholder(R.drawable.nav_ic_profil)
+                                error(R.drawable.nav_ic_profil)
+                            }
                         }
-                    } else {
-                        Log.e("ProfilFragment", "User not found")
+
+
+
+
                     }
 
                 }

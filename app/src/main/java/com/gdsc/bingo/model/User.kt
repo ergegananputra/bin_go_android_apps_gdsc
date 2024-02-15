@@ -14,7 +14,7 @@ data class User(
     override val table : String
         get() = "user"
 
-    private object Keys {
+    object Keys {
         const val username = "username"
         const val score = "score"
         const val profilePicturePath = "profile_picture_path"

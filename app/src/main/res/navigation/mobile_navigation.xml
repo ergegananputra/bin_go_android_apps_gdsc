@@ -114,6 +114,9 @@
         <argument
             android:name="create_at_seconds"
             app:argType="long" />
+        <argument
+            android:name="likes_reference"
+            app:argType="string" />
     </fragment>
 
 </navigation>

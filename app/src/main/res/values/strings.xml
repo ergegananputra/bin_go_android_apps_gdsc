@@ -35,4 +35,6 @@
     <string name="error_upload_file">Gagal mengupload file</string>
     <string name="komentar">komentar</string>
     <string name="suka">menyukai</string>
+    <string name="you_cant_like_your_own_post">Anda tidak dapat menyukai postingan Anda sendiri</string>
+    <string name="tulis_komentar">Tulis komentar...</string>
 </resources>

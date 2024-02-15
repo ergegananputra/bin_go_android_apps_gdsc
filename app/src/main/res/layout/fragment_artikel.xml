@@ -211,32 +211,20 @@
 
             </com.facebook.shimmer.ShimmerFrameLayout>
 
-            <com.google.android.material.button.MaterialButton
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:button="@drawable/button_favorite"
+                android:checked="true"
                 android:id="@+id/artikel_button_like"
-                style="@style/Widget.Material3.Button.IconButton"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_marginTop="32dp"
                 android:layout_marginEnd="16dp"
-                app:icon="@drawable/ic_favorite_border_24"
                 app:iconGravity="textStart"
                 app:iconSize="24dp"
                 app:iconTint="?attr/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/artikel_text_view_content" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/artikel_button_comment"
-                style="@style/Widget.Material3.Button.IconButton"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginEnd="4dp"
-                app:icon="@drawable/ic_chat_bubble_outline_24"
-                app:iconGravity="textStart"
-                app:iconSize="24dp"
-                app:iconTint="?attr/colorSecondary"
-                app:layout_constraintEnd_toStartOf="@+id/artikel_button_like"
-                app:layout_constraintTop_toTopOf="@+id/artikel_button_like" />
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/artikel_text_view_like_and_comment_count"
@@ -248,11 +236,11 @@
                 android:maxLines="1"
                 android:textAppearance="?attr/textAppearanceLabelLarge"
                 android:textColor="?attr/colorOnTertiaryContainer"
-                app:layout_constraintBottom_toBottomOf="@+id/artikel_button_comment"
-                app:layout_constraintEnd_toStartOf="@+id/artikel_button_comment"
+                app:layout_constraintBottom_toBottomOf="@+id/artikel_button_like"
+                app:layout_constraintEnd_toStartOf="@+id/artikel_button_like"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/artikel_button_comment" />
+                app:layout_constraintTop_toTopOf="@+id/artikel_button_like" />
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/artikel_shimmer_like_and_comment_count"
@@ -279,16 +267,41 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/artikel_button_like" />
 
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/artikel_text_input_layout_komentar"
+                style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
+                app:endIconMode="custom"
+                app:endIconDrawable="@drawable/ic_send_fill_24"
+                app:endIconTint="?attr/colorSecondary"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                app:hintEnabled="false"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/artikel_divider_to_comment_section">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/tulis_komentar"
+                    />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/artikel_recycler_view_comment_section"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintHeight_min="0dp"
-                app:layout_constraintHeight_max="800dp"
+                android:layout_marginTop="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/artikel_divider_to_comment_section"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_max="800dp"
+                app:layout_constraintHeight_min="0dp"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/artikel_text_input_layout_komentar"
                 tools:listitem="@layout/component_comment" />
 
 

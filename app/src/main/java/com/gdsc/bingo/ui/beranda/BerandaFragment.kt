@@ -102,10 +102,25 @@ class BerandaFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         (activity as MainActivity).setBottomNavigationVisibility(this)
 
+        setupGreetings()
         setupBinPoints()
         setupKomunitasBinGo()
         setupBerandaPinPoint()
         refreshRecyclerMostLikeData()
+    }
+
+    private fun setupGreetings() {
+        val preferences = AppPreferences(requireContext())
+        val name = preferences.userName.let {
+            if (it.isBlank()) {
+                null
+            } else {
+                "$it!"
+            }
+        } ?: return
+        val prefixGreet = getString(R.string.beranda_prefix_greeting)
+        val text = "$prefixGreet\n$name"
+        binding.berandaTextViewGreeting.text = text
     }
 
     private fun refreshRecyclerMostLikeData() {

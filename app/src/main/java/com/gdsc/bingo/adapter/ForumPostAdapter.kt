@@ -235,11 +235,13 @@ class ForumPostAdapter(
                 binding.componentCardKomunitasImageViewPost.visibility = if (thumbnailPhotosUrl == null) View.GONE else View.VISIBLE
                 if (thumbnailPhotosUrl == null) return@launch
 
-                val thumbnail = withContext(Dispatchers.IO) {
-                    storage.getReference(thumbnailPhotosUrl).downloadUrl.await()
+
+                storage.getReference(thumbnailPhotosUrl).downloadUrl.addOnSuccessListener { thumbnail ->
+                    binding.componentCardKomunitasImageViewPost.load(thumbnail)
+                }.addOnFailureListener {
+                    Log.e("ForumPostAdapter", "Error loading thumbnail", it)
                 }
 
-                binding.componentCardKomunitasImageViewPost.load(thumbnail)
             }
 
 

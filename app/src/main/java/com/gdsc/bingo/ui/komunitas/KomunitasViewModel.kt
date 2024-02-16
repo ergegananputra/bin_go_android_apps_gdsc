@@ -7,6 +7,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.gdsc.bingo.model.FireModel
 import com.gdsc.bingo.model.Forums
+import com.gdsc.bingo.model.User
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -46,6 +47,39 @@ class KomunitasViewModel : ViewModel() {
         }
     }
 
+    fun loadMostLiketData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val query = firestore.collection(tempObj.table)
+                .orderBy(Forums.Keys.likeCount, Query.Direction.DESCENDING)
+                .limit(1)
+            query.get()
+                .addOnSuccessListener { result ->
+                    val forums = tempObj.toModels(result)
+                    _forum.value = forums
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("KomunitasViewModel", "Error getting documents: ", exception)
+                }
+        }
+    }
+
+    fun loadLatestUserPost(uid: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val path = "${User().table}/$uid"
+            val query = firestore.collection(tempObj.table)
+                .whereEqualTo(Forums.Keys.author, firestore.document(path))
+                .orderBy(FireModel.Keys.createdAt, Query.Direction.DESCENDING)
+                .limit(1)
+            query.get()
+                .addOnSuccessListener { result ->
+                    val forums = tempObj.toModels(result)
+                    _forum.value = forums
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("KomunitasViewModel", "Error getting documents: ", exception)
+                }
+        }
+    }
 
     fun refreshRecyclerData(forceUpdate : Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {

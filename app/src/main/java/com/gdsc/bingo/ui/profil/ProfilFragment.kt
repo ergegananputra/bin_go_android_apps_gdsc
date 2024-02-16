@@ -12,15 +12,20 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import coil.transform.CircleCropTransformation
 import com.gdsc.bingo.MainActivity
 import com.gdsc.bingo.R
+import com.gdsc.bingo.adapter.ForumPostAdapter
 import com.gdsc.bingo.databinding.FragmentProfilBinding
+import com.gdsc.bingo.model.Forums
 import com.gdsc.bingo.model.User
 import com.gdsc.bingo.services.preferences.AppPreferences
+import com.gdsc.bingo.ui.komunitas.KomunitasViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -38,12 +43,63 @@ class ProfilFragment : Fragment() {
     private lateinit var storage: FirebaseStorage
     private lateinit var firestore: FirebaseFirestore
 
+    private lateinit var komunitasViewModel: KomunitasViewModel
+
     private val appPreferences by lazy {
         AppPreferences(requireContext())
     }
 
     private val binding by lazy {
         FragmentProfilBinding.inflate(layoutInflater)
+    }
+
+    private val forumPostAdapter by lazy {
+        ForumPostAdapter(
+            context = requireActivity(),
+            storage = storage,
+            actionComment = { forum -> actionComment(forum) },
+            actionLike = { forum -> actionLike(forum) },
+            actionVerticalButton = { forum -> actionVerticalButton(forum) },
+            actionOpenDetail = { forum -> actionOpenDetail(forum) }
+        )
+    }
+
+    private fun actionOpenDetail(forum: Forums) {
+        val destination = with(forum){
+            ProfilFragmentDirections
+                .actionNavigationProfilToArtikelFragment(
+                    referenecePathDocumentString = referencePath?.path!!,
+                    title = title!!,
+                    text = text,
+                    isUsingTextFile = isUsingTextFile,
+                    textFilePathDocumentString = textFilePath,
+                    videoLink = videoLink,
+                    likeCount = likeCount,
+                    dislikeCount = dislikeCount,
+                    likesReference = likesReference?.path!!,
+                    commentCount = commentCount,
+                    thumbnailPhotosUrl = thumbnailPhotosUrl,
+                    authorDocumentString = author?.path!!,
+                    komentarHubDocumentString = komentarHub?.path,
+                    createAtSeconds = createdAt?.toDate()?.time ?: 0
+                )
+        }
+        findNavController().navigate(destination)
+    }
+
+    private fun actionVerticalButton(forum: Forums) {
+        // TODO : navigate to detail forum
+        Toast.makeText(requireContext(), "Vertical button on ${forum.title}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun actionLike(forum: Forums) {
+        // TODO : like forum
+        Toast.makeText(requireContext(), "Like on ${forum.title}", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun actionComment(forum: Forums) {
+        // TODO : navigate to komentar fragment
+        Toast.makeText(requireContext(), "Comment on ${forum.title}", Toast.LENGTH_SHORT).show()
     }
 
 
@@ -97,11 +153,25 @@ class ProfilFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         (activity as MainActivity).setBottomNavigationVisibility(this)
+        komunitasViewModel = ViewModelProvider(this)[KomunitasViewModel::class.java]
         preLoad()
         auth = FirebaseAuth.getInstance()
         storage = FirebaseStorage.getInstance()
         firestore = FirebaseFirestore.getInstance()
+        setupRecyclerLatestUserPost()
+        loadOrRefreshPicture(true)
         return binding.root
+    }
+
+    private fun setupRecyclerLatestUserPost() {
+        binding.profilRecyclerUserLatestPost.apply {
+            adapter = forumPostAdapter
+            layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
+        }
+
+        komunitasViewModel.forum.observe(viewLifecycleOwner) {
+            forumPostAdapter.submitList(it)
+        }
     }
 
     /**
@@ -147,6 +217,16 @@ class ProfilFragment : Fragment() {
         setupCardProfil()
         setupCardProfilPicture()
         setupBinPoints()
+        refreshRecyclerUserLatestPost()
+    }
+
+    private fun refreshRecyclerUserLatestPost() {
+        if (appPreferences.userId.isEmpty()) {
+            binding.profilRecyclerUserLatestPost.visibility = View.GONE
+            return
+        }
+
+        komunitasViewModel.loadLatestUserPost(appPreferences.userId)
     }
 
     private fun setupBinPoints() {

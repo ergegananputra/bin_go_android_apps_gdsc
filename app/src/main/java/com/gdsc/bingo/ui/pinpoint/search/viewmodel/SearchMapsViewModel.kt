@@ -20,16 +20,18 @@ class SearchMapsViewModel : ViewModel(){
     fun setMarkerLocation(strLocation: String) {
         val apiService: ApiInterface = ApiService.getMaps()
 
+        val combinedResults = ArrayList<ModelResults>()
+
         // Mencari TPA
         val callTPA = apiService.getDataResult(strApiKey, "TPA", strLocation, "distance")
         callTPA.enqueue(object : Callback<ModelResultsNearby> {
-            override fun onResponse(
-                call: Call<ModelResultsNearby>,
-                response: Response<ModelResultsNearby>
-            ) {
+            override fun onResponse(call: Call<ModelResultsNearby>, response: Response<ModelResultsNearby>) {
                 if (response.isSuccessful && response.body() != null) {
-                    val items = ArrayList(response.body()!!.modelResults)
-                    modelResultsMutableLiveData.postValue(items)
+                    combinedResults.addAll(response.body()!!.modelResults)
+                    // Jika kedua panggilan telah selesai, maka kita bisa mem-post data ke modelResultsMutableLiveData
+                    if (combinedResults.size >= 2) {
+                        modelResultsMutableLiveData.postValue(combinedResults)
+                    }
                 } else {
                     Log.e("responseTPA", response.toString())
                 }
@@ -43,13 +45,13 @@ class SearchMapsViewModel : ViewModel(){
         // Mencari TPS
         val callTPS = apiService.getDataResult(strApiKey, "TPS", strLocation, "distance")
         callTPS.enqueue(object : Callback<ModelResultsNearby> {
-            override fun onResponse(
-                call: Call<ModelResultsNearby>,
-                response: Response<ModelResultsNearby>
-            ) {
+            override fun onResponse(call: Call<ModelResultsNearby>, response: Response<ModelResultsNearby>) {
                 if (response.isSuccessful && response.body() != null) {
-                    val items = ArrayList(response.body()!!.modelResults)
-                    modelResultsMutableLiveData.postValue(items)
+                    combinedResults.addAll(response.body()!!.modelResults)
+                    // Jika kedua panggilan telah selesai, maka kita bisa mem-post data ke modelResultsMutableLiveData
+                    if (combinedResults.size >= 2) {
+                        modelResultsMutableLiveData.postValue(combinedResults)
+                    }
                 } else {
                     Log.e("responseTPS", response.toString())
                 }

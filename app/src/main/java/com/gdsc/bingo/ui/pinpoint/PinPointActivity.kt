@@ -1,11 +1,12 @@
 package com.gdsc.bingo.ui.pinpoint
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.gdsc.bingo.R
 import com.gdsc.bingo.databinding.ActivityPinPointBinding
+import com.gdsc.bingo.ui.CustomSystemTweak
 
 class PinPointActivity : AppCompatActivity() {
 
@@ -16,6 +17,10 @@ class PinPointActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        CustomSystemTweak(this)
+            .statusBarTweak()
+            .customNavigationBarColorSet(com.google.android.material.R.attr.colorSurfaceContainer)
 
         setupNavController()
         setupBackButton()

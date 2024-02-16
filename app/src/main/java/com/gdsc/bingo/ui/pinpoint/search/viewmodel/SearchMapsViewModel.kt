@@ -13,14 +13,17 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.util.*
-class SearchMapsViewModel : ViewModel(){
-    val modelResultsMutableLiveData = MutableLiveData<ArrayList<ModelResults>>()
-    private var strApiKey = MAPS_API_KEY
+class SearchMapsViewModel : ViewModel() {
+    private val modelResultsMutableLiveData = MutableLiveData<ArrayList<ModelResults>>()
+    private val strApiKey = MAPS_API_KEY
 
     fun setMarkerLocation(strLocation: String) {
         val apiService: ApiInterface = ApiService.getMaps()
 
         val combinedResults = ArrayList<ModelResults>()
+
+        // Hitung jumlah panggilan API yang telah selesai
+        var completedCalls = 0
 
         // Mencari TPA
         val callTPA = apiService.getDataResult(strApiKey, "TPA", strLocation, "distance")
@@ -28,8 +31,10 @@ class SearchMapsViewModel : ViewModel(){
             override fun onResponse(call: Call<ModelResultsNearby>, response: Response<ModelResultsNearby>) {
                 if (response.isSuccessful && response.body() != null) {
                     combinedResults.addAll(response.body()!!.modelResults)
+                    completedCalls++
+
                     // Jika kedua panggilan telah selesai, maka kita bisa mem-post data ke modelResultsMutableLiveData
-                    if (combinedResults.size >= 2) {
+                    if (completedCalls == 2) {
                         modelResultsMutableLiveData.postValue(combinedResults)
                     }
                 } else {
@@ -48,8 +53,10 @@ class SearchMapsViewModel : ViewModel(){
             override fun onResponse(call: Call<ModelResultsNearby>, response: Response<ModelResultsNearby>) {
                 if (response.isSuccessful && response.body() != null) {
                     combinedResults.addAll(response.body()!!.modelResults)
+                    completedCalls++
+
                     // Jika kedua panggilan telah selesai, maka kita bisa mem-post data ke modelResultsMutableLiveData
-                    if (combinedResults.size >= 2) {
+                    if (completedCalls == 2) {
                         modelResultsMutableLiveData.postValue(combinedResults)
                     }
                 } else {
@@ -64,5 +71,4 @@ class SearchMapsViewModel : ViewModel(){
     }
 
     fun getMarkerLocation(): LiveData<ArrayList<ModelResults>> = modelResultsMutableLiveData
-
 }

@@ -7,6 +7,8 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,6 +51,9 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
 
     private val markerList = mutableListOf<Marker>()
 
+    // Properti untuk menyimpan hasil pencarian
+    private var modelResultsArrayList = ArrayList<ModelResults>()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -71,6 +76,32 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         mapFragment?.getMapAsync(this)
 
         getLastLocation()
+
+        // Dapatkan referensi ke TextInputEditText di dalam TextInputLayout
+        val searchTextInputEditText = binding.searchMapsTextInputLayoutSearch.editText
+
+        // Tambahkan TextWatcher
+        searchTextInputEditText?.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Tidak ada aksi yang diperlukan sebelum teks berubah
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Ketika teks berubah, Anda dapat memicu pencarian disini
+                val searchText = s.toString()
+                if (searchText.isNotEmpty()) {
+                    performSearch(searchText)
+                } else {
+                    // Jika teks pencarian kosong, tampilkan semua marker
+                    getMarker(modelResultsArrayList)
+                }
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+                // Tidak ada aksi yang diperlukan setelah teks berubah
+            }
+        })
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -193,6 +224,8 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         ViewModelMaps.setMarkerLocation(strCurrentLocation)
         ViewModelMaps.getMarkerLocation().observe(this) { modelResults: ArrayList<ModelResults> ->
             if (modelResults.isNotEmpty()) {
+                modelResultsArrayList.clear()
+                modelResultsArrayList.addAll(modelResults)
                 getMarker(modelResults)
             } else {
                 requestLocationPermission()
@@ -236,6 +269,45 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             marker?.let { markerList.add(it) }
         }
 }
+
+    private fun performSearch(searchText: String) {
+        // Filter modelResultsArrayList berdasarkan teks pencarian
+        val filteredResults = modelResultsArrayList.filter { it.name.contains(searchText, ignoreCase = true) }
+
+        // Jika ditemukan hasil pencarian yang sesuai
+        if (filteredResults.isNotEmpty()) {
+            // Ambil lokasi dari hasil pencarian pertama
+            val firstResult = filteredResults[0]
+            val latLng = LatLng(firstResult.modelGeometry.modelLocation.lat, firstResult.modelGeometry.modelLocation.lng)
+
+            // Atur kamera untuk melakukan zoom ke lokasi hasil pencarian pertama
+            googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
+        }
+
+        // Hapus semua marker yang ada sebelum menambahkan yang baru
+        googleMap?.clear()
+
+        // Tambahkan marker untuk hasil pencarian yang sesuai
+        for (result in filteredResults) {
+            val latLngMarker = LatLng(result.modelGeometry.modelLocation.lat, result.modelGeometry.modelLocation.lng)
+
+            val info = ModelResults()
+            info.name = result.name
+            info.placeId = result.placeId
+            info.vicinity = result.vicinity
+
+            val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
+            googleMap?.setInfoWindowAdapter(customInfoWindow)
+
+            val markerOptions = MarkerOptions()
+                .position(latLngMarker)
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+
+            val marker = googleMap?.addMarker(markerOptions)
+            marker?.tag = info
+            marker?.showInfoWindow()
+        }
+    }
 
     companion object {
         private const val DEFAULT_ZOOM = 15f

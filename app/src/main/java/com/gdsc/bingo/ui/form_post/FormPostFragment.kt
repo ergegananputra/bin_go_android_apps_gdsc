@@ -50,6 +50,7 @@ class FormPostFragment : Fragment() {
     }
 
     private val imagePostAdapter = ImagePostAdapter(
+        storage = FirebaseStorage.getInstance(),
         useDeleteButton = true,
         onDeleteItem = { position ->
             onDeleteImage(position)

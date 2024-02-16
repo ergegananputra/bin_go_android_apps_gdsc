@@ -1,5 +1,6 @@
 package com.gdsc.bingo.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,9 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.gdsc.bingo.databinding.ComponentPostImageBinding
 import com.gdsc.bingo.model.PostImage
+import com.google.firebase.storage.FirebaseStorage
 
 class ImagePostAdapter (
     private val isOnline : Boolean = false,
+    private val storage : FirebaseStorage,
     private val useDeleteButton : Boolean = false,
     private var onDeleteItem : (Int) -> Unit = {}
 ) : ListAdapter<PostImage, ImagePostAdapter.ImagePostViewHolder>(ImagePostDiffUtil()) {
@@ -42,7 +45,17 @@ class ImagePostAdapter (
         }
 
         private fun loadOnlineImage(image: PostImage) {
-            // TODO: Load image from Firebase Storage
+            try {
+                Log.i("ImagePostAdapter", "Loading image ${image.path}")
+                val imageRef = storage.getReference(image.path!!)
+
+                imageRef.downloadUrl.addOnSuccessListener { uri ->
+                    binding.componentPostImageView.load(uri)
+                }
+            } catch (e: Exception) {
+                Log.e("ImagePostAdapter", "Error loading image", e)
+            }
+
         }
     }
 

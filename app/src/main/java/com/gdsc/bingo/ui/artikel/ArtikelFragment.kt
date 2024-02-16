@@ -16,12 +16,14 @@ import coil.transform.CircleCropTransformation
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.gdsc.bingo.MainActivity
 import com.gdsc.bingo.R
+import com.gdsc.bingo.adapter.ImagePostAdapter
 import com.gdsc.bingo.adapter.KomentarAdapter
 import com.gdsc.bingo.databinding.FragmentArtikelBinding
 import com.gdsc.bingo.model.FireModel
 import com.gdsc.bingo.model.Forums.Keys.commentCount
 import com.gdsc.bingo.model.Komentar
 import com.gdsc.bingo.model.Like
+import com.gdsc.bingo.model.PostImage
 import com.gdsc.bingo.model.User
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Timestamp
@@ -52,6 +54,10 @@ class ArtikelFragment : Fragment() {
         storage = FirebaseStorage.getInstance()
     )
 
+    private val imagePostAdapter = ImagePostAdapter(
+        storage = FirebaseStorage.getInstance(),
+        isOnline = true
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,10 +66,18 @@ class ArtikelFragment : Fragment() {
         // Inflate the layout for this fragment
         setupShimmer()
         setupRecyclerViewComment()
+        setupRecyclerPostImage()
         fireStore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
         storage = FirebaseStorage.getInstance()
         return binding.root
+    }
+
+    private fun setupRecyclerPostImage() {
+        binding.artikelImageViewContent.apply {
+            adapter = imagePostAdapter
+            layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
+        }
     }
 
     private fun setupShimmer() {
@@ -96,7 +110,7 @@ class ArtikelFragment : Fragment() {
             this.launch { setupTitle() }
             this.launch { setupProfile() }
             this.launch{ setupTimestamp(navArgs.createAtSeconds) }
-            this.launch(Dispatchers.IO) { setupImagesContent(navArgs.thumbnailPhotosUrl) }
+            this.launch(Dispatchers.IO) { setupImagesContent(navArgs.referenecePathDocumentString) }
             this.launch { setupTextContent(navArgs.text, navArgs.isUsingTextFile, navArgs.textFilePathDocumentString) }
             this.launch { setupLikeAndCommentCount(navArgs.likeCount, navArgs.dislikeCount, navArgs.commentCount) }
             this.launch(Dispatchers.IO) { setupVideoContent(navArgs.videoLink) }
@@ -327,16 +341,20 @@ class ArtikelFragment : Fragment() {
             }
     }
 
-    private suspend fun setupImagesContent(thumbnailPhotosUrl: String?) {
+    private suspend fun setupImagesContent(documentReferenceString: String?) {
         withContext(Dispatchers.Main) {
-            if (thumbnailPhotosUrl.isNullOrEmpty()) {
-                binding.artikelImageViewContent.visibility = View.GONE
-                binding.artikelShimmerImageContent.stop()
-                return@withContext
-            }
+            fireStore.document(documentReferenceString!!).collection(PostImage().table).get(Source.SERVER)
+                .addOnSuccessListener { documentSnapshot ->
+                    val imagePost = PostImage().toModels(documentSnapshot)
+                    imagePostAdapter.submitList(imagePost)
+                    binding.artikelShimmerImageContent.stop()
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("ArtikelFragment", "Error getting image content", exception)
+                    binding.artikelImageViewContent.visibility = View.GONE
+                    binding.artikelShimmerImageContent.stop()
+                }
 
-            // TODO: Load image content
-            Toast.makeText(requireContext(), "ThumbnailPhotosUrl: $thumbnailPhotosUrl", Toast.LENGTH_SHORT).show()
         }
     }
 

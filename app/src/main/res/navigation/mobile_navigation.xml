@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_navigation_beranda_to_pinPointActivity"
             app:destination="@id/pinPointActivity" />
+        <action
+            android:id="@+id/action_navigation_beranda_to_artikelFragment"
+            app:destination="@id/artikelFragment" />
     </fragment>
     <fragment
         android:id="@+id/navigation_komunitas"
@@ -40,6 +43,9 @@
         <action
             android:id="@+id/action_navigation_profil_to_navigation_profil_detail"
             app:destination="@id/navigation_profil_detail" />
+        <action
+            android:id="@+id/action_navigation_profil_to_artikelFragment"
+            app:destination="@id/artikelFragment" />
     </fragment>
     <fragment
         android:id="@+id/pointsHistoryFragment"

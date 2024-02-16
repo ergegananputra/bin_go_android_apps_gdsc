@@ -77,24 +77,33 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/form_post_text_view_no_image_uploaded"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tidak_ada_gambar_yang_terunggah"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:layout_gravity="center"
+                android:layout_margin="32dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/form_post_image_container"
+                android:visibility="gone"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                tools:itemCount="1"
+                tools:listitem="@layout/component_post_image"/>
 
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/form_post_image_view"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:scaleType="centerCrop"
-                    app:layout_constraintDimensionRatio="1.4"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:src="@tools:sample/backgrounds/scenic" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/form_post_button_unggah_gambar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/unggah_gambar"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center"
+                style="@style/Widget.Material3.Button"
+                app:icon="@drawable/ic_file_upload_baseline_24"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/form_post_text_input_layout_title"

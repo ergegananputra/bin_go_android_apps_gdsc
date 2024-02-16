@@ -37,4 +37,6 @@
     <string name="suka">menyukai</string>
     <string name="you_cant_like_your_own_post">Anda tidak dapat menyukai postingan Anda sendiri</string>
     <string name="tulis_komentar">Tulis komentar...</string>
+    <string name="unggah_gambar">Unggah Gambar</string>
+    <string name="tidak_ada_gambar_yang_terunggah">Tidak ada gambar yang terunggah</string>
 </resources>

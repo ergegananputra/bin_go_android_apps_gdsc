@@ -253,7 +253,7 @@ class FormPostFragment : Fragment() {
                     if (imagePostAdapter.currentList.isNotEmpty()) {
 
                         val imageRef = forumPostRef.collection(PostImage().table)
-                        imagePostAdapter.currentList.forEach { image ->
+                        imagePostAdapter.currentList.forEachIndexed { index, image ->
                             val photosRef = storage.reference
                                 .child("public/${forums.table}/${forumPostRef.id}/${image.table}/${image.filename}_${image.createAt?.seconds}")
 
@@ -276,6 +276,21 @@ class FormPostFragment : Fragment() {
                                             onSuccessReference.update(FireModel.Keys.referencePath, onSuccessReference)
                                                 .addOnSuccessListener {
                                                     Log.i("FormPostFragment", "uploadForums: Image uploaded")
+
+                                                    if (index == 0) {
+                                                        addUploadToken()
+
+                                                        forumPostRef.update(Forums.Keys.thumbnailPhotosUrl, image.path)
+                                                            .addOnSuccessListener {
+                                                                Log.i("FormPostFragment", "uploadForums: Thumbnail updated")
+                                                                removeUploadToken()
+                                                            }
+                                                            .addOnFailureListener {
+                                                                Log.e("FormPostFragment", "uploadForums: failed when update thumbnail \n ${it.message}")
+                                                                executeFailure()
+                                                            }
+                                                    }
+
                                                     removeUploadToken()
                                                 }
                                                 .addOnFailureListener {

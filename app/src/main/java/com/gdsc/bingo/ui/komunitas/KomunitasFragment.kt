@@ -169,12 +169,16 @@ class KomunitasFragment : Fragment() {
     }
 
     private fun setupCreateKomunitasExtendedFloatingActionButton() {
+        if (auth.currentUser == null) {
+            binding.komunitasExtendedFloatingActionButton.visibility = View.GONE
+        } else {
+            binding.komunitasExtendedFloatingActionButton.visibility = View.VISIBLE
+        }
+
         val destination = KomunitasFragmentDirections.actionNavigationKomunitasToFormPostFragment()
         binding.komunitasExtendedFloatingActionButton.setOnClickListener {
             findNavController().navigate(destination)
         }
-
-        // TODO : Expand and collapse extended floating action button based on scroll in recycler view
     }
 
 

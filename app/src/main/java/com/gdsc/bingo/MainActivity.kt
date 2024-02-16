@@ -7,7 +7,9 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.gdsc.bingo.databinding.ActivityMainBinding
+import com.gdsc.bingo.ui.CustomSystemTweak
 import com.gdsc.bingo.ui.artikel.ArtikelFragment
+import com.gdsc.bingo.ui.form_post.FormPostFragment
 import com.gdsc.bingo.ui.points_history.PointsHistoryFragment
 import com.gdsc.bingo.ui.profil.detail.ProfilDetailFragment
 
@@ -20,6 +22,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        CustomSystemTweak(this)
+            .statusBarTweak()
+            .customNavigationBarColorSet(com.google.android.material.R.attr.colorSurfaceContainer)
 
         setupBottomNavigation()
     }
@@ -37,6 +43,7 @@ class MainActivity : AppCompatActivity() {
             is PointsHistoryFragment -> bottomViewGone()
             is ProfilDetailFragment -> bottomViewGone()
             is ArtikelFragment -> bottomViewGone()
+            is FormPostFragment -> bottomViewGone()
             else -> bottomViewVisible()
         }
     }

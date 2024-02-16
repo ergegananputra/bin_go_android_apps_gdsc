@@ -14,7 +14,10 @@ import com.gdsc.bingo.R
 import com.gdsc.bingo.adapter.ForumPostAdapter
 import com.gdsc.bingo.databinding.FragmentBerandaBinding
 import com.gdsc.bingo.model.Forums
+import com.gdsc.bingo.model.User
+import com.gdsc.bingo.services.preferences.AppPreferences
 import com.gdsc.bingo.ui.komunitas.KomunitasViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 
 class BerandaFragment : Fragment() {
@@ -124,11 +127,32 @@ class BerandaFragment : Fragment() {
 
 
     private fun setupBinPoints() {
-        val destination = BerandaFragmentDirections.actionNavigationBerandaToPointsHistoryFragment()
+//        val destination = BerandaFragmentDirections.actionNavigationBerandaToPointsHistoryFragment()
+//
+//        binding.include.componentCardBinPoints.setOnClickListener {
+//            findNavController().navigate(destination)
+//        }
 
-        binding.include.componentCardBinPoints.setOnClickListener {
-            findNavController().navigate(destination)
+        val fireStore = FirebaseFirestore.getInstance()
+        val preferences = AppPreferences(requireContext())
+        val uid = preferences.userId.also {
+            if (it.isBlank()) {
+                binding.include.componentCardBinPointsTextViewPoints.text = ""
+                return
+            }
         }
+        val tempUser = User()
+        fireStore.collection(tempUser.table)
+            .document(uid)
+            .get()
+            .addOnSuccessListener {
+                val user = tempUser.toModel(it)
+                binding.include.componentCardBinPointsTextViewPoints.text = user.score.toString()
+                preferences.score = user.score.toInt()
+            }
+            .addOnFailureListener {
+                binding.include.componentCardBinPointsTextViewPoints.text = preferences.score.toString()
+            }
     }
 
 }

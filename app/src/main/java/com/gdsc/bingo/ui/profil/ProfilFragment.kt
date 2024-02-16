@@ -230,11 +230,32 @@ class ProfilFragment : Fragment() {
     }
 
     private fun setupBinPoints() {
-        val destination = ProfilFragmentDirections.actionNavigationProfilToPointsHistoryFragment()
+//        val destination = ProfilFragmentDirections.actionNavigationProfilToPointsHistoryFragment()
+//
+//        binding.profilIncludeBinPoints.componentCardBinPoints.setOnClickListener {
+//            findNavController().navigate(destination)
+//        }
 
-        binding.profilIncludeBinPoints.componentCardBinPoints.setOnClickListener {
-            findNavController().navigate(destination)
+        val fireStore = FirebaseFirestore.getInstance()
+        val preferences = AppPreferences(requireContext())
+        val uid = preferences.userId.also {
+            if (it.isBlank()) {
+                binding.profilIncludeBinPoints.componentCardBinPointsTextViewPoints.text = ""
+                return
+            }
         }
+        val tempUser = User()
+        fireStore.collection(tempUser.table)
+            .document(uid)
+            .get()
+            .addOnSuccessListener {
+                val user = tempUser.toModel(it)
+                binding.profilIncludeBinPoints.componentCardBinPointsTextViewPoints.text = user.score.toString()
+                preferences.score = user.score.toInt()
+            }
+            .addOnFailureListener {
+                binding.profilIncludeBinPoints.componentCardBinPointsTextViewPoints.text = preferences.score.toString()
+            }
     }
 
     private fun setupCardProfilPicture() {

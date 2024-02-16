@@ -25,9 +25,12 @@ import com.gdsc.bingo.model.Komentar
 import com.gdsc.bingo.model.Like
 import com.gdsc.bingo.model.PostImage
 import com.gdsc.bingo.model.User
+import com.gdsc.bingo.services.points.Points
+import com.gdsc.bingo.services.points.PointsRewardSystem
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Source
@@ -41,7 +44,7 @@ import java.time.ZoneId
 
 
 
-class ArtikelFragment : Fragment() {
+class ArtikelFragment : Fragment(), PointsRewardSystem {
     private val navArgs by navArgs<ArtikelFragmentArgs>()
 
     private lateinit var fireStore : FirebaseFirestore
@@ -156,6 +159,11 @@ class ArtikelFragment : Fragment() {
 
                     setupLikeAndCommentCount(navArgs.likeCount, navArgs.dislikeCount, newCommentCount)
 
+                    commentPointRewards(
+                        fireStore.collection(User().table).document(auth.uid!!),
+                        fireStore.document(navArgs.authorDocumentString)
+                    )
+
                     binding.artikelTextInputLayoutKomentar.apply {
                         editText?.text?.clear()
                         clearFocus()
@@ -242,9 +250,15 @@ class ArtikelFragment : Fragment() {
                         documentReference.reference.set(like.toFirebaseModel())
                             .addOnSuccessListener {
 
-                                val newLike = if (initialState) likeCount else likeCount + 1
+                                val newLike = if (initialState) likeCount else {
+                                    likePointRewards(user, author)
+                                    likeCount + 1
+                                }
 
                                 forumRef.update("like_count", newLike)
+
+
+
                                 setupLikeAndCommentCount(newLike, navArgs.dislikeCount, navArgs.commentCount)
                             }
                         return@addOnSuccessListener
@@ -252,9 +266,15 @@ class ArtikelFragment : Fragment() {
                         documentReference.reference.delete()
                             .addOnSuccessListener {
 
-                                val newLike = if (initialState) likeCount - 1 else likeCount
+                                val newLike = if (initialState) {
+                                    unlikePointRewards(user, author)
+                                    likeCount - 1
+                                } else likeCount
 
                                 forumRef.update("like_count", newLike)
+
+
+
                                 setupLikeAndCommentCount(newLike, navArgs.dislikeCount, navArgs.commentCount)
                             }
                     }
@@ -265,6 +285,55 @@ class ArtikelFragment : Fragment() {
         }
 
     }
+
+    override fun likePointRewards(user: DocumentReference, author: DocumentReference) {
+        author.get(Source.SERVER)
+            .addOnSuccessListener { userDocument ->
+                val newScore = userDocument.get(User.Keys.score) as Long + Points.RECEIVED_LIKE
+                userDocument.reference.update(User.Keys.score, newScore)
+            }
+
+        user.get(Source.SERVER)
+            .addOnSuccessListener { userDocument ->
+                val newScore = userDocument.get(User.Keys.score) as Long + Points.DO_LIKE
+                userDocument.reference.update(User.Keys.score, newScore)
+            }
+    }
+
+    override fun unlikePointRewards(user: DocumentReference, author: DocumentReference) {
+        author.get(Source.SERVER)
+            .addOnSuccessListener { userDocument ->
+                val newScore = (userDocument.get(User.Keys.score) as Long - Points.RECEIVED_LIKE).let {
+                    if (it >= 0) it else 0
+                }
+                userDocument.reference.update(User.Keys.score, newScore)
+            }
+
+        user.get(Source.SERVER)
+            .addOnSuccessListener { userDocument ->
+                val newScore = (userDocument.get(User.Keys.score) as Long - Points.DO_LIKE).let {
+                    if (it >= 0) it else 0
+                }
+                userDocument.reference.update(User.Keys.score, newScore)
+            }
+    }
+
+
+    override fun commentPointRewards(user: DocumentReference, author: DocumentReference) {
+        author.get(Source.SERVER)
+            .addOnSuccessListener { userDocument ->
+                val newScore = userDocument.get(User.Keys.score) as Long + Points.RECEIVED_COMMENT
+                userDocument.reference.update(User.Keys.score, newScore)
+            }
+
+        user.get(Source.SERVER)
+            .addOnSuccessListener { userDocument ->
+                val newScore = userDocument.get(User.Keys.score) as Long + Points.DO_COMMENT
+                userDocument.reference.update(User.Keys.score, newScore)
+            }
+    }
+
+
 
     private fun unlikeUI() {
         binding.artikelButtonLike.isChecked = false

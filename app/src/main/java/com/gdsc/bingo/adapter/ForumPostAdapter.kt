@@ -16,6 +16,8 @@ import com.gdsc.bingo.databinding.ComponentCardKomunitasBinding
 import com.gdsc.bingo.model.Forums
 import com.gdsc.bingo.model.Like
 import com.gdsc.bingo.model.User
+import com.gdsc.bingo.services.points.Points
+import com.gdsc.bingo.services.points.PointsRewardSystem
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
@@ -50,7 +52,7 @@ class ForumPostAdapter(
 
     inner class ForumPostViewHolder(
         private val binding : ComponentCardKomunitasBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
+    ) : RecyclerView.ViewHolder(binding.root), PointsRewardSystem {
         fun bind(forums: Forums) {
             Log.i("ForumPostAdapter", "Bind data to viewholder: \n\t${forums}")
 
@@ -149,9 +151,15 @@ class ForumPostAdapter(
                                 documentReference.reference.set(like.toFirebaseModel())
                                     .addOnSuccessListener {
 
-                                        val newLike = if (initialState) likeCount else likeCount + 1
+                                        val newLike = if (initialState) likeCount else {
+                                            likePointRewards(user, author)
+                                            likeCount + 1
+                                        }
 
                                         forumRef.update("like_count", newLike)
+
+
+
                                         setupCommentAndLikeCount(
                                             likeCount = newLike,
                                             dislikeCount = forums.dislikeCount,
@@ -163,9 +171,14 @@ class ForumPostAdapter(
                                 documentReference.reference.delete()
                                     .addOnSuccessListener {
 
-                                        val newLike = if (initialState) likeCount - 1 else likeCount
+                                        val newLike = if (initialState) {
+                                            unlikePointRewards(user, author)
+                                            likeCount - 1
+                                        } else likeCount
 
                                         forumRef.update("like_count", newLike)
+
+
                                         setupCommentAndLikeCount(
                                             likeCount = newLike,
                                             dislikeCount = forums.dislikeCount,
@@ -308,6 +321,42 @@ class ForumPostAdapter(
             }
 
         }
+
+        override fun likePointRewards(user: DocumentReference, author: DocumentReference) {
+            author.get(Source.SERVER)
+                .addOnSuccessListener { userDocument ->
+                    val newScore = userDocument.get(User.Keys.score) as Long + Points.RECEIVED_LIKE
+                    userDocument.reference.update(User.Keys.score, newScore)
+                }
+
+            user.get(Source.SERVER)
+                .addOnSuccessListener { userDocument ->
+                    val newScore = userDocument.get(User.Keys.score) as Long + Points.DO_LIKE
+                    userDocument.reference.update(User.Keys.score, newScore)
+                }
+        }
+
+        override fun unlikePointRewards(user: DocumentReference, author: DocumentReference) {
+            Log.d("ForumPostAdapter", "unlikePointRewards")
+            author.get(Source.SERVER)
+                .addOnSuccessListener { userDocument ->
+                    val newScore = (userDocument.get(User.Keys.score) as Long - Points.RECEIVED_LIKE).let {
+                        Log.i("ForumPostAdapter", "New score : $it")
+                        if (it >= 0) it else 0
+                    }
+                    userDocument.reference.update(User.Keys.score, newScore)
+                }
+
+            user.get(Source.SERVER)
+                .addOnSuccessListener { userDocument ->
+                    val newScore = (userDocument.get(User.Keys.score) as Long - Points.DO_LIKE).let {
+                        if (it >= 0) it else 0
+                    }
+                    userDocument.reference.update(User.Keys.score, newScore)
+                }
+        }
+
+        override fun commentPointRewards(user: DocumentReference, author: DocumentReference) {}
 
     }
 

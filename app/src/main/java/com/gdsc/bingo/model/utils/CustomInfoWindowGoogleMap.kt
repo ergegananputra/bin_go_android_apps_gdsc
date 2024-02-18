@@ -3,6 +3,7 @@ package com.gdsc.bingo.model.utils
 import android.content.Context
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.gdsc.bingo.R
 import com.gdsc.bingo.model.nearby.ModelResults
@@ -17,10 +18,15 @@ class CustomInfoWindowGoogleMap(private val context: Context) : InfoWindowAdapte
 
         val tvNamaLokasi = view.findViewById<TextView>(R.id.tvNamaLokasi)
         val tvAlamat = view.findViewById<TextView>(R.id.tvAlamat)
-        val infoWindowData = marker.tag as ModelResults
 
-        tvNamaLokasi.text = infoWindowData.name
-        tvAlamat.text = infoWindowData.vicinity
+        val infoWindowData = marker.tag as? ModelResults
+
+        if (infoWindowData != null) {
+            tvNamaLokasi.text = infoWindowData.name
+            tvAlamat.text = infoWindowData.vicinity
+        } else {
+            Toast.makeText(context, "InfoWindow data is null", Toast.LENGTH_SHORT).show()
+        }
 
         return view
     }

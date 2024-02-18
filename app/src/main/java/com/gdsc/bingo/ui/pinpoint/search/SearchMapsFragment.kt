@@ -3,12 +3,14 @@ package com.gdsc.bingo.ui.pinpoint.search
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.location.Location
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.transition.Transition
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,12 +34,18 @@ import com.gdsc.bingo.model.nearby.ModelResults
 import com.gdsc.bingo.model.utils.CustomInfoWindowGoogleMap
 import com.gdsc.bingo.ui.pinpoint.search.viewmodel.SearchMapsViewModel
 import com.google.android.gms.maps.model.Marker
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.SimpleTarget
+
 
 class SearchMapsFragment : Fragment(), OnMapReadyCallback {
 
     private val binding by lazy {
         FragmentSearchMapsBinding.inflate(layoutInflater)
     }
+
+    val desiredWidth = 144
+    val desiredHeight = 144
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var lastKnownLocation: Location
@@ -257,18 +265,26 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)
 
-            val markerOptions = MarkerOptions()
-            markerOptions.position(latLngMarker)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-
-            val marker = googleMap?.addMarker(markerOptions)
-            marker?.tag = info
-            marker?.showInfoWindow()
-
-            // Tambahkan marker ke daftar marker
-            marker?.let { markerList.add(it) }
+            Glide.with(requireContext())
+                .asBitmap()
+                .load(R.drawable.ic_custom_marker_maps)
+                .into(object : SimpleTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                        val scaledBitmap = Bitmap.createScaledBitmap(resource, desiredWidth, desiredHeight, false)
+                        val bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
+                        val markerOptions = MarkerOptions()
+                            .position(latLngMarker)
+                            .icon(bitmapDescriptor)
+                        val marker = googleMap?.addMarker(markerOptions)
+                        marker?.tag = info
+                        marker?.showInfoWindow()
+                        marker?.let { markerList.add(it) }
+                    }
+                })
         }
-}
+    }
+
+
 
     private fun performSearch(searchText: String) {
         // Filter modelResultsArrayList berdasarkan teks pencarian
@@ -299,13 +315,22 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)
 
-            val markerOptions = MarkerOptions()
-                .position(latLngMarker)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
-
-            val marker = googleMap?.addMarker(markerOptions)
-            marker?.tag = info
-            marker?.showInfoWindow()
+            Glide.with(requireContext())
+                .asBitmap()
+                .load(R.drawable.ic_custom_marker_maps)
+                .into(object : SimpleTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
+                        val scaledBitmap = Bitmap.createScaledBitmap(resource, desiredWidth, desiredHeight, false)
+                        val bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
+                        val markerOptions = MarkerOptions()
+                            .position(latLngMarker)
+                            .icon(bitmapDescriptor)
+                        val marker = googleMap?.addMarker(markerOptions)
+                        marker?.tag = info
+                        marker?.showInfoWindow()
+                        marker?.let { markerList.add(it) }
+                    }
+                })
         }
     }
 

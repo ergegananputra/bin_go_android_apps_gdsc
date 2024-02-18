@@ -13,7 +13,7 @@
         app:layout_constraintGuide_percent="0.5" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/materialTextView4"
+        android:id="@+id/component_history_information_score"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="24dp"
@@ -32,7 +32,7 @@
         tools:ignore="RtlHardcoded" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/materialTextView5"
+        android:id="@+id/copmonent_history_information_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -43,7 +43,7 @@
         android:maxLines="1"
         android:ellipsize="marquee"
         app:layout_constraintBottom_toTopOf="@+id/copmonent_history_information_item_guideline_vertical"
-        app:layout_constraintEnd_toStartOf="@+id/materialTextView4"
+        app:layout_constraintEnd_toStartOf="@+id/component_history_information_score"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0" />
@@ -57,8 +57,8 @@
         android:maxLines="1"
         android:ellipsize="marquee"
         android:textAppearance="?attr/textAppearanceBodyMedium"
-        app:layout_constraintEnd_toStartOf="@+id/materialTextView4"
-        app:layout_constraintStart_toStartOf="@+id/materialTextView5"
+        app:layout_constraintEnd_toStartOf="@+id/component_history_information_score"
+        app:layout_constraintStart_toStartOf="@+id/copmonent_history_information_title"
         app:layout_constraintTop_toTopOf="@+id/copmonent_history_information_item_guideline_vertical" />
 
     <com.google.android.material.divider.MaterialDivider

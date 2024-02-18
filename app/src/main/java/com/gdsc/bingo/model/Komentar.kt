@@ -51,7 +51,7 @@ data class Komentar(
             Komentar(
                 referencePath = it[FireModel.Keys.referencePath] as DocumentReference,
                 komentar = it[Keys.komentar] as String,
-                profilePicturePath = it[Keys.profilePicturePath] as String,
+                profilePicturePath = it[Keys.profilePicturePath] as String?,
                 username = it[Keys.username] as String,
                 createdAt = it[FireModel.Keys.createdAt] as Timestamp
             )

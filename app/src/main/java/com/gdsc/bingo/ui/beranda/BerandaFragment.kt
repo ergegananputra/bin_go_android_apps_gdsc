@@ -100,7 +100,7 @@ class BerandaFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as MainActivity).setBottomNavigationVisibility(this)
+        (activity as MainActivity).setStatusAndBottomNavigation(this)
 
         setupGreetings()
         setupBinPoints()
@@ -142,11 +142,11 @@ class BerandaFragment : Fragment() {
 
 
     private fun setupBinPoints() {
-//        val destination = BerandaFragmentDirections.actionNavigationBerandaToPointsHistoryFragment()
-//
-//        binding.include.componentCardBinPoints.setOnClickListener {
-//            findNavController().navigate(destination)
-//        }
+        val destination = BerandaFragmentDirections.actionNavigationBerandaToPointsHistoryFragment()
+
+        binding.include.componentCardBinPoints.setOnClickListener {
+            findNavController().navigate(destination)
+        }
 
         val fireStore = FirebaseFirestore.getInstance()
         val preferences = AppPreferences(requireContext())

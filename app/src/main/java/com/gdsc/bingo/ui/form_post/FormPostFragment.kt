@@ -86,7 +86,7 @@ class FormPostFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         // Inflate the layout for this fragment
-        (activity as MainActivity).setBottomNavigationVisibility(this)
+        (activity as MainActivity).setStatusAndBottomNavigation(this)
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
         storage = FirebaseStorage.getInstance()

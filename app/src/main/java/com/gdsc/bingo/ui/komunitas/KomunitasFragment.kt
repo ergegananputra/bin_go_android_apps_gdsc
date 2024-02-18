@@ -55,7 +55,7 @@ class KomunitasFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as MainActivity).setBottomNavigationVisibility(this)
+        (activity as MainActivity).setStatusAndBottomNavigation(this)
 
 
         setupCreateKomunitasExtendedFloatingActionButton()

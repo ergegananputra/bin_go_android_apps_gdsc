@@ -141,6 +141,9 @@ class ProfilFragment : Fragment() {
 
                     loadOrRefreshPicture(true)
                 }
+                .addOnFailureListener {
+                    Log.e("ProfilFragment", "storage path:$userProfilRef\n${it.message}")
+                }
 
         }.addOnFailureListener {
             Log.e("ProfilFragment", "Upload picture failed", it)
@@ -152,7 +155,7 @@ class ProfilFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         // Inflate the layout for this fragment
-        (activity as MainActivity).setBottomNavigationVisibility(this)
+        (activity as MainActivity).setStatusAndBottomNavigation(this)
         komunitasViewModel = ViewModelProvider(this)[KomunitasViewModel::class.java]
         preLoad()
         auth = FirebaseAuth.getInstance()
@@ -230,11 +233,11 @@ class ProfilFragment : Fragment() {
     }
 
     private fun setupBinPoints() {
-//        val destination = ProfilFragmentDirections.actionNavigationProfilToPointsHistoryFragment()
-//
-//        binding.profilIncludeBinPoints.componentCardBinPoints.setOnClickListener {
-//            findNavController().navigate(destination)
-//        }
+        val destination = ProfilFragmentDirections.actionNavigationProfilToPointsHistoryFragment()
+
+        binding.profilIncludeBinPoints.componentCardBinPoints.setOnClickListener {
+            findNavController().navigate(destination)
+        }
 
         val fireStore = FirebaseFirestore.getInstance()
         val preferences = AppPreferences(requireContext())
@@ -350,6 +353,11 @@ class ProfilFragment : Fragment() {
         } else {
             setupTextName(getString(R.string.anda_belum_login))
             setupTextEmail(getString(R.string.klik_disini_untuk_login))
+
+            binding.profilCardProfilImage.load(R.drawable.nav_ic_profil) {
+                crossfade(true)
+                transformations(CircleCropTransformation())
+            }
 
             val destination = ProfilFragmentDirections.actionNavigationProfilToNavigationProfilDetail()
             binding.profilCardProfilContainer.setOnClickListener {

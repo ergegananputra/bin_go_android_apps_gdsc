@@ -9,8 +9,10 @@ import androidx.navigation.ui.setupWithNavController
 import com.gdsc.bingo.databinding.ActivityMainBinding
 import com.gdsc.bingo.ui.CustomSystemTweak
 import com.gdsc.bingo.ui.artikel.ArtikelFragment
+import com.gdsc.bingo.ui.beranda.BerandaFragment
 import com.gdsc.bingo.ui.form_post.FormPostFragment
 import com.gdsc.bingo.ui.points_history.PointsHistoryFragment
+import com.gdsc.bingo.ui.profil.ProfilFragment
 import com.gdsc.bingo.ui.profil.detail.ProfilDetailFragment
 
 class MainActivity : AppCompatActivity() {
@@ -38,7 +40,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun setBottomNavigationVisibility(fragment: Fragment) {
+    fun setStatusAndBottomNavigation(fragment: Fragment) {
+        setBottomNavigationVisibility(fragment)
+        setTweakColor(fragment)
+    }
+
+    private fun setBottomNavigationVisibility(fragment: Fragment) {
         when (fragment) {
             is PointsHistoryFragment -> bottomViewGone()
             is ProfilDetailFragment -> bottomViewGone()
@@ -46,6 +53,32 @@ class MainActivity : AppCompatActivity() {
             is FormPostFragment -> bottomViewGone()
             else -> bottomViewVisible()
         }
+    }
+
+    private fun setTweakColor(fragment: Fragment) {
+        when (fragment) {
+            is PointsHistoryFragment -> {
+                CustomSystemTweak(this)
+                    .customStatusBarColorSet(com.google.android.material.R.attr.colorPrimaryContainer)
+                    .customNavigationBarColorSet(com.google.android.material.R.attr.colorSurface)
+            }
+            is ProfilFragment -> {
+                CustomSystemTweak(this)
+                    .customStatusBarColorSet(com.google.android.material.R.attr.colorPrimaryContainer, 0.3)
+                    .customNavigationBarColorSet(com.google.android.material.R.attr.colorSurfaceContainer)
+            }
+            is BerandaFragment -> {
+                CustomSystemTweak(this)
+                    .customStatusBarColorSet(com.google.android.material.R.attr.colorPrimaryContainer, 0.3)
+                    .customNavigationBarColorSet(com.google.android.material.R.attr.colorSurfaceContainer)
+            }
+            else -> {
+                CustomSystemTweak(this)
+                    .statusBarTweak()
+                    .customNavigationBarColorSet(com.google.android.material.R.attr.colorSurfaceContainer)
+            }
+        }
+
     }
 
     private fun bottomViewGone() {

@@ -25,9 +25,9 @@ class SearchMapsViewModel : ViewModel() {
         // Hitung jumlah panggilan API yang telah selesai
         var completedCalls = 0
 
-        // Mencari TPA
-        val callTPA = apiService.getDataResult(strApiKey, "TPA", strLocation, "distance")
-        callTPA.enqueue(object : Callback<ModelResultsNearby> {
+        // Mencari Tempat Pembuangan
+        val callTePeEs = apiService.getDataResult(strApiKey, "Tempat Pembuangan Sampah", strLocation, "distance")
+        callTePeEs.enqueue(object : Callback<ModelResultsNearby> {
             override fun onResponse(call: Call<ModelResultsNearby>, response: Response<ModelResultsNearby>) {
                 if (response.isSuccessful && response.body() != null) {
                     combinedResults.addAll(response.body()!!.modelResults)
@@ -38,12 +38,12 @@ class SearchMapsViewModel : ViewModel() {
                         modelResultsMutableLiveData.postValue(combinedResults)
                     }
                 } else {
-                    Log.e("responseTPA", response.toString())
+                    Log.e("responseTePeEs", response.toString())
                 }
             }
 
             override fun onFailure(call: Call<ModelResultsNearby>, t: Throwable) {
-                Log.e("failureTPA", t.toString())
+                Log.e("failureTePeEs", t.toString())
             }
         })
 

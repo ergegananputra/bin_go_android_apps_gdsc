@@ -25,7 +25,7 @@
         app:backgroundTint="?attr/colorPrimary"
         app:elevation="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/search_maps_text_input_layout_search"

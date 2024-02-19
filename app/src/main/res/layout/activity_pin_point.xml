@@ -46,16 +46,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/pinpoint_divider"
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        app:dividerColor="?attr/colorOutline"
-        app:layout_constraintBottom_toBottomOf="@+id/pinpoint_header_container"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/pinpoint_header_container" />
-
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment_activity_pin_point"

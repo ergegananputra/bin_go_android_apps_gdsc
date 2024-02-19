@@ -3,17 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/pin_point_navigation"
-    app:startDestination="@id/pintPointFrontFragment">
+    app:startDestination="@id/searchMapsFragment">
 
-    <fragment
-        android:id="@+id/pintPointFrontFragment"
-        android:name="com.gdsc.bingo.ui.pinpoint.front.PintPointFrontFragment"
-        android:label="fragment_pint_point_front"
-        tools:layout="@layout/fragment_pint_point_front" >
-        <action
-            android:id="@+id/action_pintPointFrontFragment_to_searchMapsFragment"
-            app:destination="@id/searchMapsFragment" />
-    </fragment>
     <fragment
         android:id="@+id/searchMapsFragment"
         android:name="com.gdsc.bingo.ui.pinpoint.search.SearchMapsFragment"

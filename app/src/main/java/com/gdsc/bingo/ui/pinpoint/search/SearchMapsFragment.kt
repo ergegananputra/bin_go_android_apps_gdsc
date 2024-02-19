@@ -73,10 +73,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val fabMyLocation: FloatingActionButton = binding.fabMyLocation
-        fabMyLocation.setOnClickListener {
-            showUserLocation()
-        }
+        setupHeaderCard()
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
@@ -110,6 +107,12 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             }
         })
 
+    }
+
+    private fun setupHeaderCard() {
+        binding.searchMapsMyLocation.setOnClickListener {
+            showUserLocation()
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

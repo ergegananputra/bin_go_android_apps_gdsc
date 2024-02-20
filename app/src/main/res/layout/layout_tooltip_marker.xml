@@ -1,76 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="16dp"
+    app:cardBackgroundColor="?attr/colorTertiaryContainer"
+    app:strokeWidth="0dp"
+    >
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvContent"
-        android:layout_width="300dp"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerInParent="true"
-        android:orientation="vertical"
-        app:cardBackgroundColor="@color/md_theme_dark_scrim"
-        app:cardCornerRadius="25dp"
-        app:cardElevation="0dp"
-        app:cardUseCompatPadding="true">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        >
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="?attr/colorTertiaryContainer"
+            >
 
-            <RelativeLayout
+            <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/rectangle_rounded_top"
-                android:backgroundTint="#42b752"
-                android:padding="8dp">
+                android:layout_height="match_parent"
+                android:src="@drawable/bingo_48x48"
+                android:scaleType="centerCrop"/>
 
-                <ImageView
-                    android:id="@+id/imageLocation"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_alignParentStart="true"
-                    android:layout_centerInParent="true"
-                    android:background="@drawable/bg_circle_radius"
-                    android:padding="8dp"
-                    android:src="@drawable/ic_location"
-                    app:tint="@color/md_theme_dark_green" />
 
-                <TextView
-                    android:id="@+id/tvNamaLokasi"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:layout_toEndOf="@+id/imageLocation"
-                    android:text="Nama Jalan"
-                    android:textColor="@color/md_theme_light_background"
-                    android:textSize="16sp" />
+        </com.google.android.material.card.MaterialCardView>
 
-            </RelativeLayout>
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tooltip_text_view_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textColor="?attr/colorOnTertiaryContainer"
+            android:text="Terpilih"/>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+    </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tvAlamat"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/app_name"
-                    android:textSize="12sp"
-                    android:padding="10dp"
-                    android:textColor="@color/md_theme_light_onPrimary" />
 
-            </LinearLayout>
 
-        </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
-
-</RelativeLayout>
+</com.google.android.material.card.MaterialCardView>

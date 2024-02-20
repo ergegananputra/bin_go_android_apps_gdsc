@@ -41,4 +41,5 @@
     <string name="tidak_ada_gambar_yang_terunggah">Tidak ada gambar yang terunggah</string>
     <string name="papan_skor">Papan skor</string>
     <string name="keterangan_format_gambar">Rekomendasi ukuran rasio gambar adalah 1:1.41. (Rasio kertas metrics, contoh A1, A2, A3, A4, dst)</string>
+    <string name="belum_ada_lokasi_terpilih">Belum ada lokasi terpilih</string>
 </resources>

@@ -114,6 +114,7 @@
         app:strokeWidth="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/search_maps_bottom_dialog_main_constraint_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="16dp">
@@ -147,76 +148,103 @@
             </com.google.android.material.textfield.TextInputLayout>
 
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/search_maps_text_view_lokasi_terpilih"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/search_maps_group_marker_info"
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Belum ada lokasi terpilih"
-                android:textAppearance="?attr/textAppearanceTitleMedium"
-                app:layout_constraintTop_toBottomOf="@+id/search_maps_text_input_layout_search"
-                tools:layout_editor_absoluteX="16dp" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/search_maps_text_view_lokasi_rating"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="8dp"
-                android:drawableStart="@drawable/baseline_reviews_24"
-                android:drawablePadding="16dp"
-                android:drawableTint="?attr/colorSecondary"
-                android:gravity="center_vertical"
-                android:text="0"
-                android:textAppearance="?attr/textAppearanceTitleMedium"
-                app:layout_constraintEnd_toStartOf="@+id/guideline"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/search_maps_text_view_lokasi_terpilih" />
-
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_navigate_route"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Rute Perjalanan"
-                app:icon="@drawable/baseline_navigation_24"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/search_maps_text_view_lokasi_rating" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.5" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/search_maps_chip_buka"
-                style="@style/Widget.Material3.Chip.Assist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Buka"
-                android:textColor="?attr/colorOnTertiary"
-                app:chipBackgroundColor="?attr/colorTertiary"
-                app:layout_constraintBottom_toBottomOf="@+id/search_maps_text_view_lokasi_rating"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/search_maps_text_view_lokasi_rating"
-                android:visibility="gone" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/search_maps_text_input_layout_search">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/search_maps_chip_tutup"
-                style="@style/Widget.Material3.Chip.Assist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tutup"
-                android:textColor="?attr/colorOnError"
-                app:chipBackgroundColor="?attr/colorError"
-                app:layout_constraintBottom_toBottomOf="@+id/search_maps_text_view_lokasi_rating"
-                app:layout_constraintEnd_toStartOf="@+id/search_maps_chip_buka"
-                app:layout_constraintTop_toTopOf="@+id/search_maps_text_view_lokasi_rating"
-                android:visibility="gone" />
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/search_maps_text_view_lokasi_terpilih"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/belum_ada_lokasi_terpilih"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/search_maps_text_view_address_lokasi_terpilih"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/search_maps_text_view_lokasi_terpilih" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/search_maps_text_view_lokasi_rating"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:drawableStart="@drawable/baseline_reviews_24"
+                    android:drawablePadding="16dp"
+                    android:drawableTint="?attr/colorSecondary"
+                    android:gravity="center_vertical"
+                    android:text="0"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/search_maps_text_view_address_lokasi_terpilih" />
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_navigate_route"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="Rute Perjalanan"
+                    app:icon="@drawable/baseline_navigation_24"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/search_maps_text_view_lokasi_rating" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/search_maps_chip_buka"
+                    style="@style/Widget.Material3.Chip.Assist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Buka"
+                    android:textColor="?attr/colorOnTertiary"
+                    app:chipBackgroundColor="?attr/colorTertiary"
+                    app:layout_constraintBottom_toBottomOf="@+id/search_maps_text_view_lokasi_rating"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/search_maps_text_view_lokasi_rating"
+                    android:visibility="gone" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/search_maps_chip_tutup"
+                    style="@style/Widget.Material3.Chip.Assist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tutup"
+                    android:textColor="?attr/colorOnError"
+                    app:chipBackgroundColor="?attr/colorError"
+                    app:layout_constraintBottom_toBottomOf="@+id/search_maps_text_view_lokasi_rating"
+                    app:layout_constraintEnd_toStartOf="@+id/search_maps_chip_buka"
+                    app:layout_constraintTop_toTopOf="@+id/search_maps_text_view_lokasi_rating"
+                    android:visibility="gone" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

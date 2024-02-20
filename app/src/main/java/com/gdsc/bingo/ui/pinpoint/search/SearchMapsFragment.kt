@@ -13,7 +13,6 @@ import android.os.Bundle
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.transition.Transition
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +22,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.transition.TransitionManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.SimpleTarget
+import com.gdsc.bingo.R
+import com.gdsc.bingo.databinding.FragmentSearchMapsBinding
+import com.gdsc.bingo.model.nearby.ModelResults
+import com.gdsc.bingo.model.utils.CustomInfoWindowGoogleMap
+import com.gdsc.bingo.ui.pinpoint.search.viewmodel.SearchMapsViewModel
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -30,18 +37,9 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.gdsc.bingo.R
-import com.gdsc.bingo.databinding.FragmentSearchMapsBinding
-import com.gdsc.bingo.model.nearby.ModelResults
-import com.gdsc.bingo.model.utils.CustomInfoWindowGoogleMap
-import com.gdsc.bingo.ui.pinpoint.search.viewmodel.SearchMapsViewModel
 import com.google.android.gms.maps.model.Marker
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.SimpleTarget
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.textview.MaterialTextView
-import java.util.Locale
 import java.util.*
 
 
@@ -55,7 +53,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
     val desiredHeight = 144
 
     private lateinit var locationTextView: MaterialTextView
-    private var selectedLocationText: String = "Belum ada lokasi terpilih"
+    private var selectedLocationText: String = ""
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var lastKnownLocation: Location
@@ -77,6 +75,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        selectedLocationText = getString(R.string.belum_ada_lokasi_terpilih)
         return binding.root
     }
 
@@ -363,9 +362,15 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             // Jika tag tidak null
             if (markerInfo != null) {
                 // Update teks terpilih dengan informasi dari marker yang diklik
-                selectedLocationText = "Pin Lokasi: ${markerInfo.name}"
+                selectedLocationText = "${markerInfo.name}"
                 // Perbarui teks pada TextView
                 binding.searchMapsTextViewLokasiTerpilih.text = selectedLocationText
+                binding.searchMapsTextViewAddressLokasiTerpilih.text = markerInfo.vicinity
+
+                // NOTE: Animasi disini
+                TransitionManager.beginDelayedTransition(binding.searchMapsBottomDialogMainConstraintLayout)
+                binding.searchMapsGroupMarkerInfo.visibility = View.VISIBLE
+
                 // Periksa apakah tempat tersebut terbuka atau tutup
                 val isOpen = markerInfo.isOpen ?: true // Defaultnya adalah false jika properti isOpen null
                 if (isOpen) {
@@ -383,6 +388,11 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             }
             // Kembalikan false agar default behavior dari marker juga berlaku
             false
+        }
+
+        googleMap?.setOnMapClickListener {
+            TransitionManager.beginDelayedTransition(binding.searchMapsBottomDialogMainConstraintLayout)
+            binding.searchMapsGroupMarkerInfo.visibility = View.GONE
         }
     }
 

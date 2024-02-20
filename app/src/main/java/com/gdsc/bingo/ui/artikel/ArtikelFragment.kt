@@ -35,6 +35,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -119,10 +122,34 @@ class ArtikelFragment : Fragment(), PointsRewardSystem {
             this.launch(Dispatchers.IO) { setupVideoContent(navArgs.videoLink) }
             this.launch(Dispatchers.IO) { loadRecyclerCommentData() }
             this.launch(Dispatchers.Main) { setupKomentar() }
+            this.launch(Dispatchers.Main) { setupYoutubePlayerVideo() }
         }
         setupLikeButton()
 
 
+    }
+
+    private fun setupYoutubePlayerVideo() {
+        val youtubePlayer = binding.artikelYoutubePlayer
+
+        youtubePlayer.addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+            override fun onReady(youTubePlayer: YouTubePlayer) {
+                val videoId = navArgs.videoLink ?: run {
+                    Log.e("ArtikelFragment", "Video link is null")
+                    youtubePlayer.visibility = View.GONE
+                    return
+                }
+
+                youtubePlayer.visibility = View.VISIBLE
+                youTubePlayer.loadVideo(videoId, 0f)
+            }
+
+            override fun onError(youTubePlayer: YouTubePlayer, error: PlayerConstants.PlayerError) {
+                super.onError(youTubePlayer, error)
+                Log.e("ArtikelFragment", "YoutubePlayer error: $error")
+                youtubePlayer.visibility = View.GONE
+            }
+        })
     }
 
     private suspend fun setupKomentar() {
@@ -412,7 +439,10 @@ class ArtikelFragment : Fragment(), PointsRewardSystem {
 
     private suspend fun setupImagesContent(documentReferenceString: String?) {
         withContext(Dispatchers.Main) {
-            fireStore.document(documentReferenceString!!).collection(PostImage().table).get(Source.SERVER)
+            fireStore.document(documentReferenceString!!)
+                .collection(PostImage().table)
+                .orderBy(FireModel.Keys.createdAt, Query.Direction.ASCENDING)
+                .get(Source.SERVER)
                 .addOnSuccessListener { documentSnapshot ->
                     val imagePost = PostImage().toModels(documentSnapshot)
                     imagePostAdapter.submitList(imagePost)

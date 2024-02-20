@@ -81,6 +81,9 @@
                 android:id="@+id/form_post_text_view_no_image_uploaded"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:drawableTop="@drawable/ic_insert_photo_24"
+                android:drawablePadding="16dp"
+                app:drawableTint="?attr/colorOutline"
                 android:text="@string/tidak_ada_gambar_yang_terunggah"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="?attr/colorOnSurfaceVariant"
@@ -104,6 +107,17 @@
                 android:layout_gravity="center"
                 style="@style/Widget.Material3.Button"
                 app:icon="@drawable/ic_file_upload_baseline_24"/>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/keterangan_format_gambar"
+                android:textAppearance="?attr/textAppearanceLabelMedium"
+                android:textColor="?attr/colorOutline"
+                android:gravity="center"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginVertical="8dp"
+                />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/form_post_text_input_layout_title"
@@ -151,7 +165,9 @@
                 android:layout_marginTop="16dp"
                 app:endIconMode="clear_text"
                 app:boxStrokeWidth="0dp"
-                android:hint="Video link">
+                app:helperTextEnabled="true"
+                app:helperText="(Opsional) Masukkan link yang memiliki domain youtube.com atau youtu.be"
+                android:hint="Link video Youtube">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:maxLines="1"

@@ -184,6 +184,20 @@
 
             </com.facebook.shimmer.ShimmerFrameLayout>
 
+            <com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+                android:id="@+id/artikel_youtube_player"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+
+                android:visibility="gone"
+
+                app:autoPlay="false"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/artikel_image_view_content" />
+
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/artikel_text_view_content"
                 android:layout_width="match_parent"
@@ -195,7 +209,7 @@
                 android:textColor="?attr/colorOnBackground"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/artikel_image_view_content" />
+                app:layout_constraintTop_toBottomOf="@+id/artikel_youtube_player" />
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/artikel_shimmer_content"

@@ -81,7 +81,7 @@
                     android:textAppearance="?attr/textAppearanceHeadlineSmall"
                     android:textColor="?attr/colorOnTertiaryContainer"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/beranda_card_image_view_illustration_1"
+                    app:layout_constraintEnd_toStartOf="@+id/beranda_card_guideline_vertical"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/beranda_card_image_view_illustration_1"
@@ -94,7 +94,7 @@
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="16dp"
                     android:maxLines="2"
-                    android:text="Buka Bin Locator"
+                    android:text="@string/buka_bin_locator"
                     android:textAppearance="?attr/textAppearanceLabelSmall"
                     android:textColor="?attr/colorPrimary"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -106,8 +106,9 @@
                     android:id="@+id/beranda_card_image_view_illustration_1"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/image_illustration_1"
-                    app:layout_constraintDimensionRatio="1"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/beranda_card_guideline_vertical"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -119,6 +120,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     app:layout_constraintGuide_percent="0.6" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_begin="20dp" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>

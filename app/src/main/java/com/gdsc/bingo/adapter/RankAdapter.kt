@@ -28,7 +28,11 @@ class RankAdapter(
         fun bind(item: User, position: Int) {
             binding.componentHistoryInformationScore.text = item.score.toString()
             binding.copmonentHistoryInformationTitle.text = item.username
-            val text = "#Rank ${position + 1}"
+            binding.copmonentHistoryInformationTitle.apply {
+                isSelected = true
+                isFocusable = true
+            }
+            val text = "Rank #${position + 1}"
             binding.componentHistoryInformationTextViewActivityRewardFrom.text = text
         }
 

@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.util.PatternsCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import coil.load
 import coil.transform.CircleCropTransformation
@@ -26,6 +27,8 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 
 class ProfilDetailFragment : Fragment() {
@@ -221,15 +224,9 @@ class ProfilDetailFragment : Fragment() {
     }
 
     private fun login() {
-        val username = binding.profilDetailTextInputLayoutUsername.editText!!.text.toString().trim()
         val email = binding.profilDetailTextInputLayoutEmail.editText!!.text.toString().trim()
         val password = binding.profilDetailTextInputLayoutPassword.editText!!.text.toString().trim()
 
-        if (username.isEmpty()) {
-            val errMsg = getString(R.string.username_tidak_valid)
-            binding.profilDetailTextInputLayoutUsername.error = errMsg
-            return
-        }
         if (email.isEmpty() || PatternsCompat.EMAIL_ADDRESS.matcher(email).matches().not() ) {
             val errMsg = getString(R.string.email_tidak_valid)
             binding.profilDetailTextInputLayoutEmail.error = errMsg
@@ -246,13 +243,19 @@ class ProfilDetailFragment : Fragment() {
                 if (it.isSuccessful) {
                     Toast.makeText(requireContext(), "Login Berhasil", Toast.LENGTH_SHORT).show()
 
-                    AppPreferences(requireContext()).apply {
-                        userId = auth.currentUser!!.uid
-                        userName = username
-                        userEmail = email
-                    }
+                    lifecycleScope.launch {
+                        val user = firestore.collection(User().table).document(auth.currentUser!!.uid).get().await().let { fireUser ->
+                            User().toModel(fireUser)
+                        }
 
-                    findNavController().navigateUp()
+                        AppPreferences(requireContext()).apply {
+                            userId = auth.currentUser!!.uid
+                            userName = user.username!!
+                            userEmail = email
+                        }
+
+                        findNavController().navigateUp()
+                    }
                 } else {
                     val errMsg = it.exception?.message
                     binding.profilDetailTextInputLayoutEmail.error = errMsg
@@ -279,6 +282,7 @@ class ProfilDetailFragment : Fragment() {
 
         binding.profilDetailContainerImageView.visibility = View.VISIBLE
         binding.profilDetailButtonUbahFotoProfil.visibility = View.VISIBLE
+        binding.profilDetailTextInputLayoutUsername.visibility = View.VISIBLE
     }
 
     private fun switchToLogin() {
@@ -289,6 +293,7 @@ class ProfilDetailFragment : Fragment() {
 
         binding.profilDetailContainerImageView.visibility = View.GONE
         binding.profilDetailButtonUbahFotoProfil.visibility = View.GONE
+        binding.profilDetailTextInputLayoutUsername.visibility = View.GONE
     }
 
 

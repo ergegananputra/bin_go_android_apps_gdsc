@@ -142,15 +142,12 @@
             android:id="@+id/beranda_text_view_description_komunitas"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Komunitas adalah ... cek segera"
+            android:text="Komunitas Bin-Go adalah komunitas pengguna Bin-Go untuk saling berinteraksi. Komunitas ini dapat digunakan untuk saling memberikan informasi atau mencari informasi. Cek segera!"
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:textColor="?attr/colorOnSurface"
-            app:layout_constraintBottom_toBottomOf="@+id/beranda_button_go_to_komunitas"
             app:layout_constraintEnd_toEndOf="@+id/beranda_text_view_title_komunitas"
             app:layout_constraintStart_toStartOf="@+id/include"
-            app:layout_constraintTop_toBottomOf="@+id/beranda_text_view_title_komunitas"
-            app:layout_constraintVertical_bias="0.19999999" />
+            app:layout_constraintTop_toBottomOf="@+id/beranda_text_view_title_komunitas" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/beranda_button_go_to_komunitas"

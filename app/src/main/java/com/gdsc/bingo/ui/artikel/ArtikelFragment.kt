@@ -5,7 +5,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -119,7 +118,6 @@ class ArtikelFragment : Fragment(), PointsRewardSystem {
             this.launch(Dispatchers.IO) { setupImagesContent(navArgs.referenecePathDocumentString) }
             this.launch { setupTextContent(navArgs.text, navArgs.isUsingTextFile, navArgs.textFilePathDocumentString) }
             this.launch { setupLikeAndCommentCount(navArgs.likeCount, navArgs.dislikeCount, navArgs.commentCount) }
-            this.launch(Dispatchers.IO) { setupVideoContent(navArgs.videoLink) }
             this.launch(Dispatchers.IO) { loadRecyclerCommentData() }
             this.launch(Dispatchers.Main) { setupKomentar() }
             this.launch(Dispatchers.Main) { setupYoutubePlayerVideo() }
@@ -389,18 +387,6 @@ class ArtikelFragment : Fragment(), PointsRewardSystem {
                 layoutManager = LinearLayoutManager(requireActivity())
             }
 
-        }
-    }
-
-    private fun setupVideoContent(videoLink: String?) {
-        //TODO: setup video content
-
-        lifecycleScope.launch(Dispatchers.Main) {
-            Toast.makeText(
-                requireContext(),
-                "Unimplemented setupVideoContent",
-                Toast.LENGTH_SHORT
-            ).show()
         }
     }
 

@@ -176,6 +176,7 @@
 
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_navigate_route"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -201,7 +202,8 @@
                 app:chipBackgroundColor="?attr/colorTertiary"
                 app:layout_constraintBottom_toBottomOf="@+id/search_maps_text_view_lokasi_rating"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/search_maps_text_view_lokasi_rating" />
+                app:layout_constraintTop_toTopOf="@+id/search_maps_text_view_lokasi_rating"
+                android:visibility="gone" />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/search_maps_chip_tutup"
@@ -213,17 +215,12 @@
                 app:chipBackgroundColor="?attr/colorError"
                 app:layout_constraintBottom_toBottomOf="@+id/search_maps_text_view_lokasi_rating"
                 app:layout_constraintEnd_toStartOf="@+id/search_maps_chip_buka"
-                app:layout_constraintTop_toTopOf="@+id/search_maps_text_view_lokasi_rating" />
+                app:layout_constraintTop_toTopOf="@+id/search_maps_text_view_lokasi_rating"
+                android:visibility="gone" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </com.google.android.material.card.MaterialCardView>
-
-
-
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

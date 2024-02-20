@@ -2,10 +2,13 @@ package com.gdsc.bingo.ui.pinpoint.search
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Bundle
 import android.os.Looper
 import android.text.Editable
@@ -14,6 +17,7 @@ import android.transition.Transition
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -36,6 +40,9 @@ import com.gdsc.bingo.ui.pinpoint.search.viewmodel.SearchMapsViewModel
 import com.google.android.gms.maps.model.Marker
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
+import com.google.android.material.textview.MaterialTextView
+import java.util.Locale
+import java.util.*
 
 
 class SearchMapsFragment : Fragment(), OnMapReadyCallback {
@@ -46,6 +53,9 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
 
     val desiredWidth = 144
     val desiredHeight = 144
+
+    private lateinit var locationTextView: MaterialTextView
+    private var selectedLocationText: String = "Belum ada lokasi terpilih"
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var lastKnownLocation: Location
@@ -75,7 +85,14 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
 
         setupHeaderCard()
 
+        locationTextView = view.findViewById(R.id.pin_point_front_text_view_current_user_location)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        if (isLocationEnabled()) {
+            requestLocation()
+        } else {
+            locationTextView.text = "Izinkan lokasi Anda untuk menemukan TPU terdekat"
+        }
 
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
@@ -107,6 +124,59 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             }
         })
 
+        val btnNavigateRoute = view.findViewById<Button>(R.id.btn_navigate_route)
+        btnNavigateRoute.setOnClickListener {
+            // Panggil metode untuk membuka Google Maps dengan arah dari lokasi yang dipilih
+            openGoogleMapsDirections()
+        }
+    }
+
+    private fun openGoogleMapsDirections() {
+        // Ambil lokasi terpilih dari teksview
+        val selectedLocationText = binding.searchMapsTextViewLokasiTerpilih.text.toString()
+
+        // Pastikan ada lokasi yang terpilih
+        if (selectedLocationText.isNotEmpty()) {
+            // Buat URI Intent untuk membuka Google Maps dengan arah dari lokasi yang dipilih
+            val uri = "https://www.google.com/maps/dir/?api=1&destination=${selectedLocationText}"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+            // Set flag agar Google Maps dibuka dalam aplikasi yang tersedia
+            intent.setPackage("com.google.android.apps.maps")
+            // Cek apakah terdapat aplikasi yang bisa menangani intent ini
+            if (intent.resolveActivity(requireContext().packageManager) != null) {
+                // Buka Google Maps
+                startActivity(intent)
+            } else {
+                // Jika tidak ada aplikasi yang bisa menangani intent ini, tampilkan pesan
+                Toast.makeText(requireContext(), "Google Maps tidak tersedia", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            // Jika tidak ada lokasi yang terpilih, tampilkan pesan
+            Toast.makeText(requireContext(), "Pilih lokasi terlebih dahulu", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun requestLocation() {
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                val address = getAddressFromLocation(location)
+                locationTextView.text = address ?: "Lokasi tidak ditemukan"
+            } else {
+                locationTextView.text = "Lokasi tidak ditemukan"
+            }
+        }
+    }
+
+    private fun getAddressFromLocation(location: Location): String? {
+        val geocoder = Geocoder(requireContext(), Locale.getDefault())
+        val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+        if (addresses != null && addresses.isNotEmpty()) {
+            val address = addresses[0]
+            val subLocality = address.subLocality
+            return subLocality ?: "Lokasi terkini: ${location.latitude}, ${location.longitude}"
+        }
+        return null
     }
 
     private fun setupHeaderCard() {
@@ -264,6 +334,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             info.name = modelResultsArrayList[i].name
             info.placeId = modelResultsArrayList[i].placeId
             info.vicinity = modelResultsArrayList[i].vicinity
+            info.rating = modelResultsArrayList[i].rating // Menambahkan rating dari model ke info
 
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)
@@ -285,9 +356,35 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
                     }
                 })
         }
+        // Tambahkan listener pada marker di luar loop
+        googleMap?.setOnMarkerClickListener { marker ->
+            // Ambil tag dari marker yang diklik
+            val markerInfo = marker.tag as? ModelResults
+            // Jika tag tidak null
+            if (markerInfo != null) {
+                // Update teks terpilih dengan informasi dari marker yang diklik
+                selectedLocationText = "Pin Lokasi: ${markerInfo.name}"
+                // Perbarui teks pada TextView
+                binding.searchMapsTextViewLokasiTerpilih.text = selectedLocationText
+                // Periksa apakah tempat tersebut terbuka atau tutup
+                val isOpen = markerInfo.isOpen ?: true // Defaultnya adalah false jika properti isOpen null
+                if (isOpen) {
+                    // Tempat terbuka, tampilkan chip "Buka" dan sembunyikan chip "Tutup"
+                    binding.searchMapsChipBuka.visibility = View.VISIBLE
+                    binding.searchMapsChipTutup.visibility = View.GONE
+                } else {
+                    // Tempat tutup, tampilkan chip "Tutup" dan sembunyikan chip "Buka"
+                    binding.searchMapsChipTutup.visibility = View.VISIBLE
+                    binding.searchMapsChipBuka.visibility = View.GONE
+                }
+                // Perbarui rating pada TextView
+                binding.searchMapsTextViewLokasiRating.visibility = View.VISIBLE
+                binding.searchMapsTextViewLokasiRating.text = "Rating: ${markerInfo.rating ?: "Rating tidak tersedia"}"
+            }
+            // Kembalikan false agar default behavior dari marker juga berlaku
+            false
+        }
     }
-
-
 
     private fun performSearch(searchText: String) {
         // Filter modelResultsArrayList berdasarkan teks pencarian
@@ -314,6 +411,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             info.name = result.name
             info.placeId = result.placeId
             info.vicinity = result.vicinity
+            info.rating = result.rating
 
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)

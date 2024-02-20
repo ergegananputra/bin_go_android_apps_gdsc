@@ -17,4 +17,7 @@ class ModelResults : Serializable {
 
     @SerializedName("rating")
     var rating = 0.0
+
+    @SerializedName("is_open")
+    var isOpen: Boolean? = null
 }

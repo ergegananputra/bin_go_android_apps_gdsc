@@ -393,15 +393,8 @@ class FormPostFragment : Fragment() {
 private fun String?.getYoutubeVideoId(): String? {
     if (this.isNullOrEmpty()) return null
 
-    // validate
-    if (
-        this.contains("youtube.com").not()
-        || this.contains("youtu.be").not()
-        ) return null
-
-
     // Youtube Filter
-    val youtubeVideoID = if (this.contains("v=")) {
+    val youtubeVideoID = if (this.contains("v=") && this.contains("youtube.com")) {
         val c1 = this.split("v=")[1]
 
         if (c1.contains("&")) {
@@ -410,7 +403,7 @@ private fun String?.getYoutubeVideoId(): String? {
             c1
         }
 
-    } else {
+    } else if (this.contains("youtu.be")){
         val c1 = this.split("youtu.be/")[1]
 
         if (c1.contains("?")) {
@@ -418,6 +411,8 @@ private fun String?.getYoutubeVideoId(): String? {
         } else {
             c1
         }
+    } else {
+        null
     }
 
 

@@ -166,7 +166,7 @@ class FormPostFragment : Fragment() {
                 return@withContext
                 }
 
-            val videoLink = binding.formPostTextInputLayoutVideoLink.getTrimEditText()
+            val videoLink = binding.formPostTextInputLayoutVideoLink.getTrimEditText().getYoutubeVideoId()
 
             val forums = Forums(
                 title = title,
@@ -388,4 +388,38 @@ class FormPostFragment : Fragment() {
 
 
 
+}
+
+private fun String?.getYoutubeVideoId(): String? {
+    if (this.isNullOrEmpty()) return null
+
+    // validate
+    if (
+        this.contains("youtube.com").not()
+        || this.contains("youtu.be").not()
+        ) return null
+
+
+    // Youtube Filter
+    val youtubeVideoID = if (this.contains("v=")) {
+        val c1 = this.split("v=")[1]
+
+        if (c1.contains("&")) {
+            c1.split("&")[0]
+        } else {
+            c1
+        }
+
+    } else {
+        val c1 = this.split("youtu.be/")[1]
+
+        if (c1.contains("?")) {
+            c1.split("?")[0]
+        } else {
+            c1
+        }
+    }
+
+
+    return youtubeVideoID
 }

@@ -109,6 +109,9 @@ dependencies {
     implementation("com.google.android.libraries.places:places:3.3.0")
     implementation ("com.github.delight-im:Android-SimpleLocation:v1.1.0")
 
+    // Youtube
+    implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
+
     // Marker Maps
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")

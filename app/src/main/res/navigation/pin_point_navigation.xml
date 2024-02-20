@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/pin_point_navigation"
+    app:startDestination="@id/searchMapsFragment">
+
+    <fragment
+        android:id="@+id/searchMapsFragment"
+        android:name="com.gdsc.bingo.ui.pinpoint.search.SearchMapsFragment"
+        android:label="fragment_search_maps"
+        tools:layout="@layout/fragment_search_maps" />
+</navigation>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.profil.ProfilFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="50dp"
+        >
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/profil_card_header"
+            android:layout_width="match_parent"
+            android:layout_height="170dp"
+            app:cardBackgroundColor="?attr/colorPrimaryContainer"
+            android:alpha="0.3"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeWidth="0dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/profil_card_profil_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            app:cardBackgroundColor="?attr/colorTertiaryContainer"
+            app:cardCornerRadius="16dp"
+            app:layout_constraintBottom_toBottomOf="@+id/profil_card_header"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profil_card_header"
+            app:strokeWidth="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/profil_card_profil_text_view_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:ellipsize="marquee"
+                    android:maxLines="1"
+                    android:text="Nama Profile"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?attr/colorOnTertiaryContainer"
+                    app:layout_constraintBottom_toTopOf="@+id/profil_card_profil_guideline_middle"
+                    app:layout_constraintEnd_toStartOf="@+id/profil_card_profil_placeholder_image"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/profil_card_profil_placeholder_image"
+                    app:layout_constraintVertical_bias="0.8" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/profile_card_profile_text_view_email"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="example@mail.com"
+                    android:textColor="?attr/colorOnTertiaryContainer"
+                    android:textAppearance="?attr/textAppearanceBodyLarge"
+                    android:maxLines="1"
+                    app:layout_constraintBottom_toBottomOf="@+id/profil_card_profil_placeholder_image"
+                    app:layout_constraintEnd_toEndOf="@+id/profil_card_profil_text_view_name"
+                    app:layout_constraintStart_toStartOf="@+id/profil_card_profil_text_view_name"
+                    app:layout_constraintTop_toTopOf="@+id/profil_card_profil_guideline_middle"
+                    app:layout_constraintVertical_bias="0.19999999" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/profil_card_profil_placeholder_image"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="8dp"
+                    app:cardCornerRadius="1000dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:strokeColor="?attr/colorPrimary"
+                    app:strokeWidth="3dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/profil_card_profil_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:src="@tools:sample/avatars" />
+
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/profil_card_profil_guideline_middle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.5" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/materialTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="70dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="70dp"
+            android:text="@string/title_profil"
+            android:textColor="?attr/colorOnSurface"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            app:layout_constraintBottom_toBottomOf="@+id/profil_card_header"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <include
+            android:id="@+id/profil_include_bin_points"
+            layout="@layout/component_card_bin_point"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="@+id/profil_card_profil_container"
+            app:layout_constraintStart_toStartOf="@+id/profil_card_profil_container"
+            app:layout_constraintTop_toBottomOf="@+id/profil_card_profil_container" />
+
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/materialTextView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:text="@string/postingan_terbaru"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profil_include_bin_points" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/profil_recycler_user_latest_post"
+            tools:itemCount="1"
+            tools:listitem="@layout/component_card_komunitas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/materialTextView3" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.core.widget.NestedScrollView>

@@ -3,23 +3,126 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@id/navigation_beranda">
 
     <fragment
-        android:id="@+id/navigation_home"
-        android:name="com.gdsc.bingo.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        tools:layout="@layout/fragment_home" />
-
+        android:id="@+id/navigation_beranda"
+        android:name="com.gdsc.bingo.ui.beranda.BerandaFragment"
+        android:label="fragment_beranda"
+        tools:layout="@layout/fragment_beranda" >
+        <action
+            android:id="@+id/action_navigation_beranda_to_pointsHistoryFragment"
+            app:destination="@id/pointsHistoryFragment" />
+        <action
+            android:id="@+id/action_navigation_beranda_to_pinPointActivity"
+            app:destination="@id/pinPointActivity" />
+        <action
+            android:id="@+id/action_navigation_beranda_to_artikelFragment"
+            app:destination="@id/artikelFragment" />
+    </fragment>
     <fragment
-        android:id="@+id/navigation_dashboard"
-        android:name="com.gdsc.bingo.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
-
+        android:id="@+id/navigation_komunitas"
+        android:name="com.gdsc.bingo.ui.komunitas.KomunitasFragment"
+        android:label="fragment_komunitas"
+        tools:layout="@layout/fragment_komunitas" >
+        <action
+            android:id="@+id/action_navigation_komunitas_to_formPostFragment"
+            app:destination="@id/formPostFragment" />
+        <action
+            android:id="@+id/action_navigation_komunitas_to_artikelFragment"
+            app:destination="@id/artikelFragment" />
+    </fragment>
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.gdsc.bingo.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_profil"
+        android:name="com.gdsc.bingo.ui.profil.ProfilFragment"
+        android:label="fragment_profil"
+        tools:layout="@layout/fragment_profil" >
+        <action
+            android:id="@+id/action_navigation_profil_to_pointsHistoryFragment"
+            app:destination="@id/pointsHistoryFragment" />
+        <action
+            android:id="@+id/action_navigation_profil_to_navigation_profil_detail"
+            app:destination="@id/navigation_profil_detail" />
+        <action
+            android:id="@+id/action_navigation_profil_to_artikelFragment"
+            app:destination="@id/artikelFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pointsHistoryFragment"
+        android:name="com.gdsc.bingo.ui.points_history.PointsHistoryFragment"
+        android:label="fragment_points_history"
+        tools:layout="@layout/fragment_points_history" />
+    <fragment
+        android:id="@+id/formPostFragment"
+        android:name="com.gdsc.bingo.ui.form_post.FormPostFragment"
+        android:label="fragment_form_post"
+        tools:layout="@layout/fragment_form_post" />
+    <activity
+        android:id="@+id/pinPointActivity"
+        android:name="com.gdsc.bingo.ui.pinpoint.PinPointActivity"
+        android:label="activity_pin_point"
+        tools:layout="@layout/activity_pin_point" />
+    <fragment
+        android:id="@+id/navigation_profil_detail"
+        android:name="com.gdsc.bingo.ui.profil.detail.ProfilDetailFragment"
+        android:label="fragment_profil_detail"
+        tools:layout="@layout/fragment_profil_detail" />
+    <fragment
+        android:id="@+id/artikelFragment"
+        android:name="com.gdsc.bingo.ui.artikel.ArtikelFragment"
+        android:label="fragment_artikel"
+        tools:layout="@layout/fragment_artikel" >
+        <argument
+            android:name="referenece_path_document_string"
+            app:argType="string" />
+        <argument
+            android:name="title"
+            app:argType="string" />
+        <argument
+            android:name="text"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="is_using_text_file"
+            app:argType="boolean"
+            android:defaultValue="false" />
+        <argument
+            android:name="text_file_path_document_string"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="video_link"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="like_count"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="dislike_count"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="comment_count"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <argument
+            android:name="thumbnail_photos_url"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="author_document_string"
+            app:argType="string" />
+        <argument
+            android:name="komentar_hub_document_string"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="create_at_seconds"
+            app:argType="long" />
+        <argument
+            android:name="likes_reference"
+            app:argType="string" />
+    </fragment>
+
 </navigation>

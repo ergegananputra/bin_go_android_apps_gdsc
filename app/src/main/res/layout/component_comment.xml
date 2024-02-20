@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/component_comment_container">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/component_comment_container_profile_picture"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        app:cardCornerRadius="1000dp"
+        app:layout_constraintBottom_toBottomOf="@+id/component_comment_button_vertical_more"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/component_comment_button_vertical_more"
+        app:strokeWidth="0dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/component_comment_image_view_profile_picture"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:src="@tools:sample/avatars" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="40dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/component_comment_button_vertical_more"
+        app:layout_constraintEnd_toStartOf="@+id/component_comment_button_vertical_more"
+        app:layout_constraintStart_toEndOf="@+id/component_comment_container_profile_picture"
+        app:layout_constraintTop_toTopOf="@+id/component_comment_button_vertical_more">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/component_comment_text_view_username"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="marquee"
+            android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/component_comment_shimmer_username"
+            style="@style/ShimmerEffect"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/component_comment_text_view_username"
+            app:layout_constraintEnd_toEndOf="@+id/component_comment_text_view_username"
+            app:layout_constraintStart_toStartOf="@+id/component_comment_text_view_username"
+            app:layout_constraintTop_toTopOf="@+id/component_comment_text_view_username">
+
+            <View style="@style/ShimmerBox" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/component_comment_text_view_timestamp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:ellipsize="marquee"
+            android:maxLines="1"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/component_comment_shimmer_username" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/component_comment_shimmer_timestamp"
+            style="@style/ShimmerEffect"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/component_comment_text_view_timestamp"
+            app:layout_constraintEnd_toEndOf="@+id/component_comment_text_view_timestamp"
+            app:layout_constraintStart_toStartOf="@+id/component_comment_text_view_timestamp"
+            app:layout_constraintTop_toTopOf="@+id/component_comment_text_view_timestamp">
+
+            <View style="@style/ShimmerBox" />
+
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/component_comment_button_vertical_more"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:icon="@drawable/more_vertical_24"
+        app:iconTint="?attr/colorOnSurfaceVariant"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/component_comment_text_view_comment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="?attr/colorOnSurface"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/component_comment_button_vertical_more"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/component_comment_shimmer_comment"
+        style="@style/ShimmerEffect"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/component_comment_text_view_comment"
+        app:layout_constraintEnd_toEndOf="@+id/component_comment_text_view_comment"
+        app:layout_constraintStart_toStartOf="@+id/component_comment_text_view_comment"
+        app:layout_constraintTop_toTopOf="@+id/component_comment_text_view_comment">
+
+        <View style="@style/ShimmerBox" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

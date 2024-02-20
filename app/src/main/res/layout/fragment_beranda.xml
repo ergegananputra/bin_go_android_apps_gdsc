@@ -76,34 +76,31 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp"
                     android:ellipsize="marquee"
                     android:text="@string/cek_tempat_sampah_terdekat"
                     android:textAppearance="?attr/textAppearanceHeadlineSmall"
                     android:textColor="?attr/colorOnTertiaryContainer"
-                    app:layout_constraintBottom_toTopOf="@+id/beranda_card_bin_locator_text_view_user_location"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/beranda_card_image_view_illustration_1"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/beranda_card_image_view_illustration_1"
-                    app:layout_constraintVertical_bias="0.55" />
+                    app:layout_constraintVertical_bias="0.32999998" />
 
                 <com.google.android.material.textview.MaterialTextView
                     android:id="@+id/beranda_card_bin_locator_text_view_user_location"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:drawableStart="@drawable/ic_my_location_24"
-                    android:drawablePadding="8dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
                     android:maxLines="2"
-                    android:text="@string/lokasi"
-                    android:textAppearance="?attr/textAppearanceBodyLarge"
-                    android:textColor="?attr/colorOnTertiaryContainer"
-                    app:drawableTint="?attr/colorPrimary"
-                    app:layout_constraintBottom_toBottomOf="@+id/beranda_card_image_view_illustration_1"
+                    android:text="Buka Bin Locator"
+                    android:textAppearance="?attr/textAppearanceLabelSmall"
+                    android:textColor="?attr/colorPrimary"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="@+id/beranda_card_bin_locator_text_view_title"
                     app:layout_constraintStart_toStartOf="@+id/beranda_card_bin_locator_text_view_title"
-                    app:layout_constraintTop_toTopOf="@+id/beranda_card_image_view_illustration_1"
-                    app:layout_constraintVertical_bias="0.86" />
+                    app:layout_constraintTop_toBottomOf="@+id/beranda_card_bin_locator_text_view_title" />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/beranda_card_image_view_illustration_1"

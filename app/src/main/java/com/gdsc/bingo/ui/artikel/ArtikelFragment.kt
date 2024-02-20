@@ -439,7 +439,10 @@ class ArtikelFragment : Fragment(), PointsRewardSystem {
 
     private suspend fun setupImagesContent(documentReferenceString: String?) {
         withContext(Dispatchers.Main) {
-            fireStore.document(documentReferenceString!!).collection(PostImage().table).get(Source.SERVER)
+            fireStore.document(documentReferenceString!!)
+                .collection(PostImage().table)
+                .orderBy(FireModel.Keys.createdAt, Query.Direction.ASCENDING)
+                .get(Source.SERVER)
                 .addOnSuccessListener { documentSnapshot ->
                     val imagePost = PostImage().toModels(documentSnapshot)
                     imagePostAdapter.submitList(imagePost)

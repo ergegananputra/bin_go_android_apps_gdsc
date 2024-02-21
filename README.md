@@ -60,7 +60,7 @@ Make sure before you run this project, you will need to add the following enviro
 Note: Don't forget to connect `console.firebase.google.com` in your project to connect to your project's storage database
 
 ## Demo Application
-Youtube : https://www.youtube.com/watch?v=_muFvdGh-fQ&ab_channel=mandelaaa
+Youtube : https://youtu.be/zqYfTEWjGGE\
 
 ## Authors
 

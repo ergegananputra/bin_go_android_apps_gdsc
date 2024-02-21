@@ -36,3 +36,37 @@ git clone https://github.com/ergegananputra/bin_go_android_apps_gdsc.git
 ```
 
 Then, open Android Studio and click “Open an existing Android Studio Project”. Locate the cloned folder and wait for the Gradle to build.
+
+
+## Preparation
+
+Make sure you add in your `local.properties` file the location of your sdk `sdk.dir=C\:\\`, `MAPS_API_KEY` and `MAPS_PLACE_API_KEY` in it.
+
+<img width="446" alt="Screenshot 2024-02-21 224011" src="https://github.com/ergegananputra/bin_go_android_apps_gdsc/assets/79182959/452befd5-87d7-49bf-a2e9-41c9cce62c28">
+
+## Environment Variables
+
+Make sure before you run this project, you will need to add the following environment variables to your `google.services.json` file
+
+
+ `YOUR_API_KEY` you can build in your project `[console.google.com](https://console.cloud.google.com/apis/dashboard)` an then copy your api_key to this file
+
+<div style="text-align:center;">
+  <img width="300" alt="Screenshot 2024-02-21 224231" src="https://github.com/ergegananputra/bin_go_android_apps_gdsc/assets/79182959/fa69c729-e0e1-4a55-8b4a-b937766b1976" style="display: inline-block;">
+  <img width="400" alt="Screenshot 2024-02-21 224011" src="https://github.com/ergegananputra/bin_go_android_apps_gdsc/assets/79182959/976dd015-68b6-4a65-b4c5-f0683ee4c7ab" style="display: inline-block;">
+</div>
+
+
+Note: Don't forget to connect `console.firebase.google.com` in your project to connect to your project's storage database
+
+## Demo Application
+Youtube : https://www.youtube.com/watch?v=_muFvdGh-fQ&ab_channel=mandelaaa
+
+## Authors
+
+- [@ergegananputra](https://github.com/ergegananputra)
+- [@aldyardiansyah](https://github.com/ItsmeAldy17)
+- [@salmanataya](https://github.com/salmanataya)
+- [@danielwinstonmandela](https://github.com/danielwinstonmandela)
+
+

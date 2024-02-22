@@ -26,7 +26,6 @@ import com.gdsc.bingo.model.PostImage
 import com.gdsc.bingo.model.User
 import com.gdsc.bingo.services.points.Points
 import com.gdsc.bingo.services.points.PointsRewardSystem
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
@@ -245,18 +244,23 @@ class ArtikelFragment : Fragment(), PointsRewardSystem {
                 }
             }
 
+        var user = fireStore.collection(User().table).document(auth.uid!!)
+        var author = fireStore.document(navArgs.authorDocumentString)
+        if (user.path == author.path) {
+            binding.artikelButtonLike.setOnCheckedChangeListener { _, isChecked ->
+                if (isChecked) {
+                    binding.artikelButtonLike.isChecked = false
+                }
+            }
+            return
+        }
         binding.artikelButtonLike.setOnCheckedChangeListener { _, isChecked ->
             val forumRef = fireStore.document(navArgs.referenecePathDocumentString)
             val likeCount = navArgs.likeCount
             val dislikeCount = navArgs.dislikeCount
-            val user = fireStore.collection(User().table).document(auth.uid!!)
-            val author = fireStore.document(navArgs.authorDocumentString)
+            user = fireStore.collection(User().table).document(auth.uid!!)
+            author = fireStore.document(navArgs.authorDocumentString)
 
-            if (user.path == author.path) {
-                val msg = getString(R.string.you_cant_like_your_own_post)
-                Snackbar.make(requireView(), msg, Snackbar.LENGTH_SHORT).show()
-                return@setOnCheckedChangeListener
-            }
 
             val like = Like(
                 referencePath = forumRef,

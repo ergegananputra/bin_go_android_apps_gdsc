@@ -100,6 +100,7 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/component_comment_button_vertical_more"
         style="@style/Widget.Material3.Button.IconButton"
+        android:visibility="invisible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"

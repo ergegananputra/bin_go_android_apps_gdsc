@@ -57,7 +57,7 @@ Make sure before you run this project, you will need to add the following enviro
 </div>
 
 
-Note: Don't forget to connect `console.firebase.google.com` in your project to connect to your project's storage database
+Note: Don't forget to connect `console.firebase.google.com` in your project to connect to your project's storage database and sync the Gradle
 
 ## Demo Application
 Youtube : https://youtu.be/zqYfTEWjGGE\

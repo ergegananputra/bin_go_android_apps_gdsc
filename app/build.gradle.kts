@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -16,6 +19,14 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+val localProperties = Properties().apply {
+    FileInputStream(rootProject.file("local.properties")).use { load(it) }
+}
+
+val keystorePath: String by localProperties
+val keystorePassword: String by localProperties
+val keyAliasProperties: String by localProperties
+
 android {
     namespace = "com.gdsc.bingo"
     compileSdk = 34
@@ -30,6 +41,15 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(keystorePath)
+            storePassword = keystorePassword
+            keyAlias = keyAliasProperties
+            keyPassword = keystorePassword
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -37,6 +57,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {

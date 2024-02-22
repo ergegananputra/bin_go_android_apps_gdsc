@@ -41,8 +41,13 @@ Then, open Android Studio and click â€œOpen an existing Android Studio Projectâ€
 ## Preparation
 
 Make sure you add in your `local.properties` file the location of your sdk `sdk.dir=C\:\\`, `MAPS_API_KEY` and `MAPS_PLACE_API_KEY` in it.
+You may also add keystorePath, keystorePassword, keyAliasProperties, and keyPassword for build and release configuration and setting up SHA for firebase Authentication.
 
-<img width="446" alt="Screenshot 2024-02-21 224011" src="https://github.com/ergegananputra/bin_go_android_apps_gdsc/assets/79182959/452befd5-87d7-49bf-a2e9-41c9cce62c28">
+![image](https://github.com/ergegananputra/bin_go_android_apps_gdsc/assets/126530940/8951fb05-d300-4d52-8ed7-752e7c3c5ba4)
+
+Note: Don't forget to change path_to_your_sdk, your_place_api_key, ..., and your_key_password
+
+
 
 ## Environment Variables
 

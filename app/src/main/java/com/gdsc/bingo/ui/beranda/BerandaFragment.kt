@@ -124,7 +124,7 @@ class BerandaFragment : Fragment() {
     }
 
     private fun refreshRecyclerMostLikeData() {
-        komunitasViewModel.loadMostLiketData()
+        komunitasViewModel.loadMostLikeData()
     }
 
     private fun setupBerandaPinPoint() {

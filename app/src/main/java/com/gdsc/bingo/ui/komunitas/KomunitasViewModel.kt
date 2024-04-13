@@ -39,6 +39,8 @@ class KomunitasViewModel : ViewModel() {
                 .limit(1)
             query.get()
                 .addOnSuccessListener { result ->
+                    if (result.isEmpty) return@addOnSuccessListener
+
                     endOfList = result.documents[0]
                 }
                 .addOnFailureListener { exception ->
@@ -47,7 +49,7 @@ class KomunitasViewModel : ViewModel() {
         }
     }
 
-    fun loadMostLiketData() {
+    fun loadMostLikeData() {
         viewModelScope.launch(Dispatchers.IO) {
             val query = firestore.collection(tempObj.table)
                 .orderBy(Forums.Keys.likeCount, Query.Direction.DESCENDING)
@@ -88,6 +90,8 @@ class KomunitasViewModel : ViewModel() {
 
             baseQuery.get(source)
                 .addOnSuccessListener { result ->
+                    if (result.isEmpty) return@addOnSuccessListener
+
                     val forums = tempObj.toModels(result)
                     _forum.value = forums
 

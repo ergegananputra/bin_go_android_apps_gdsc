@@ -155,7 +155,12 @@ dependencies {
     implementation ("com.github.delight-im:Android-SimpleLocation:v1.1.0")
 
     // WYSIWYG
-//    implementation("com.github.onecode369:WYSIWYG:4.0")
+    implementation("com.github.onecode369:WYSIWYG:4.0")
+
+    // HTML Parser
+    val ksoupVersion = "0.3.1"
+    implementation("com.mohamedrejeb.ksoup:ksoup-html:$ksoupVersion")
+    implementation("com.mohamedrejeb.ksoup:ksoup-entities:$ksoupVersion")
 
     // Swipe Refresh Layout
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")

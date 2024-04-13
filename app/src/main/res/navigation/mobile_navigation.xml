@@ -27,7 +27,7 @@
         tools:layout="@layout/fragment_komunitas" >
         <action
             android:id="@+id/action_navigation_komunitas_to_formPostFragment"
-            app:destination="@id/formPostFragment" />
+            app:destination="@id/navigation" />
         <action
             android:id="@+id/action_navigation_komunitas_to_artikelFragment"
             app:destination="@id/artikelFragment" />
@@ -52,11 +52,6 @@
         android:name="com.gdsc.bingo.ui.points_history.PointsHistoryFragment"
         android:label="fragment_points_history"
         tools:layout="@layout/fragment_points_history" />
-    <fragment
-        android:id="@+id/formPostFragment"
-        android:name="com.gdsc.bingo.ui.form_post.FormPostFragment"
-        android:label="fragment_form_post"
-        tools:layout="@layout/fragment_form_post" />
     <activity
         android:id="@+id/pinPointActivity"
         android:name="com.gdsc.bingo.ui.pinpoint.PinPointActivity"
@@ -124,5 +119,21 @@
             android:name="likes_reference"
             app:argType="string" />
     </fragment>
+    <navigation android:id="@+id/navigation"
+        app:startDestination="@id/formPostFragment">
+        <fragment
+            android:id="@+id/formPostFragment"
+            android:name="com.gdsc.bingo.ui.form_post.FormPostFragment"
+            android:label="fragment_form_post"
+            tools:layout="@layout/fragment_form_post">
+            <action
+                android:id="@+id/action_formPostFragment_to_formFullEditorFragment"
+                app:destination="@id/formFullEditorFragment" />
+        </fragment>
+        <fragment
+            android:id="@+id/formFullEditorFragment"
+            android:name="com.gdsc.bingo.ui.form_post.FormFullEditorFragment"
+            android:label="FormFullEditorFragment" />
+    </navigation>
 
 </navigation>

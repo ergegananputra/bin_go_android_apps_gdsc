@@ -2,6 +2,7 @@ package com.gdsc.bingo.ui.form_post
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -13,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -27,6 +29,8 @@ import com.gdsc.bingo.model.KomentarHub
 import com.gdsc.bingo.model.Likes
 import com.gdsc.bingo.model.PostImage
 import com.gdsc.bingo.model.User
+import com.gdsc.bingo.services.textstyling.AddOnSpannableTextStyle
+import com.gdsc.bingo.ui.form_post.viewmodel.FormPostViewModel
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -47,6 +51,10 @@ class FormPostFragment : Fragment() {
     private lateinit var storage: FirebaseStorage
     private val binding by lazy {
         FragmentFormPostBinding.inflate(layoutInflater)
+    }
+
+    private val formViewModel by lazy {
+        ViewModelProvider(requireActivity())[FormPostViewModel::class.java]
     }
 
     private val imagePostAdapter = ImagePostAdapter(
@@ -81,6 +89,11 @@ class FormPostFragment : Fragment() {
         imagePostAdapter.submitList(lists)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        formViewModel.description.value = null
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -101,6 +114,34 @@ class FormPostFragment : Fragment() {
         setupImageRecycler()
         setupAddImageButton()
 
+        setupDescriptionText()
+        setupButtonEditDescription()
+    }
+
+    private fun setupDescriptionText() {
+
+        formViewModel.description.observe(viewLifecycleOwner) { rawHTML ->
+            if (rawHTML.isNullOrEmpty()) {
+
+                return@observe
+            }
+
+            val spannableConverter = AddOnSpannableTextStyle()
+
+            val spanned = spannableConverter.convertHtmlWithOrderedList(rawHTML)
+//                android.text.Html.fromHtml(rawHTML, android.text.Html.FROM_HTML_MODE_COMPACT)
+
+            binding.formPostTextViewDescription.text = spanned
+            val typeface = Typeface.DEFAULT
+            binding.formPostTextViewDescription.typeface = typeface
+        }
+    }
+
+    private fun setupButtonEditDescription() {
+        binding.formPostButtonEditDescription.setOnClickListener {
+            val action = FormPostFragmentDirections.actionFormPostFragmentToFormFullEditorFragment()
+            findNavController().navigate(action)
+        }
     }
 
     private val openImageLauncher = registerForActivityResult(
@@ -160,11 +201,16 @@ class FormPostFragment : Fragment() {
                 binding.formPostTextInputLayoutTitle.error = errMsg
                 return@withContext
                 }
-            val caption = binding.formPostTextInputLayoutCaption.getTrimEditText() ?: run {
+            val caption = formViewModel.description.value ?: run {
                 val errMsg = getString(R.string.error_caption_required)
-                binding.formPostTextInputLayoutCaption.error = errMsg
+                binding.formPostTextViewDescription.error = errMsg
                 return@withContext
                 }
+//            val caption = binding.formPostTextInputLayoutCaption.getTrimEditText() ?: run {
+//                val errMsg = getString(R.string.error_caption_required)
+//                binding.formPostTextInputLayoutCaption.error = errMsg
+//                return@withContext
+//                }
 
             val videoLink = binding.formPostTextInputLayoutVideoLink.getTrimEditText().getYoutubeVideoId()
 

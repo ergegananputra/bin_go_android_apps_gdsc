@@ -1,5 +1,6 @@
 package com.gdsc.bingo.ui.artikel
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -26,6 +27,7 @@ import com.gdsc.bingo.model.PostImage
 import com.gdsc.bingo.model.User
 import com.gdsc.bingo.services.points.Points
 import com.gdsc.bingo.services.points.PointsRewardSystem
+import com.gdsc.bingo.services.textstyling.AddOnSpannableTextStyle
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
@@ -407,16 +409,30 @@ class ArtikelFragment : Fragment(), PointsRewardSystem {
         usingTextFile: Boolean,
         textFilePathDocumentString: String?,
     ) {
+        val spannableConverter = AddOnSpannableTextStyle()
+
+
         if (usingTextFile.not()) {
-            binding.artikelTextViewContent.text = text
+            val spanned = spannableConverter.convertHtmlWithOrderedList(text ?: "")
+
+            binding.artikelTextViewContent.text = spanned
+            val typeface = Typeface.DEFAULT
+            binding.artikelTextViewContent.typeface = typeface
+
             binding.artikelShimmerContent.stop()
             return
         }
 
+
         storage.getReference(textFilePathDocumentString!!).getBytes(10_000_000)
             .addOnSuccessListener { bytes ->
                 val textData = String(bytes)
-                binding.artikelTextViewContent.text = textData
+                val spanned = spannableConverter.convertHtmlWithOrderedList(textData)
+
+                binding.artikelTextViewContent.text = spanned
+                val typeface = Typeface.DEFAULT
+                binding.artikelTextViewContent.typeface = typeface
+
                 binding.artikelShimmerContent.stop()
 
             }

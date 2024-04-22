@@ -1,11 +1,12 @@
 package com.gdsc.bingo.ui.form_post
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.gdsc.bingo.databinding.FragmentFormFullEditorBinding
@@ -22,12 +23,19 @@ class FormFullEditorFragment : Fragment() {
         ViewModelProvider(requireActivity())[FormPostViewModel::class.java]
     }
 
+    private val currentExpandableTools : MutableLiveData<View?> = MutableLiveData()
+    private var previousExpandableTools : View? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         // Inflate the layout for this fragment
+        binding.editorHeadingOptions.isVisible = false
+        binding.editorJustifyOptions.isVisible = false
+        binding.editorMoreOptions.isVisible = false
+
         return binding.root
     }
 
@@ -43,11 +51,42 @@ class FormFullEditorFragment : Fragment() {
             wysiwygEditor.setEditorHeight(200)
             wysiwygEditor.setEditorFontSize(16)
             wysiwygEditor.setPadding(10, 10, 10, 10)
-            wysiwygEditor.setPlaceholder("Insert your notes here...")
+            wysiwygEditor.setPlaceholder("Apa yang ingin Anda bagikan? ...")
 
-//        val mPreview = preview as TextView
-//        wysiwygEditor.setOnTextChangeListener(OnTextChangeListener { text -> mPreview.setText(text) })
+            setupWYSIWYGListeners(wysiwygEditor)
+            setupExpandableButtons()
 
+        }
+    }
+
+    private fun setupExpandableButtons() {
+
+
+        with(binding) {
+            actionHeadingOptions.setOnClickListener { currentExpandableTools.value = it }
+            actionAlignOptions.setOnClickListener { currentExpandableTools.value = it }
+            actionMoreOptions.setOnClickListener { currentExpandableTools.value = it }
+        }
+
+        currentExpandableTools.observe(viewLifecycleOwner) {
+            with(binding) {
+                editorHeadingOptions.isVisible = it == actionHeadingOptions
+                editorJustifyOptions.isVisible = it == actionAlignOptions
+                editorMoreOptions.isVisible = it == actionMoreOptions
+
+                if (previousExpandableTools != null && previousExpandableTools == it) {
+                    currentExpandableTools.value = null
+                } else {
+                    previousExpandableTools = it
+                }
+            }
+        }
+
+
+    }
+
+    private fun setupWYSIWYGListeners(wysiwygEditor: WYSIWYG) {
+        with(binding) {
             actionUndo.setOnClickListener{ wysiwygEditor.undo() }
 
             actionRedo.setOnClickListener{ wysiwygEditor.redo() }
@@ -100,22 +139,6 @@ class FormFullEditorFragment : Fragment() {
                 )
             }
 
-            actionTxtColor.setOnClickListener(object : View.OnClickListener {
-                private var isChanged = false
-                override fun onClick(v: View) {
-                    wysiwygEditor.setTextColor(if (isChanged) Color.BLACK else Color.RED)
-                    isChanged = !isChanged
-                }
-            })
-
-            actionBgColor.setOnClickListener(object : View.OnClickListener {
-                private var isChanged = false
-                override fun onClick(v: View) {
-                    wysiwygEditor.setTextBackgroundColor(if (isChanged) Color.TRANSPARENT else Color.YELLOW)
-                    isChanged = !isChanged
-                }
-            })
-
             actionIndent.setOnClickListener{wysiwygEditor.setIndent() }
 
             actionOutdent.setOnClickListener { wysiwygEditor.setOutdent() }
@@ -135,35 +158,8 @@ class FormFullEditorFragment : Fragment() {
             actionInsertNumbers.setOnClickListener { wysiwygEditor.setNumbers() }
 
             actionInsertCheckbox.setOnClickListener{ wysiwygEditor.insertTodo() }
-
-            var visible = false
-
-            preview.setOnClickListener {
-                if(!visible){
-                    wysiwygEditor.setInputEnabled(false)
-                    preview.setImageResource(com.github.onecode369.wysiwyg.R.drawable.visibility_off)
-                }else{
-                    wysiwygEditor.setInputEnabled(true)
-                    preview.setImageResource(com.github.onecode369.wysiwyg.R.drawable.visibility)
-                }
-                visible = !visible
-            }
-
-            insertLatex.setOnClickListener {
-                if(latextEditor.visibility == View.GONE) {
-                    latextEditor.visibility = View.VISIBLE
-                    submitLatex.setOnClickListener {
-                        wysiwygEditor.insertLatex(latexEquation.text.toString())
-                    }
-                }else{
-                    latextEditor.visibility = View.GONE
-                }
-            }
-
-            insertCode.setOnClickListener{ wysiwygEditor.setCode() }
-
-
         }
+
     }
 
     private fun setupSaveButton() {

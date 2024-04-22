@@ -130,7 +130,6 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:hint="@string/title"
-                app:boxStrokeWidth="0dp"
                 app:endIconMode="clear_text">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -148,7 +147,6 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
                 android:hint="Link video Youtube"
-                app:boxStrokeWidth="0dp"
                 app:endIconMode="clear_text"
                 app:helperText="(Opsional) Masukkan link yang memiliki domain youtube.com atau youtu.be"
                 app:helperTextEnabled="true">

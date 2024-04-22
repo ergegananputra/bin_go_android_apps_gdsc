@@ -1,10 +1,14 @@
 package com.gdsc.bingo.ui.komunitas
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -57,11 +61,61 @@ class KomunitasFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         (activity as MainActivity).setStatusAndBottomNavigation(this)
 
+        setupSearchBar()
 
         setupCreateKomunitasExtendedFloatingActionButton()
         komunitasViewModel.refreshRecyclerData()
         setupSwipeRefresh()
         setupPaginationAndScrollingBehaviour()
+    }
+
+    private fun setupSearchBar() {
+        binding.komunitasOpenSearchButton.visibility = View.VISIBLE
+        binding.komunitasTextViewTitle.visibility = View.VISIBLE
+        binding.komunitasTextInputLayoutSearch.visibility = View.GONE
+
+        binding.komunitasOpenSearchButton.setOnClickListener { button ->
+            button.visibility = if (button.isVisible) {
+                binding.komunitasTextInputLayoutSearch.apply {
+                    visibility = View.VISIBLE
+                    this.requestFocus()
+                    val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    inputMethodManager.showSoftInput(this.editText, InputMethodManager.SHOW_IMPLICIT)
+                }
+                View.GONE
+            } else {
+                binding.komunitasTextInputLayoutSearch.apply {
+                    visibility = View.GONE
+                    editText?.text?.clear()
+                    clearFocus()
+                    val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    inputMethodManager.hideSoftInputFromWindow(this.editText?.windowToken, 0)
+                }
+                View.VISIBLE
+            }
+
+            binding.komunitasTextViewTitle.visibility = button.visibility
+        }
+
+        binding.komunitasTextInputLayoutSearch.setEndIconOnClickListener {
+            val query = binding.komunitasTextInputLayoutSearch.editText?.text.toString().trim()
+            if (query.isNotBlank()) {
+                binding.komunitasTextInputLayoutSearch.editText?.text?.clear()
+            } else {
+                binding.komunitasOpenSearchButton.performClick()
+            }
+        }
+
+        binding.komunitasTextInputLayoutSearch.editText?.doAfterTextChanged {
+            val query = it.toString().trim()
+            if (query.isNotBlank()) {
+                // TODO : search for query
+                Toast.makeText(requireContext(), "Search for $query", Toast.LENGTH_SHORT).show()
+            } else {
+                // TODO : search for all
+                Toast.makeText(requireContext(), "Search for all", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setupEndOfList() {

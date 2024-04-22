@@ -12,6 +12,12 @@
         android:title="@string/title_komunitas" />
 
     <item
+        android:id="@+id/navigation_locator"
+        android:icon="@drawable/ic_travel_explore"
+        android:title="@string/locator"
+        />
+
+    <item
         android:id="@+id/navigation_profil"
         android:icon="@drawable/nav_ic_profil"
         android:title="@string/title_profil" />

@@ -6,28 +6,94 @@
     android:layout_height="match_parent"
     tools:context=".ui.komunitas.KomunitasFragment">
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:visibility="gone"
+        android:id="@+id/komunitas_text_input_layout_search"
+        style="@style/ThemeOverlay.Material3.TextInputEditText.FilledBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurfaceContainerHighest"
+        android:hint="@string/title"
+        app:boxCornerRadiusBottomEnd="0dp"
+        app:boxCornerRadiusBottomStart="0dp"
+        app:boxCornerRadiusTopEnd="0dp"
+        app:boxCornerRadiusTopStart="0dp"
+        app:boxStrokeWidth="0dp"
+        app:endIconMode="custom"
+        app:endIconDrawable="@drawable/ic_close_24"
+        app:endIconTint="?attr/colorOnSurface"
+        app:hintEnabled="false"
+        app:layout_constraintBottom_toTopOf="@+id/materialDivider"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ketik penulusuran disini ..."
+            android:maxLines="1"
+            android:textColor="?attr/colorOnSurface" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/komunitas_text_view_title"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
         android:paddingHorizontal="16dp"
         android:paddingVertical="20dp"
         android:text="@string/title_komunitas"
         android:textAppearance="?attr/textAppearanceTitleMedium"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/materialDivider"
+        app:layout_constraintEnd_toStartOf="@+id/komunitas_open_search_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.divider.MaterialDivider
-        android:id="@+id/materialDivider"
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:backgroundTint="?attr/colorOutline"
-        app:layout_constraintBottom_toBottomOf="@+id/komunitas_text_view_title"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/komunitas_open_search_button"
+        style="@style/Widget.Material3.Button.IconButton.Outlined"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        app:icon="@drawable/ic_search_24"
+        app:iconTint="?attr/colorOnSurface"
+        app:layout_constraintBottom_toTopOf="@+id/materialDivider"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/komunitas_text_view_title" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="0dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/materialDivider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="64dp" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@+id/materialDivider" >
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Postingan"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Laporan"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DIY"/>
+
+    </com.google.android.material.tabs.TabLayout>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/komunitas_swipe_refresh_layout"
@@ -36,19 +102,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/komunitas_text_view_title">
+        app:layout_constraintTop_toBottomOf="@+id/tabLayout">
 
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/komunitas_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="4dp"
             android:paddingHorizontal="16dp"
+            android:paddingTop="4dp"
             android:scrollbars="none"
             tools:itemCount="3"
             tools:listitem="@layout/component_card_komunitas" />
-
 
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
@@ -61,7 +126,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/komunitas_text_view_title"
+        app:layout_constraintTop_toBottomOf="@+id/materialDivider"
         app:layout_constraintVertical_bias="0.35000002" />
 
 

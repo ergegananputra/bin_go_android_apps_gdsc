@@ -12,7 +12,7 @@
         android:title="@string/title_komunitas" />
 
     <item
-        android:id="@+id/navigation_locator"
+        android:id="@+id/pinPointActivity"
         android:icon="@drawable/ic_travel_explore"
         android:title="@string/locator"
         />

@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,10 +28,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
 import com.gdsc.bingo.R
 import com.gdsc.bingo.databinding.FragmentSearchMapsBinding
+import com.gdsc.bingo.model.BinLocation
 import com.gdsc.bingo.model.nearby.ModelResults
 import com.gdsc.bingo.model.utils.CustomInfoWindowGoogleMap
 import com.gdsc.bingo.ui.pinpoint.search.viewmodel.SearchMapsViewModel
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -40,7 +46,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.textview.MaterialTextView
-import java.util.*
+import java.util.Locale
 
 
 class SearchMapsFragment : Fragment(), OnMapReadyCallback {
@@ -68,13 +74,13 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
     private val markerList = mutableListOf<Marker>()
 
     // Properti untuk menyimpan hasil pencarian
-    private var modelResultsArrayList = ArrayList<ModelResults>()
+    private var binLocationList = ArrayList<BinLocation>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         selectedLocationText = getString(R.string.belum_ada_lokasi_terpilih)
         return binding.root
     }
@@ -114,7 +120,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
                     performSearch(searchText)
                 } else {
                     // Jika teks pencarian kosong, tampilkan semua marker
-                    getMarker(modelResultsArrayList)
+                    getMarker(binLocationList)
                 }
             }
 
@@ -298,42 +304,32 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    @SuppressLint("FragmentLiveDataObserve")
     private fun setViewModel() {
         ViewModelMaps = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[SearchMapsViewModel::class.java]
         ViewModelMaps.setMarkerLocation(strCurrentLocation)
-        ViewModelMaps.getMarkerLocation().observe(this) { modelResults: ArrayList<ModelResults> ->
-            if (modelResults.isNotEmpty()) {
-                modelResultsArrayList.clear()
-                modelResultsArrayList.addAll(modelResults)
-                getMarker(modelResults)
-            } else {
+        ViewModelMaps.modelResultsMutableLiveData.observe(requireActivity()) { newBinLocationList ->
+            if (newBinLocationList.isEmpty()) {
                 requestLocationPermission()
+                return@observe
             }
+
+            binLocationList.clear()
+            binLocationList.addAll(newBinLocationList)
+            getMarker(newBinLocationList)
         }
     }
 
-    private fun getMarker(modelResultsArrayList: ArrayList<ModelResults>) {
+    private fun getMarker(binLocationList: ArrayList<BinLocation>) {
         // Hapus semua marker yang ada sebelum menambahkan yang baru
         googleMap?.clear()
         markerList.clear()
 
-        for (i in modelResultsArrayList.indices) {
-            val latLngMarker = LatLng(
-                modelResultsArrayList[i]
-                    .modelGeometry
-                    .modelLocation
-                    .lat, modelResultsArrayList[i]
-                    .modelGeometry
-                    .modelLocation
-                    .lng
-            )
+        for (binLocation in binLocationList) {
+            if (binLocation.latitude == null || binLocation.longitude == null) {
+                continue
+            }
 
-            val info = ModelResults()
-            info.name = modelResultsArrayList[i].name
-            info.placeId = modelResultsArrayList[i].placeId
-            info.vicinity = modelResultsArrayList[i].vicinity
-            info.rating = modelResultsArrayList[i].rating // Menambahkan rating dari model ke info
+            val latLngMarker = LatLng(binLocation.latitude!!, binLocation.longitude!!)
 
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)
@@ -349,45 +345,65 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
                             .position(latLngMarker)
                             .icon(bitmapDescriptor)
                         val marker = googleMap?.addMarker(markerOptions)
-                        marker?.tag = info
+                        marker?.tag = ModelResults().apply {
+                            name = binLocation.name!!
+                            placeId = binLocation.additionalInfo?.get("place_id").toString()
+                            vicinity = binLocation.address!!
+                            rating = binLocation.rating!!
+                        }
                         marker?.showInfoWindow()
                         marker?.let { markerList.add(it) }
                     }
                 })
         }
+
         // Tambahkan listener pada marker di luar loop
         googleMap?.setOnMarkerClickListener { marker ->
             // Ambil tag dari marker yang diklik
-            val markerInfo = marker.tag as? ModelResults
-            // Jika tag tidak null
-            if (markerInfo != null) {
-                // Update teks terpilih dengan informasi dari marker yang diklik
-                selectedLocationText = "${markerInfo.name}"
-                // Perbarui teks pada TextView
-                binding.searchMapsTextViewLokasiTerpilih.text = selectedLocationText
-                binding.searchMapsTextViewAddressLokasiTerpilih.text = markerInfo.vicinity
+            Log.i("MarkerClicked", "Marker clicked")
+            val markerInfoRaw = marker.tag as? ModelResults ?: return@setOnMarkerClickListener  false // Kembalikan false agar default behavior dari marker juga berlaku
 
-                // NOTE: Animasi disini
-                TransitionManager.beginDelayedTransition(binding.searchMapsBottomDialogMainConstraintLayout)
-                binding.searchMapsGroupMarkerInfo.visibility = View.VISIBLE
+            val markerInfo = BinLocation(
+                referencePath = null,
+                name = markerInfoRaw.name,
+                address = markerInfoRaw.vicinity,
+                latitude = marker.position.latitude,
+                longitude = marker.position.longitude,
+                additionalInfo = mapOf(
+                    "place_id" to markerInfoRaw.placeId
+                ),
+                isOpen = markerInfoRaw.isOpen,
+                rating = markerInfoRaw.rating
+            )
 
-                // Periksa apakah tempat tersebut terbuka atau tutup
-                val isOpen = markerInfo.isOpen ?: true // Defaultnya adalah false jika properti isOpen null
-                if (isOpen) {
-                    // Tempat terbuka, tampilkan chip "Buka" dan sembunyikan chip "Tutup"
-                    binding.searchMapsChipBuka.visibility = View.VISIBLE
-                    binding.searchMapsChipTutup.visibility = View.GONE
-                } else {
-                    // Tempat tutup, tampilkan chip "Tutup" dan sembunyikan chip "Buka"
-                    binding.searchMapsChipTutup.visibility = View.VISIBLE
-                    binding.searchMapsChipBuka.visibility = View.GONE
-                }
-                // Perbarui rating pada TextView
-                binding.searchMapsTextViewLokasiRating.visibility = View.VISIBLE
-                binding.searchMapsTextViewLokasiRating.text = "Rating: ${markerInfo.rating ?: "Rating tidak tersedia"}"
+            // Perbarui teks pada TextView
+            binding.searchMapsTextViewLokasiTerpilih.text = markerInfo.name
+            binding.searchMapsTextViewAddressLokasiTerpilih.text = markerInfo.address
+
+            // NOTE: Animasi disini
+            TransitionManager.beginDelayedTransition(binding.searchMapsBottomDialogMainConstraintLayout)
+            binding.searchMapsGroupMarkerInfo.visibility = View.VISIBLE
+
+            // Periksa apakah tempat tersebut terbuka atau tutup
+            val isOpen = markerInfo.isOpen ?: true // Defaultnya adalah false jika properti isOpen null
+            if (isOpen) {
+                // Tempat terbuka, tampilkan chip "Buka" dan sembunyikan chip "Tutup"
+                binding.searchMapsChipBuka.visibility = View.VISIBLE
+                binding.searchMapsChipTutup.visibility = View.GONE
+            } else {
+                // Tempat tutup, tampilkan chip "Tutup" dan sembunyikan chip "Buka"
+                binding.searchMapsChipTutup.visibility = View.VISIBLE
+                binding.searchMapsChipBuka.visibility = View.GONE
             }
-            // Kembalikan false agar default behavior dari marker juga berlaku
-            false
+            // Perbarui rating pada TextView
+            binding.searchMapsTextViewLokasiRating.visibility = View.VISIBLE
+
+            val ratingTextString =  "Rating: ${markerInfo.rating ?: "Rating tidak tersedia"}"
+            binding.searchMapsTextViewLokasiRating.text = ratingTextString
+
+            marker.showInfoWindow()
+
+            return@setOnMarkerClickListener true
         }
 
         googleMap?.setOnMapClickListener {
@@ -398,13 +414,17 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
 
     private fun performSearch(searchText: String) {
         // Filter modelResultsArrayList berdasarkan teks pencarian
-        val filteredResults = modelResultsArrayList.filter { it.name.contains(searchText, ignoreCase = true) }
+        val filteredResults = binLocationList.filter {
+            it.name?.contains(searchText, ignoreCase = true)
+            ?: false // not in the list
+        }
 
         // Jika ditemukan hasil pencarian yang sesuai
         if (filteredResults.isNotEmpty()) {
             // Ambil lokasi dari hasil pencarian pertama
             val firstResult = filteredResults[0]
-            val latLng = LatLng(firstResult.modelGeometry.modelLocation.lat, firstResult.modelGeometry.modelLocation.lng)
+
+            val latLng = LatLng(firstResult.latitude!!, firstResult.longitude!!)
 
             // Atur kamera untuk melakukan zoom ke lokasi hasil pencarian pertama
             googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
@@ -414,14 +434,12 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         googleMap?.clear()
 
         // Tambahkan marker untuk hasil pencarian yang sesuai
-        for (result in filteredResults) {
-            val latLngMarker = LatLng(result.modelGeometry.modelLocation.lat, result.modelGeometry.modelLocation.lng)
+        for (binLocation in filteredResults) {
+            if (binLocation.latitude == null || binLocation.longitude == null) {
+                continue
+            }
 
-            val info = ModelResults()
-            info.name = result.name
-            info.placeId = result.placeId
-            info.vicinity = result.vicinity
-            info.rating = result.rating
+            val latLngMarker = LatLng(binLocation.latitude!!, binLocation.longitude!!)
 
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)
@@ -437,7 +455,12 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
                             .position(latLngMarker)
                             .icon(bitmapDescriptor)
                         val marker = googleMap?.addMarker(markerOptions)
-                        marker?.tag = info
+                        marker?.tag = ModelResults().apply {
+                            name = binLocation.name!!
+                            placeId = binLocation.additionalInfo?.get("place_id").toString()
+                            vicinity = binLocation.address!!
+                            rating = binLocation.rating!!
+                        }
                         marker?.showInfoWindow()
                         marker?.let { markerList.add(it) }
                     }

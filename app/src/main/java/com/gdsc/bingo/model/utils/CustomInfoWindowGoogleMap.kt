@@ -1,6 +1,7 @@
 package com.gdsc.bingo.model.utils
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -13,6 +14,7 @@ import com.google.android.material.textview.MaterialTextView
 class CustomInfoWindowGoogleMap(private val context: Context) : InfoWindowAdapter {
 
     override fun getInfoWindow(marker: Marker): View? {
+        Log.i("InfoWindowAdapter", "getInfoWindow")
         val view = (context as AppCompatActivity)
             .layoutInflater
             .inflate(R.layout.layout_tooltip_marker, null)

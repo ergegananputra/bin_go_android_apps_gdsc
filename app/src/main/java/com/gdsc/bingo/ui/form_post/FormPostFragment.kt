@@ -10,8 +10,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.LinearLayout
+import android.widget.ListPopupWindow
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModelProvider
@@ -31,6 +36,7 @@ import com.gdsc.bingo.model.PostImage
 import com.gdsc.bingo.model.User
 import com.gdsc.bingo.services.textstyling.AddOnSpannableTextStyle
 import com.gdsc.bingo.ui.form_post.viewmodel.FormPostViewModel
+import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -116,6 +122,64 @@ class FormPostFragment : Fragment() {
 
         setupDescriptionText()
         setupButtonEditDescription()
+        setupCategoryDropdown()
+    }
+
+    private fun setupCategoryDropdown() {
+        val categoryPopUpWindow = ListPopupWindow(requireContext(), null, com.google.android.material.R.attr.listPopupWindowStyle)
+
+        categoryPopUpWindow.anchorView = binding.formPostCardViewCategory
+
+        // Set List Popup Content
+        val categoryList = listOf("Plastik", "Kaleng", "Galon", "Kertas", "Minyak Jelantah")
+        val adapter = ArrayAdapter(requireContext(), R.layout.list_popup_window_item, categoryList)
+        categoryPopUpWindow.setAdapter(adapter)
+
+        // Set list popup item click listener
+        categoryPopUpWindow.setOnItemClickListener { parent: AdapterView<*>?, view: View?, position: Int, id: Long ->
+            // Respond to list popup window item click.
+            val category = categoryList[position]
+            appendChips(category)
+
+            // Dismiss popup.
+            categoryPopUpWindow.dismiss()
+        }
+
+        // Show list popup window on button click.
+        binding.formPostButtonCategory.setOnClickListener {
+            categoryPopUpWindow.show()
+        }
+    }
+
+    private fun appendChips(category: String) {
+        checkIfAlreadyExist(category).let { if (it) return }
+
+        val chip = LayoutInflater.from(requireContext()).inflate(R.layout.item_chips_category, null) as Chip
+        chip.text = category
+
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.MATCH_PARENT
+        )
+        params.setMargins(4, 4, 4, 4)
+        chip.layoutParams = params
+
+        chip.setOnClickListener { view ->
+            binding.formPostCategoryChipContainer.removeView(view)
+        }
+
+        binding.formPostCategoryChipContainer.addView(chip)
+    }
+
+    private fun checkIfAlreadyExist(category: String) : Boolean {
+        var alreadyExist = false
+        binding.formPostCategoryChipContainer.forEach {
+            if ((it as Chip).text == category) {
+                alreadyExist = true
+                return@forEach
+            }
+        }
+        return alreadyExist
     }
 
     private fun setupDescriptionText() {
@@ -206,11 +270,6 @@ class FormPostFragment : Fragment() {
                 binding.formPostTextViewDescription.error = errMsg
                 return@withContext
                 }
-//            val caption = binding.formPostTextInputLayoutCaption.getTrimEditText() ?: run {
-//                val errMsg = getString(R.string.error_caption_required)
-//                binding.formPostTextInputLayoutCaption.error = errMsg
-//                return@withContext
-//                }
 
             val videoLink = binding.formPostTextInputLayoutVideoLink.getTrimEditText().getYoutubeVideoId()
 

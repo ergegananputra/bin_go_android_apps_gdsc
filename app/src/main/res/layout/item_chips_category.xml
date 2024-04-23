@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.chip.Chip xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/form_post_chip_category_example"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    style="@style/Widget.Material3.Chip.Input"
+    android:checkable="false"
+    android:text="Chips"
+    android:layout_margin="4dp"
+    android:visibility="visible"
+    tools:showIn="@layout/fragment_form_post" />

@@ -160,7 +160,68 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/form_post_card_view_category"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                app:strokeColor="?attr/colorOutline"
+                app:strokeWidth="1dp"
+                app:cardCornerRadius="4dp"
+                >
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    >
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/form_post_button_category"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minHeight="55dp"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        app:cornerRadius="0dp"
+                        android:drawableEnd="@drawable/ic_arrow_drop_down_24"
+                        android:drawableTint="?attr/colorOnSurface"
+                        android:text="Kategori"
+                        android:textAppearance="?attr/textAppearanceBodyMedium"
+                        android:textColor="?attr/colorOnSurface"
+                        app:strokeWidth="0dp"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="0dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <HorizontalScrollView
+                        android:id="@+id/form_post_category_horizontal_scroll_view"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:scrollbars="none"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@+id/form_post_button_category"
+                        app:layout_constraintTop_toTopOf="parent" >
+
+                        <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/form_post_category_chip_container"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:paddingEnd="16dp"
+                            android:paddingStart="0dp"
+                            android:orientation="horizontal"/>
+
+                    </HorizontalScrollView>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            </com.google.android.material.card.MaterialCardView>
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"

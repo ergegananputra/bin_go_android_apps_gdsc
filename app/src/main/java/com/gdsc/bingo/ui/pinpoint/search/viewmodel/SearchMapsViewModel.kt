@@ -18,59 +18,8 @@ class SearchMapsViewModel : ViewModel() {
     val modelResultsMutableLiveData: LiveData<ArrayList<BinLocation>>
         get() = _modelResultsMutableLiveData
 
-//    private val strApiKey = MAPS_API_KEY
-
     fun setMarkerLocation(strLocation: String) {
         val mapsApiService: MapsApiInterface = ApiService.getMaps()
-//
-//        val combinedResults = ArrayList<ModelResults>()
-
-        // Hitung jumlah panggilan API yang telah selesai
-//        var completedCalls = 0
-
-//        // Mencari Tempat Pembuangan
-//        val callTePeEs = apiService.getDataResult(strApiKey, "Tempat Pembuangan Sampah", strLocation, "distance")
-//        callTePeEs.enqueue(object : Callback<ModelResultsNearbyResponse> {
-//            override fun onResponse(call: Call<ModelResultsNearbyResponse>, response: Response<ModelResultsNearbyResponse>) {
-//                if (response.isSuccessful && response.body() != null) {
-//                    combinedResults.addAll(response.body()!!.modelResults)
-//                    completedCalls++
-//
-//                    // Jika kedua panggilan telah selesai, maka kita bisa mem-post data ke modelResultsMutableLiveData
-//                    if (completedCalls == 2) {
-//                        modelResultsMutableLiveData.postValue(combinedResults)
-//                    }
-//                } else {
-//                    Log.e("responseTePeEs", response.toString())
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<ModelResultsNearbyResponse>, t: Throwable) {
-//                Log.e("failureTePeEs", t.toString())
-//            }
-//        })
-//
-//        // Mencari TPS
-//        val callTPS = apiService.getDataResult(strApiKey, "TPS", strLocation, "distance")
-//        callTPS.enqueue(object : Callback<ModelResultsNearbyResponse> {
-//            override fun onResponse(call: Call<ModelResultsNearbyResponse>, response: Response<ModelResultsNearbyResponse>) {
-//                if (response.isSuccessful && response.body() != null) {
-//                    combinedResults.addAll(response.body()!!.modelResults)
-//                    completedCalls++
-//
-//                    // Jika kedua panggilan telah selesai, maka kita bisa mem-post data ke modelResultsMutableLiveData
-//                    if (completedCalls == 2) {
-//                        modelResultsMutableLiveData.postValue(combinedResults)
-//                    }
-//                } else {
-//                    Log.e("responseTPS", response.toString())
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<ModelResultsNearbyResponse>, t: Throwable) {
-//                Log.e("failureTPS", t.toString())
-//            }
-//        })
 
         CoroutineScope(Dispatchers.Default).launch {
             val queryTempatPembuanganSampah = withContext(Dispatchers.IO) {

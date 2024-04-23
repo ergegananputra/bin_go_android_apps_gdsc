@@ -13,7 +13,7 @@
 
     <item
         android:id="@+id/pinPointActivity"
-        android:icon="@drawable/ic_travel_explore"
+        android:icon="@drawable/nav_locator"
         android:title="@string/locator"
         />
 

@@ -118,6 +118,9 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage")
 
+    // Add this to your app/build.gradle
+    implementation("com.firebase:geofire-android-common:3.2.0")
+
     // Coil
     implementation("io.coil-kt:coil:2.5.0")
 

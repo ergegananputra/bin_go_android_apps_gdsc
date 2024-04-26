@@ -4,94 +4,165 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.firebase.geofire.GeoFireUtils
+import com.firebase.geofire.GeoLocation
 import com.gdsc.bingo.BuildConfig.MAPS_API_KEY
 import com.gdsc.bingo.model.BinLocation
+import com.gdsc.bingo.services.api.firebase.MapsDataSyncFirebase
 import com.gdsc.bingo.services.networking.ApiService
 import com.gdsc.bingo.services.networking.MapsApiInterface
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class SearchMapsViewModel : ViewModel() {
     private val _modelResultsMutableLiveData = MutableLiveData<ArrayList<BinLocation>>()
+    private lateinit var firestore: FirebaseFirestore
     val modelResultsMutableLiveData: LiveData<ArrayList<BinLocation>>
         get() = _modelResultsMutableLiveData
 
-//    private val strApiKey = MAPS_API_KEY
-
-    fun setMarkerLocation(strLocation: String) {
+    fun setMarkerLocation(
+        strLocation: String,
+        isCreditAvailable : Boolean = false,
+        isSyncMapsToFirebase : Boolean = false,
+        isDeveloperMode : Boolean = false
+    ) {
         val mapsApiService: MapsApiInterface = ApiService.getMaps()
-//
-//        val combinedResults = ArrayList<ModelResults>()
-
-        // Hitung jumlah panggilan API yang telah selesai
-//        var completedCalls = 0
-
-//        // Mencari Tempat Pembuangan
-//        val callTePeEs = apiService.getDataResult(strApiKey, "Tempat Pembuangan Sampah", strLocation, "distance")
-//        callTePeEs.enqueue(object : Callback<ModelResultsNearbyResponse> {
-//            override fun onResponse(call: Call<ModelResultsNearbyResponse>, response: Response<ModelResultsNearbyResponse>) {
-//                if (response.isSuccessful && response.body() != null) {
-//                    combinedResults.addAll(response.body()!!.modelResults)
-//                    completedCalls++
-//
-//                    // Jika kedua panggilan telah selesai, maka kita bisa mem-post data ke modelResultsMutableLiveData
-//                    if (completedCalls == 2) {
-//                        modelResultsMutableLiveData.postValue(combinedResults)
-//                    }
-//                } else {
-//                    Log.e("responseTePeEs", response.toString())
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<ModelResultsNearbyResponse>, t: Throwable) {
-//                Log.e("failureTePeEs", t.toString())
-//            }
-//        })
-//
-//        // Mencari TPS
-//        val callTPS = apiService.getDataResult(strApiKey, "TPS", strLocation, "distance")
-//        callTPS.enqueue(object : Callback<ModelResultsNearbyResponse> {
-//            override fun onResponse(call: Call<ModelResultsNearbyResponse>, response: Response<ModelResultsNearbyResponse>) {
-//                if (response.isSuccessful && response.body() != null) {
-//                    combinedResults.addAll(response.body()!!.modelResults)
-//                    completedCalls++
-//
-//                    // Jika kedua panggilan telah selesai, maka kita bisa mem-post data ke modelResultsMutableLiveData
-//                    if (completedCalls == 2) {
-//                        modelResultsMutableLiveData.postValue(combinedResults)
-//                    }
-//                } else {
-//                    Log.e("responseTPS", response.toString())
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<ModelResultsNearbyResponse>, t: Throwable) {
-//                Log.e("failureTPS", t.toString())
-//            }
-//        })
 
         CoroutineScope(Dispatchers.Default).launch {
-            val queryTempatPembuanganSampah = withContext(Dispatchers.IO) {
-                searchPlaceMaps("Tempat Pembuangan Sampah", mapsApiService, strLocation) ?: emptyList()
+
+            val queryTempatPembuanganSampah : MutableList<BinLocation> = mutableListOf()
+            val queryTPS : MutableList<BinLocation> = mutableListOf()
+            val queryBankSampah : MutableList<BinLocation> = mutableListOf()
+
+            if (isCreditAvailable) {
+                withContext(Dispatchers.IO) {
+                    queryTempatPembuanganSampah.addAll(
+                        searchPlaceMaps(
+                            "Tempat Pembuangan Sampah",
+                            mapsApiService,
+                            strLocation
+                        ) ?: emptyList()
+                    )
+                    queryTPS.addAll(
+                        searchPlaceMaps(
+                            "TPS",
+                            mapsApiService,
+                            strLocation
+                        ) ?: emptyList()
+                    )
+                    queryBankSampah.addAll(
+                        searchPlaceMaps(
+                            "Bank Sampah",
+                            mapsApiService,
+                            strLocation
+                        ) ?: emptyList()
+                    )
+                }
+
+                if (isSyncMapsToFirebase) {
+                    withContext(Dispatchers.IO) {
+                        val binLocationList = mutableListOf<BinLocation>()
+                        binLocationList.addAll(queryTempatPembuanganSampah)
+                        binLocationList.addAll(queryTPS)
+                        binLocationList.addAll(queryBankSampah)
+
+                        MapsDataSyncFirebase
+                            .getInstance()
+                            .uploadDataToFirestore(binLocationList)
+                    }
+                }
             }
-            val queryTPS = withContext(Dispatchers.IO) {
-                searchPlaceMaps("TPS", mapsApiService, strLocation) ?: emptyList()
+
+            withContext(Dispatchers.IO) {
+                MapsDataSyncFirebase
+                    .getInstance()
+                    .startGeoHashingForDev(isDeveloperMode)
             }
-            val queryBankSampah = withContext(Dispatchers.IO) {
-                searchPlaceMaps("Bank Sampah", mapsApiService, strLocation) ?: emptyList()
+
+            val fireBinPoint = withContext(Dispatchers.IO) {
+                fetchBinPointData(strLocation) ?: emptyList()
             }
 
             _modelResultsMutableLiveData.postValue(
                 arrayListOf<BinLocation>().apply {
-                    addAll(queryTempatPembuanganSampah)
-                    addAll(queryTPS)
-                    addAll(queryBankSampah)
+                    if (isCreditAvailable) {
+                        addAll(queryTempatPembuanganSampah)
+                        addAll(queryTPS)
+                        addAll(queryBankSampah)
+                    }
+                    addAll(fireBinPoint)
                 }
             )
 
 
+        }
+    }
+
+
+
+    private suspend fun fetchBinPointData(strLocation: String) : List<BinLocation>? {
+        firestore = FirebaseFirestore.getInstance()
+        val places = firestore.collection(BinLocation().table)
+
+        val locationList = strLocation.split(",")
+        val latitude = locationList[0].toDouble()
+        val longitude = locationList[1].toDouble()
+
+        /**
+         * Get the bounds of the search area
+         * Source : https://firebase.google.com/docs/firestore/solutions/geoqueries#kotlin+ktx_1
+         */
+        val center = GeoLocation(latitude, longitude)
+        val radiusInM = 50.0 * 1000.0
+        val bounds = GeoFireUtils.getGeoHashQueryBounds(center, radiusInM)
+        val tasks : MutableList<Task<QuerySnapshot>> = ArrayList()
+        for (b in bounds) {
+            val q = places
+                .orderBy(BinLocation.BinLocationFields.GEOHASH.fieldName)
+                .startAt(b.startHash)
+                .endAt(b.endHash)
+
+            tasks.add(q.get())
+        }
+
+        return suspendCoroutine { continuation ->
+            Tasks.whenAllComplete(tasks)
+                .addOnCompleteListener {
+                    val matchingDocs: MutableList<DocumentSnapshot> = ArrayList()
+                    for (task in tasks) {
+                        val snap = task.result
+                        for (doc in snap!!.documents) {
+                            val location = doc.getGeoPoint(BinLocation.BinLocationFields.LOCATION.fieldName) ?: continue
+                            val lat = location.latitude
+                            val lng = location.longitude
+
+                            // We have to filter out a few false positives due to GeoHash
+                            // accuracy, but most will match
+                            val docLocation = GeoLocation(lat, lng)
+                            val distanceInM = GeoFireUtils.getDistanceBetween(docLocation, center)
+                            if (distanceInM <= radiusInM) {
+                                matchingDocs.add(doc)
+                            }
+                        }
+                    }
+
+                    Log.i("SearchMapsViewModel", "fetchBinPointData: $matchingDocs")
+
+                    // matchingDocs contains the results
+                    continuation.resume(matchingDocs.mapNotNull {
+                        BinLocation().toModel(it)
+                    })
+                }
         }
     }
 
@@ -123,12 +194,13 @@ class SearchMapsViewModel : ViewModel() {
         Log.i("SearchMapsViewModel", "searchPlaceMaps: $data done fetching data")
 
         return data.map { modelResults ->
+            val latitude = modelResults.modelGeometry.modelLocation.lat
+            val longitude = modelResults.modelGeometry.modelLocation.lng
             BinLocation(
                 referencePath = null,
                 name = modelResults.name,
                 address = modelResults.vicinity,
-                latitude = modelResults.modelGeometry.modelLocation.lat,
-                longitude = modelResults.modelGeometry.modelLocation.lng,
+                location = GeoPoint(latitude, longitude),
                 additionalInfo = mapOf(
                     "place_id" to modelResults.placeId
                 ),

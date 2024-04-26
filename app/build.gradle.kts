@@ -121,9 +121,6 @@ dependencies {
     // Add this to your app/build.gradle
     implementation("com.firebase:geofire-android-common:3.2.0")
 
-    // Geo Firestore by imperiumlabs (OPEN SOURCES)
-//    implementation("com.github.imperiumlabs:GeoFirestore-Android:v1.5.0")
-
     // Coil
     implementation("io.coil-kt:coil:2.5.0")
 

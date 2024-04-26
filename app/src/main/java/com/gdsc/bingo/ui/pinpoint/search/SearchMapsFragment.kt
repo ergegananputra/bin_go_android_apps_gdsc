@@ -46,6 +46,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.textview.MaterialTextView
+import com.google.firebase.firestore.GeoPoint
 import java.util.Locale
 
 
@@ -325,11 +326,11 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         markerList.clear()
 
         for (binLocation in binLocationList) {
-            if (binLocation.latitude == null || binLocation.longitude == null) {
+            if (binLocation.location?.latitude == null || binLocation.location?.longitude == null) {
                 continue
             }
 
-            val latLngMarker = LatLng(binLocation.latitude!!, binLocation.longitude!!)
+            val latLngMarker = LatLng(binLocation.location!!.latitude, binLocation.location!!.longitude)
 
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)
@@ -349,7 +350,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
                             name = binLocation.name!!
                             placeId = binLocation.additionalInfo?.get("place_id").toString()
                             vicinity = binLocation.address!!
-                            rating = binLocation.rating!!
+                            rating = binLocation.rating ?: 0.0
                         }
                         marker?.showInfoWindow()
                         marker?.let { markerList.add(it) }
@@ -367,8 +368,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
                 referencePath = null,
                 name = markerInfoRaw.name,
                 address = markerInfoRaw.vicinity,
-                latitude = marker.position.latitude,
-                longitude = marker.position.longitude,
+                location = GeoPoint(marker.position.latitude, marker.position.longitude),
                 additionalInfo = mapOf(
                     "place_id" to markerInfoRaw.placeId
                 ),
@@ -424,7 +424,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             // Ambil lokasi dari hasil pencarian pertama
             val firstResult = filteredResults[0]
 
-            val latLng = LatLng(firstResult.latitude!!, firstResult.longitude!!)
+            val latLng = LatLng(firstResult.location!!.latitude, firstResult.location!!.longitude)
 
             // Atur kamera untuk melakukan zoom ke lokasi hasil pencarian pertama
             googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
@@ -435,11 +435,11 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
 
         // Tambahkan marker untuk hasil pencarian yang sesuai
         for (binLocation in filteredResults) {
-            if (binLocation.latitude == null || binLocation.longitude == null) {
+            if (binLocation.location?.latitude == null || binLocation.location?.longitude == null) {
                 continue
             }
 
-            val latLngMarker = LatLng(binLocation.latitude!!, binLocation.longitude!!)
+            val latLngMarker = LatLng(binLocation.location!!.latitude, binLocation.location!!.longitude)
 
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)

@@ -57,8 +57,8 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         FragmentSearchMapsBinding.inflate(layoutInflater)
     }
 
-    val desiredWidth = 144
-    val desiredHeight = 144
+    private val desiredWidth = 144
+    private val desiredHeight = 144
 
     private lateinit var locationTextView: MaterialTextView
     private var selectedLocationText: String = ""

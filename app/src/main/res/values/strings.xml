@@ -44,4 +44,10 @@
     <string name="belum_ada_lokasi_terpilih">Belum ada lokasi terpilih</string>
     <string name="buka_bin_locator">Buka Bin Locator</string>
     <string name="locator">Locator</string>
+    <string name="location">lokasi</string>
+    <string name="post">Post</string>
+    <string name="report_title">Lapor</string>
+    <string name="kembali">kembali</string>
+    <string name="lokasi_saya">Lokasi saya</string>
+    <string name="pilih_lokasi">Pilih Lokasi</string>
 </resources>

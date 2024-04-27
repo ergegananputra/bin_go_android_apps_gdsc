@@ -6,6 +6,25 @@
     app:startDestination="@id/navigation_beranda">
 
     <fragment
+        android:id="@+id/formPostFragment"
+        android:name="com.gdsc.bingo.ui.form_post.FormPostFragment"
+        android:label="fragment_form_post"
+        tools:layout="@layout/fragment_form_post">
+        <action
+            android:id="@+id/action_formPostFragment_to_formFullEditorFragment"
+            app:destination="@id/formFullEditorFragment" />
+        <argument
+            android:name="type"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_formPostFragment_to_reportMapsFragment"
+            app:destination="@id/reportMapsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/formFullEditorFragment"
+        android:name="com.gdsc.bingo.ui.form_post.FormFullEditorFragment"
+        android:label="FormFullEditorFragment" />
+    <fragment
         android:id="@+id/navigation_beranda"
         android:name="com.gdsc.bingo.ui.beranda.BerandaFragment"
         android:label="fragment_beranda"
@@ -26,11 +45,11 @@
         android:label="fragment_komunitas"
         tools:layout="@layout/fragment_komunitas" >
         <action
-            android:id="@+id/action_navigation_komunitas_to_formPostFragment"
-            app:destination="@id/navigation" />
-        <action
             android:id="@+id/action_navigation_komunitas_to_artikelFragment"
             app:destination="@id/artikelFragment" />
+        <action
+            android:id="@+id/action_navigation_komunitas_to_formPostFragment"
+            app:destination="@id/formPostFragment" />
     </fragment>
     <fragment
         android:id="@+id/navigation_profil"
@@ -119,21 +138,10 @@
             android:name="likes_reference"
             app:argType="string" />
     </fragment>
-    <navigation android:id="@+id/navigation"
-        app:startDestination="@id/formPostFragment">
-        <fragment
-            android:id="@+id/formPostFragment"
-            android:name="com.gdsc.bingo.ui.form_post.FormPostFragment"
-            android:label="fragment_form_post"
-            tools:layout="@layout/fragment_form_post">
-            <action
-                android:id="@+id/action_formPostFragment_to_formFullEditorFragment"
-                app:destination="@id/formFullEditorFragment" />
-        </fragment>
-        <fragment
-            android:id="@+id/formFullEditorFragment"
-            android:name="com.gdsc.bingo.ui.form_post.FormFullEditorFragment"
-            android:label="FormFullEditorFragment" />
-    </navigation>
+    <fragment
+        android:id="@+id/reportMapsFragment"
+        android:name="com.gdsc.bingo.ui.form_post.ReportMapsFragment"
+        android:label="fragment_report_maps"
+        tools:layout="@layout/fragment_report_maps" />
 
 </navigation>

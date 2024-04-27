@@ -39,6 +39,7 @@ data class Forums(
     var author : DocumentReference? = null,
     var komentarHub : DocumentReference? = null,
     var createdAt : Timestamp? = null,
+    var type : String = ForumType.ARTICLE.fieldName
 ) : FireModel {
 
     override val table: String
@@ -59,6 +60,28 @@ data class Forums(
         const val thumbnailPhotosUrl = "thumbnail_photos_url"
         const val author = "author"
         const val komentarHub = "komentar_hub"
+        const val type = "type"
+    }
+
+    enum class ForumFields(val fieldName: String) {
+        TITLE("title"),
+        TEXT("text"),
+        IS_USING_TEXT_FILE("is_using_text_file"),
+        TEXT_FILE_PATH("text_file_path"),
+        VIDEO_LINK("video_link"),
+        LIKE_COUNT("like_count"),
+        DISLIKE_COUNT("dislike_count"),
+        LIKES_REFERENCE("likes_reference"),
+        COMMENT_COUNT("comment_count"),
+        THUMBNAIL_PHOTOS_URL("thumbnail_photos_url"),
+        AUTHOR("author"),
+        KOMENTAR_HUB("komentar_hub"),
+        TYPE("type")
+    }
+
+    enum class ForumType(val fieldName: String) {
+        REPORT("report"),
+        ARTICLE("article")
     }
 
     override fun toFirebaseModel() = hashMapOf(
@@ -75,7 +98,8 @@ data class Forums(
         Keys.thumbnailPhotosUrl to thumbnailPhotosUrl,
         Keys.author to author,
         Keys.komentarHub to komentarHub,
-        FireModel.Keys.createdAt to createdAt
+        FireModel.Keys.createdAt to createdAt,
+        ForumFields.TYPE.fieldName to type,
         )
 
     override fun toModels(querySnapshot: QuerySnapshot): List<Forums> {
@@ -94,7 +118,8 @@ data class Forums(
                 thumbnailPhotosUrl = data[Keys.thumbnailPhotosUrl] as? String,
                 author = data[Keys.author] as? DocumentReference,
                 komentarHub = data[Keys.komentarHub] as? DocumentReference,
-                createdAt = data[FireModel.Keys.createdAt] as? Timestamp
+                createdAt = data[FireModel.Keys.createdAt] as? Timestamp,
+                type = data[ForumFields.TYPE.fieldName] as? String ?: ForumType.ARTICLE.fieldName
             )
         }
     }
@@ -114,7 +139,8 @@ data class Forums(
             thumbnailPhotosUrl = documentSnapshot.getString(Keys.thumbnailPhotosUrl),
             author = documentSnapshot.getDocumentReference(Keys.author),
             komentarHub = documentSnapshot.getDocumentReference(Keys.komentarHub),
-            createdAt = documentSnapshot.getTimestamp(FireModel.Keys.createdAt)
+            createdAt = documentSnapshot.getTimestamp(FireModel.Keys.createdAt),
+            type = documentSnapshot.getString(ForumFields.TYPE.fieldName) ?: ForumType.ARTICLE.fieldName
         )
     }
 }

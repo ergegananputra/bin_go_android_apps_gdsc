@@ -136,10 +136,6 @@ dependencies {
     // Youtube
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
 
-    // Marker Maps
-    implementation ("com.github.bumptech.glide:glide:4.12.0")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
-
     // Flex Box
     implementation("com.google.android.flexbox:flexbox:3.0.0")
 

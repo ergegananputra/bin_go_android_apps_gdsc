@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gdsc.bingo.MainActivity
 import com.gdsc.bingo.R
@@ -52,6 +53,7 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class FormPostFragment : Fragment() {
+    private val args : FormPostFragmentArgs by navArgs()
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
@@ -97,6 +99,7 @@ class FormPostFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        formViewModel.vicinity.value = null
         formViewModel.description.value = null
     }
 
@@ -109,7 +112,28 @@ class FormPostFragment : Fragment() {
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
         storage = FirebaseStorage.getInstance()
+
+        chooseFormType(binding, args.type)
         return binding.root
+    }
+
+    private fun chooseFormType(binding: FragmentFormPostBinding, type: String) {
+        with(binding) {
+            when (type) {
+                Forums.ForumType.REPORT.fieldName -> {
+                    formPostHeaderTextViewTitle.text = getString(R.string.report_title)
+                    formPostCardViewLocation.visibility = View.VISIBLE
+                    formPostCardViewCategory.visibility = View.GONE
+                    formPostTextInputLayoutVideoLink.visibility = View.GONE
+                }
+                else -> {
+                    formPostHeaderTextViewTitle.text = getString(R.string.post)
+                    formPostCardViewLocation.visibility = View.GONE
+                    formPostCardViewCategory.visibility = View.VISIBLE
+                    formPostTextInputLayoutVideoLink.visibility = View.VISIBLE
+                }
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -123,6 +147,26 @@ class FormPostFragment : Fragment() {
         setupDescriptionText()
         setupButtonEditDescription()
         setupCategoryDropdown()
+
+        setupLocationButton()
+        setupLocationText()
+    }
+
+    private fun setupLocationText() {
+        formViewModel.vicinity.observe(viewLifecycleOwner) { geoPoint ->
+            val vicinity = geoPoint?.let {
+                "(${it.latitude}, ${it.longitude})"
+            } ?: getString(R.string.pilih_lokasi)
+
+            binding.formPostTextViewLocation.text = vicinity
+        }
+    }
+
+    private fun setupLocationButton() {
+        binding.formPostCardViewLocation.setOnClickListener {
+            val action = FormPostFragmentDirections.actionFormPostFragmentToReportMapsFragment()
+            findNavController().navigate(action)
+        }
     }
 
     private fun setupCategoryDropdown() {
@@ -193,7 +237,6 @@ class FormPostFragment : Fragment() {
             val spannableConverter = AddOnSpannableTextStyle()
 
             val spanned = spannableConverter.convertHtmlWithOrderedList(rawHTML)
-//                android.text.Html.fromHtml(rawHTML, android.text.Html.FROM_HTML_MODE_COMPACT)
 
             binding.formPostTextViewDescription.text = spanned
             val typeface = Typeface.DEFAULT

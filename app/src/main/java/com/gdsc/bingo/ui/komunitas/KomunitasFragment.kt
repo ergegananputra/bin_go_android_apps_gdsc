@@ -63,6 +63,7 @@ class KomunitasFragment : Fragment() {
 
         setupSearchBar()
 
+        setupCreateKomunitasReportFloatingActionButton()
         setupCreateKomunitasExtendedFloatingActionButton()
         komunitasViewModel.refreshRecyclerData()
         setupSwipeRefresh()
@@ -127,10 +128,12 @@ class KomunitasFragment : Fragment() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                if (dy > 0) {
+                if (dy > 20) {
                     binding.komunitasExtendedFloatingActionButton.shrink()
+                    binding.komunitasFloatingActionButtonReport.hide()
                 } else if (dy < 0) {
                     binding.komunitasExtendedFloatingActionButton.extend()
+                    binding.komunitasFloatingActionButtonReport.show()
                 }
 
 
@@ -222,19 +225,37 @@ class KomunitasFragment : Fragment() {
         findNavController().navigate(destination)
     }
 
-    private fun setupCreateKomunitasExtendedFloatingActionButton() {
-        if (auth.currentUser == null) {
-            binding.komunitasExtendedFloatingActionButton.visibility = View.GONE
-        } else {
-            binding.komunitasExtendedFloatingActionButton.visibility = View.VISIBLE
-        }
+    private fun setupCreateKomunitasReportFloatingActionButton() {
+        binding.komunitasFloatingActionButtonReport.apply {
+            hideIfUnauthenticated()
 
-        val destination = KomunitasFragmentDirections.actionNavigationKomunitasToFormPostFragment()
-        binding.komunitasExtendedFloatingActionButton.setOnClickListener {
-            findNavController().navigate(destination)
+            val destination = KomunitasFragmentDirections
+                .actionNavigationKomunitasToFormPostFragment(Forums.ForumType.REPORT.fieldName)
+            setOnClickListener {
+                findNavController().navigate(destination)
+            }
         }
     }
 
+    private fun setupCreateKomunitasExtendedFloatingActionButton() {
+        binding.komunitasExtendedFloatingActionButton.apply {
+            hideIfUnauthenticated()
 
+            val destination = KomunitasFragmentDirections
+                .actionNavigationKomunitasToFormPostFragment(Forums.ForumType.ARTICLE.fieldName)
+
+            setOnClickListener {
+                findNavController().navigate(destination)
+            }
+        }
+    }
+
+    private fun View.hideIfUnauthenticated() {
+        visibility = if (auth.currentUser == null) {
+            View.GONE
+        } else {
+            View.VISIBLE
+        }
+    }
 
 }

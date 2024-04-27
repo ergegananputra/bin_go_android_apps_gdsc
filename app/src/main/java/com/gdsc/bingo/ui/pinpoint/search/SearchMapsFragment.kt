@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
@@ -24,8 +25,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.transition.TransitionManager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.SimpleTarget
+import coil.Coil
+import coil.request.ImageRequest
 import com.gdsc.bingo.R
 import com.gdsc.bingo.databinding.FragmentSearchMapsBinding
 import com.gdsc.bingo.model.BinLocation
@@ -56,8 +57,8 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         FragmentSearchMapsBinding.inflate(layoutInflater)
     }
 
-    val desiredWidth = 144
-    val desiredHeight = 144
+    private val desiredWidth = 144
+    private val desiredHeight = 144
 
     private lateinit var locationTextView: MaterialTextView
     private var selectedLocationText: String = ""
@@ -335,27 +336,31 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)
 
-            Glide.with(requireContext())
-                .asBitmap()
-                .load(R.drawable.ic_custom_marker_maps)
-                .into(object : SimpleTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                        val scaledBitmap = Bitmap.createScaledBitmap(resource, desiredWidth, desiredHeight, false)
-                        val bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
-                        val markerOptions = MarkerOptions()
-                            .position(latLngMarker)
-                            .icon(bitmapDescriptor)
-                        val marker = googleMap?.addMarker(markerOptions)
-                        marker?.tag = ModelResults().apply {
-                            name = binLocation.name!!
-                            placeId = binLocation.additionalInfo?.get("place_id").toString()
-                            vicinity = binLocation.address!!
-                            rating = binLocation.rating ?: 0.0
-                        }
-                        marker?.showInfoWindow()
-                        marker?.let { markerList.add(it) }
+
+            val request = ImageRequest.Builder(requireContext())
+                .data(R.drawable.ic_custom_marker_maps)
+                .target { drawable ->
+                    val bitmap = (drawable as BitmapDrawable).bitmap
+                    val scaleBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, false)
+                    val bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(scaleBitmap)
+                    val markerOptions = MarkerOptions()
+                        .position(latLngMarker)
+                        .icon(bitmapDescriptor)
+
+                    val marker = googleMap?.addMarker(markerOptions)
+                    marker?.tag = ModelResults().apply {
+                        name = binLocation.name!!
+                        placeId = binLocation.additionalInfo?.get("place_id").toString()
+                        vicinity = binLocation.address!!
+                        rating = binLocation.rating ?: 0.0
                     }
-                })
+                    marker?.showInfoWindow()
+                    marker?.let { markerList.add(it) }
+                }
+                .build()
+
+            val imageLoader = Coil.imageLoader(requireContext())
+            imageLoader.enqueue(request)
         }
 
         // Tambahkan listener pada marker di luar loop
@@ -415,8 +420,10 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
     private fun performSearch(searchText: String) {
         // Filter modelResultsArrayList berdasarkan teks pencarian
         val filteredResults = binLocationList.filter {
-            it.name?.contains(searchText, ignoreCase = true)
-            ?: false // not in the list
+            val name = it.name?.contains(searchText, ignoreCase = true) ?: false // not in the list
+            val address = it.address?.contains(searchText, ignoreCase = true) ?: false // not in the list
+
+            name || address
         }
 
         // Jika ditemukan hasil pencarian yang sesuai
@@ -444,27 +451,30 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)
 
-            Glide.with(requireContext())
-                .asBitmap()
-                .load(R.drawable.ic_custom_marker_maps)
-                .into(object : SimpleTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                        val scaledBitmap = Bitmap.createScaledBitmap(resource, desiredWidth, desiredHeight, false)
-                        val bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
-                        val markerOptions = MarkerOptions()
-                            .position(latLngMarker)
-                            .icon(bitmapDescriptor)
-                        val marker = googleMap?.addMarker(markerOptions)
-                        marker?.tag = ModelResults().apply {
-                            name = binLocation.name!!
-                            placeId = binLocation.additionalInfo?.get("place_id").toString()
-                            vicinity = binLocation.address!!
-                            rating = binLocation.rating!!
-                        }
-                        marker?.showInfoWindow()
-                        marker?.let { markerList.add(it) }
+            val request = ImageRequest.Builder(requireContext())
+                .data(R.drawable.ic_custom_marker_maps)
+                .target { drawable ->
+                    val bitmap = (drawable as BitmapDrawable).bitmap
+                    val scaleBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, false)
+                    val bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(scaleBitmap)
+                    val markerOptions = MarkerOptions()
+                        .position(latLngMarker)
+                        .icon(bitmapDescriptor)
+
+                    val marker = googleMap?.addMarker(markerOptions)
+                    marker?.tag = ModelResults().apply {
+                        name = binLocation.name!!
+                        placeId = binLocation.additionalInfo?.get("place_id").toString()
+                        vicinity = binLocation.address!!
+                        rating = binLocation.rating ?: 0.0
                     }
-                })
+                    marker?.showInfoWindow()
+                    marker?.let { markerList.add(it) }
+                }
+                .build()
+
+            val imageLoader = Coil.imageLoader(requireContext())
+            imageLoader.enqueue(request)
         }
     }
 

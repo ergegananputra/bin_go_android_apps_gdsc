@@ -53,6 +53,8 @@ class FormFullEditorFragment : Fragment() {
             wysiwygEditor.setPadding(10, 10, 10, 10)
             wysiwygEditor.setPlaceholder("Apa yang ingin Anda bagikan? ...")
 
+            wysiwygEditor.html = formViewModel.description.value ?: ""
+
             setupWYSIWYGListeners(wysiwygEditor)
             setupExpandableButtons()
 

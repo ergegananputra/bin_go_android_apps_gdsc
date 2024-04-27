@@ -3,7 +3,9 @@ package com.gdsc.bingo.ui.form_post
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
@@ -39,6 +41,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
+import java.util.Locale
 
 class ReportMapsFragment : Fragment(), OnMapReadyCallback {
 
@@ -168,10 +172,60 @@ class ReportMapsFragment : Fragment(), OnMapReadyCallback {
         endSet.applyTo(binding.reportMapsRoot)
     }
 
+
     private fun setupButtonSave() {
         binding.reportMapsButtonSimpan.setOnClickListener {
-            formViewModel.vicinity.value = vicinity
-            findNavController().navigateUp()
+            lifecycleScope.launch {
+                formViewModel.vicinity.value = vicinity
+
+                try {
+                    val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        geocoder.getFromLocation(
+                            vicinity!!.latitude,
+                            vicinity!!.longitude,
+                            1
+                        ) { addresses ->
+                            if (addresses.isNotEmpty()) {
+                                val address: String = addresses[0].getAddressLine(0)
+                                Log.i("ReportMapsFragment", "onMapLongClickListener: $address")
+
+
+                                formViewModel.address = address
+                                findNavController().navigateUp()
+                            }
+                        }
+
+
+                    } else {
+
+                        val addresses = withContext(Dispatchers.IO) {
+                            geocoder.getFromLocation(
+                                vicinity!!.latitude,
+                                vicinity!!.longitude,
+                                1
+                            )
+                        }
+
+                        if (addresses != null) {
+                            if (addresses.isNotEmpty()) {
+                                val address: String = addresses[0].getAddressLine(0)
+                                Log.i("ReportMapsFragment", "onMapLongClickListener: $address")
+
+                                formViewModel.address = address
+                                findNavController().navigateUp() // EXIT
+                            }
+                        }
+
+                    }
+
+
+
+                } catch (e: IOException) {
+
+                    e.printStackTrace()
+                }
+            }
         }
     }
 

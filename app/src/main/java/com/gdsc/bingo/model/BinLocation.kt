@@ -1,5 +1,6 @@
 package com.gdsc.bingo.model
 
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.GeoPoint
@@ -15,7 +16,8 @@ data class BinLocation(
     var additionalInfo: Map<String, Any>? = null,
     var rating: Double? = null,
     var reviewCount: Long? = null,
-    var type : String? = null
+    var type : String? = null,
+    var timestamp : Timestamp? = null
 ) : FireModel {
     constructor() : this(null)
 
@@ -32,6 +34,7 @@ data class BinLocation(
         const val rating = "rating"
         const val reviewCount = "review_count"
         const val type = "type"
+        const val timestamp = "timestamp"
     }
 
     enum class BinLocationFields(val fieldName: String) {
@@ -43,8 +46,8 @@ data class BinLocation(
         ADDITIONAL_INFO("additional_info"),
         RATING("rating"),
         REVIEW_COUNT("review_count"),
-        TYPE("type")
-
+        TYPE("type"),
+        TIMESTAMP("timestamp")
     }
 
     enum class BinTypeCategory(val fieldName: String) {
@@ -52,7 +55,14 @@ data class BinLocation(
         REPORT("report")
     }
 
+    enum class BinAdditionalInfo(val fieldName: String) {
+        FORUM_ID("forum_id"),
+        REPORT_DESCRIPTION("report_description"),
+        REPORT_DATE("report_date"),
+        PLACES_ID("places_id")
+    }
     override fun toFirebaseModel(): Map<String, Any?> {
+        timestamp = if (timestamp == null) Timestamp.now() else timestamp
         return hashMapOf(
             FireModel.Keys.referencePath to referencePath,
             Keys.name to name,
@@ -63,7 +73,8 @@ data class BinLocation(
             Keys.additionalInfo to additionalInfo,
             Keys.rating to rating,
             Keys.reviewCount to reviewCount,
-            Keys.type to type
+            Keys.type to type,
+            Keys.timestamp to timestamp
         )
     }
 
@@ -79,7 +90,8 @@ data class BinLocation(
                 additionalInfo = it.get(Keys.additionalInfo) as Map<String, Any>?,
                 rating = it.getDouble(Keys.rating),
                 reviewCount = it.getLong(Keys.reviewCount),
-                type = it.getString(Keys.type)
+                type = it.getString(Keys.type),
+                timestamp = it.getTimestamp(Keys.timestamp)
             )
         }
     }
@@ -95,7 +107,8 @@ data class BinLocation(
             additionalInfo = documentSnapshot.get(Keys.additionalInfo) as Map<String, Any>?,
             rating = documentSnapshot.getDouble(Keys.rating),
             reviewCount = documentSnapshot.getLong(Keys.reviewCount),
-            type = documentSnapshot.getString(Keys.type)
+            type = documentSnapshot.getString(Keys.type),
+            timestamp = documentSnapshot.getTimestamp(Keys.timestamp)
         )
     }
 }

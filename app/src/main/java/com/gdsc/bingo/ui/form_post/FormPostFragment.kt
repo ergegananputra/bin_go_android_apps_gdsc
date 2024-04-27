@@ -25,16 +25,20 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.firebase.geofire.GeoFireUtils
+import com.firebase.geofire.GeoLocation
 import com.gdsc.bingo.MainActivity
 import com.gdsc.bingo.R
 import com.gdsc.bingo.adapter.ImagePostAdapter
 import com.gdsc.bingo.databinding.FragmentFormPostBinding
+import com.gdsc.bingo.model.BinLocation
 import com.gdsc.bingo.model.FireModel
 import com.gdsc.bingo.model.Forums
 import com.gdsc.bingo.model.KomentarHub
 import com.gdsc.bingo.model.Likes
 import com.gdsc.bingo.model.PostImage
 import com.gdsc.bingo.model.User
+import com.gdsc.bingo.services.api.firebase.MapsDataSyncFirebase.Companion.generateIDforPlaces
 import com.gdsc.bingo.services.textstyling.AddOnSpannableTextStyle
 import com.gdsc.bingo.ui.form_post.viewmodel.FormPostViewModel
 import com.google.android.material.chip.Chip
@@ -42,10 +46,13 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.Source
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
@@ -101,6 +108,7 @@ class FormPostFragment : Fragment() {
         super.onCreate(savedInstanceState)
         formViewModel.vicinity.value = null
         formViewModel.description.value = null
+        formViewModel.address = null
     }
 
     override fun onCreateView(
@@ -153,12 +161,9 @@ class FormPostFragment : Fragment() {
     }
 
     private fun setupLocationText() {
-        formViewModel.vicinity.observe(viewLifecycleOwner) { geoPoint ->
-            val vicinity = geoPoint?.let {
-                "(${it.latitude}, ${it.longitude})"
-            } ?: getString(R.string.pilih_lokasi)
-
-            binding.formPostTextViewLocation.text = vicinity
+        formViewModel.vicinity.observe(viewLifecycleOwner) { _ ->
+            val address = formViewModel.address ?: getString(R.string.pilih_lokasi)
+            binding.formPostTextViewLocation.text = address
         }
     }
 
@@ -320,10 +325,23 @@ class FormPostFragment : Fragment() {
                 title = title,
                 author = firestore.collection(User().table).document(auth.uid!!),
                 videoLink = videoLink,
-                createdAt = Timestamp.now()
+                createdAt = Timestamp.now(),
+                type = args.type
             )
 
-            uploadForums(forums, caption)
+            val vicinity = formViewModel.vicinity.asFlow().firstOrNull()
+            if (args.type == Forums.ForumType.REPORT.fieldName
+                && vicinity == null) {
+
+                val errMsg = getString(R.string.error_location_required)
+                this.launch(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), errMsg, Toast.LENGTH_LONG).show()
+                }
+
+                return@withContext
+            }
+
+            uploadForums(forums, caption, vicinity, binding.formPostTextViewLocation.text.toString())
         }
     }
 
@@ -336,7 +354,7 @@ class FormPostFragment : Fragment() {
     }
 
 
-    private fun uploadForums(forums: Forums, caption: String) {
+    private fun uploadForums(forums: Forums, caption: String, vicinity: GeoPoint?, addressReport: String) {
         val uploadToken : MutableLiveData<Int> = MutableLiveData(1)
 
         fun addUploadToken() {
@@ -483,6 +501,43 @@ class FormPostFragment : Fragment() {
                         }
 
                     removeUploadToken()
+
+
+                    if (args.type == Forums.ForumType.REPORT.fieldName) {
+                        val placesId = generateIDforPlaces(vicinity!!.latitude, vicinity.longitude)
+                        firestore.collection(BinLocation().table).document(placesId)
+                            .get(Source.SERVER)
+                            .addOnSuccessListener { documentSnapshot ->
+                                if (documentSnapshot.exists().not()) {
+                                    val binLocation = BinLocation(
+                                        referencePath = documentSnapshot.reference,
+                                        name = forums.title,
+                                        address = addressReport,
+                                        location = vicinity,
+                                        geohash = GeoFireUtils.getGeoHashForLocation(GeoLocation(vicinity.latitude, vicinity.longitude)),
+                                        type = BinLocation.BinTypeCategory.REPORT.fieldName,
+                                        additionalInfo = mapOf(
+                                            BinLocation.BinAdditionalInfo.FORUM_ID.fieldName to documentId,
+                                            BinLocation.BinAdditionalInfo.REPORT_DESCRIPTION.fieldName to caption,
+                                            BinLocation.BinAdditionalInfo.REPORT_DATE.fieldName to Timestamp.now()
+                                        )
+                                    )
+
+                                    documentSnapshot.reference.set(binLocation.toFirebaseModel())
+                                        .addOnSuccessListener {
+                                            Log.i("FormPostFragment", "uploadForums: BinLocation created")
+                                        }
+                                        .addOnFailureListener {
+                                            Log.e("FormPostFragment", "uploadForums: ${it.message}")
+                                            executeFailure()
+                                        }
+                                }
+                            }
+                            .addOnFailureListener {
+                                Log.e("FormPostFragment", "uploadForums: ${it.message}")
+                                executeFailure()
+                            }
+                    }
                 }
                 .addOnFailureListener {
                     Log.e("FormPostFragment", "uploadForums: ${it.message}")

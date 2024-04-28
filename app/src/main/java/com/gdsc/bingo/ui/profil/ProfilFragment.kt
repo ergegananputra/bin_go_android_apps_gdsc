@@ -172,8 +172,8 @@ class ProfilFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
         }
 
-        komunitasViewModel.forum.observe(viewLifecycleOwner) {
-            forumPostAdapter.submitList(it)
+        komunitasViewModel.latestUserPost.observe(viewLifecycleOwner) {
+            forumPostAdapter.submitList(listOf(it))
         }
     }
 

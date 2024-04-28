@@ -10,7 +10,10 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,9 +21,11 @@ import com.gdsc.bingo.MainActivity
 import com.gdsc.bingo.adapter.ForumPostAdapter
 import com.gdsc.bingo.databinding.FragmentKomunitasBinding
 import com.gdsc.bingo.model.Forums
+import com.gdsc.bingo.ui.komunitas.KomunitasViewModel.Companion.toModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.launch
 
 class KomunitasFragment : Fragment() {
     private lateinit var firestore: FirebaseFirestore
@@ -65,7 +70,7 @@ class KomunitasFragment : Fragment() {
 
         setupCreateKomunitasReportFloatingActionButton()
         setupCreateKomunitasExtendedFloatingActionButton()
-        komunitasViewModel.refreshRecyclerData()
+        komunitasViewModel.pullLatestData()
         setupSwipeRefresh()
         setupPaginationAndScrollingBehaviour()
     }
@@ -150,7 +155,8 @@ class KomunitasFragment : Fragment() {
 
     private fun setupSwipeRefresh() {
         binding.komunitasSwipeRefreshLayout.setOnRefreshListener {
-            komunitasViewModel.refreshRecyclerData()
+//            komunitasViewModel.refreshRecyclerData()
+            komunitasViewModel.pullLatestData()
             binding.komunitasSwipeRefreshLayout.isRefreshing = false
         }
     }
@@ -161,10 +167,15 @@ class KomunitasFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireActivity())
         }
 
-        komunitasViewModel.forum.observe(viewLifecycleOwner) {
-            binding.komunitasRecyclerProgressBar.visibility = View.GONE
-            forumPostAdapter.submitList(it)
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                komunitasViewModel.forumsRealm.collect() { forumsRealms ->
+                    binding.komunitasRecyclerProgressBar.visibility = View.GONE
+                    forumPostAdapter.submitList(forumsRealms.toModel())
+                }
+            }
         }
+
     }
 
 

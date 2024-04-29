@@ -336,9 +336,14 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)
 
+            val iconResId = when (binLocation.type) {
+                "bin" -> R.drawable.ic_custom_marker_maps // Gunakan ikon untuk marker bin
+                "report" -> R.drawable.ic_custom_report_marker_maps // Gunakan ikon untuk marker report
+                else -> R.drawable.ic_custom_marker_maps // Default: Gunakan ikon default
+            }
 
             val request = ImageRequest.Builder(requireContext())
-                .data(R.drawable.ic_custom_marker_maps)
+                .data(iconResId)
                 .target { drawable ->
                     val bitmap = (drawable as BitmapDrawable).bitmap
                     val scaleBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, false)
@@ -451,8 +456,14 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)
 
+            val iconResId = when (binLocation.type) {
+                "bin" -> R.drawable.ic_custom_marker_maps // Gunakan ikon untuk marker bin
+                "report" -> R.drawable.ic_custom_report_marker_maps // Gunakan ikon untuk marker report
+                else -> R.drawable.ic_custom_marker_maps // Default: Gunakan ikon default
+            }
+
             val request = ImageRequest.Builder(requireContext())
-                .data(R.drawable.ic_custom_marker_maps)
+                .data(iconResId)
                 .target { drawable ->
                     val bitmap = (drawable as BitmapDrawable).bitmap
                     val scaleBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, false)

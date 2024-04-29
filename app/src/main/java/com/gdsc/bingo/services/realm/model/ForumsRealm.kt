@@ -6,6 +6,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.FullText
 import io.realm.kotlin.types.annotations.PrimaryKey
 import java.util.Date
 
@@ -13,6 +14,7 @@ class ForumsRealm : RealmObject, ForumsInterface {
     @PrimaryKey
     var referencePath : String = ""
     override var title: String? = null
+    @FullText
     override var text: String? = null
     override var isUsingTextFile: Boolean = false
     override var textFilePath: String? = null

@@ -22,6 +22,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.coroutines.suspendCoroutine
 
 class KomunitasViewModel : ViewModel() {
     private val realm = BinGoApplication.realm
@@ -41,6 +45,51 @@ class KomunitasViewModel : ViewModel() {
             initialValue = emptyList()
         )
 
+    val forumsRealmReport = realm.
+        query<ForumsRealm>(
+            "type == $0",
+            Forums.ForumType.REPORT.fieldName
+        )
+        .sort("createdAtMillis", Sort.DESCENDING)
+        .asFlow().map { result ->
+            result.list.toList()
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = emptyList()
+        )
+
+    val forumsRealmTricks = realm.
+        query<ForumsRealm>(
+            "type == $0",
+            Forums.ForumType.TIPS_AND_TRICKS.fieldName
+        )
+            .sort("createdAtMillis", Sort.DESCENDING)
+            .asFlow().map { result ->
+                result.list.toList()
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = emptyList()
+            )
+
+    val forumsRealmEducation = realm.
+        query<ForumsRealm>(
+            "type == $0",
+            Forums.ForumType.WASTE_MANAGEMENT_EDUCATION.fieldName
+        )
+            .sort("createdAtMillis", Sort.DESCENDING)
+            .asFlow().map { result ->
+                result.list.toList()
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = emptyList()
+            )
+
     private var lastVisible: DocumentSnapshot? = null
     private var endOfList : DocumentSnapshot? = null
 
@@ -52,15 +101,21 @@ class KomunitasViewModel : ViewModel() {
         .orderBy(FireModel.Keys.createdAt, Query.Direction.DESCENDING)
         .limit(10)
 
-    fun pullLatestData(limit: Long = 50) {
+    fun pullLatestData(limit: Long = 50, formType: Forums.ForumType = Forums.ForumType.ARTICLE) {
         viewModelScope.launch(Dispatchers.IO) {
             val query = firestore.collection(tempObj.table)
                 .orderBy(FireModel.Keys.createdAt, Query.Direction.DESCENDING)
                 .limit(limit)
 
+            if (formType != Forums.ForumType.ARTICLE) {
+                query.whereEqualTo(Forums.Keys.type, formType.fieldName)
+            }
+
             query.get(Source.SERVER)
                 .addOnSuccessListener { result ->
                     if (result.isEmpty) return@addOnSuccessListener
+
+                    lastVisible = result.documents[result.size() - 1]
 
                     val forums = Forums().toModels(result)
 
@@ -72,6 +127,46 @@ class KomunitasViewModel : ViewModel() {
 
         }
 
+    }
+
+    private suspend fun pullLatestDataCheck(formType: Forums.ForumType) : Boolean {
+        return suspendCoroutine { continuation ->
+            viewModelScope.launch(Dispatchers.IO) {
+                val query = firestore.collection(tempObj.table)
+                    .orderBy(FireModel.Keys.createdAt, Query.Direction.DESCENDING)
+                    .limit(10)
+
+                if (formType != Forums.ForumType.ARTICLE) {
+                    query.whereEqualTo(Forums.Keys.type, formType.fieldName)
+                }
+
+                try {
+                    val result = withContext(Dispatchers.IO) {
+                        withTimeoutOrNull(10_000L) {
+                            query.get(Source.SERVER).await()
+                        }
+                    }
+
+                    if (result == null) {
+                        continuation.resumeWith(Result.success(false))
+                        return@launch
+                    }
+
+
+                    lastVisible = result.documents[result.size() - 1]
+
+                    val forums = Forums().toModels(result)
+
+                    writeUpdateRealm(forums)
+                    continuation.resumeWith(Result.success(true))
+
+                } catch (e: Exception) {
+                    Log.e("KomunitasViewModel", "Error getting documents: ", e)
+                    continuation.resumeWith(Result.failure(e))
+                }
+
+            }
+        }
     }
 
     private fun writeUpdateRealm(data: List<Forums>) {
@@ -170,13 +265,29 @@ class KomunitasViewModel : ViewModel() {
      *
      * @throws Exception if last visible is null
      */
-    fun loadMoreRecyclerData() {
+    fun loadMoreRecyclerData(forumType: Forums.ForumType) {
         viewModelScope.launch(Dispatchers.IO) {
 
             if (lastVisible == null) {
                 Log.e("KomunitasViewModel", "Last visible is null on loadMoreRecyclerData()")
-                throw Exception("Wrong Action, last visible is null. \nYou should not call this " +
-                        "function before refreshRecyclerData() is called")
+
+                Log.i("KomunitasViewModel", "initiative Refreshing recycler data")
+                val result = withContext(Dispatchers.IO) {
+                    pullLatestDataCheck(forumType)
+                }
+
+                try {
+                    if (result) {
+                        Log.i("KomunitasViewModel", "Data is loaded, retrying loadMoreRecyclerData")
+                        return@launch
+                    } else {
+                        Log.i("KomunitasViewModel", "There is no data to loadMoreRecyclerData")
+                        return@launch
+                    }
+                } catch (e: Exception) {
+                    Log.e("KomunitasViewModel", "Error getting documents: ", e)
+                    return@launch
+                }
             }
 
             if (lastVisible == endOfList) {
@@ -185,6 +296,11 @@ class KomunitasViewModel : ViewModel() {
             }
 
             val query = baseQuery.startAfter(lastVisible!!)
+
+            if (forumType != Forums.ForumType.ARTICLE) {
+                query.whereEqualTo(Forums.Keys.type, forumType.fieldName)
+            }
+
             val oldList = forumsRealm.first().toModel()
 
             query.get()
@@ -200,6 +316,51 @@ class KomunitasViewModel : ViewModel() {
                 .addOnFailureListener { exception ->
                     Log.e("KomunitasViewModel", "Error getting documents: ", exception)
                 }
+        }
+    }
+
+    suspend fun searchForums(
+        keyword: String,
+        forumType: String,
+        limitToSearch : Long = 700,
+        autoCancelTime : Long = 10_000L
+    ) : List<Forums>? {
+        return try {
+            val fireQuery = firestore.collection(tempObj.table)
+                .orderBy(FireModel.Keys.createdAt, Query.Direction.DESCENDING)
+                .limit(limitToSearch)
+
+            when(forumType) {
+                Forums.ForumType.REPORT.fieldName -> fireQuery.whereEqualTo(Forums.Keys.type, forumType)
+            }
+
+            withTimeoutOrNull(autoCancelTime) {
+                val result = fireQuery.get(Source.SERVER).await()
+
+                if (result.isEmpty) return@withTimeoutOrNull
+
+                val forums = Forums().toModels(result)
+                writeUpdateRealm(forums)
+            }
+
+            val result = realm.query<ForumsRealm>(
+                "(title LIKE[c] $0 or text TEXT $0) and type == $1",
+                "*$keyword*", forumType
+                )
+                .sort("createdAtMillis", Sort.DESCENDING)
+                .asFlow().map { result ->
+                    result.list.toList()
+                }
+
+            val searchResult = result.first().toModel()
+
+            searchResult.ifEmpty {
+                Log.e("KomunitasViewModel", "No forums found with keyword: $keyword")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("KomunitasViewModel", "Error searching forums: ", e)
+            null
         }
     }
 

@@ -81,7 +81,9 @@ data class Forums(
 
     enum class ForumType(val fieldName: String) {
         REPORT("report"),
-        ARTICLE("article")
+        ARTICLE("article"),
+        TIPS_AND_TRICKS("tips_and_tricks"),
+        WASTE_MANAGEMENT_EDUCATION("waste_management_education"),
     }
 
     override fun toFirebaseModel() = hashMapOf(

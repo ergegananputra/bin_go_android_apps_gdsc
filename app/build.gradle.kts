@@ -17,6 +17,9 @@ plugins {
     // Google
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.gms.google-services")
+
+    // Realm
+    id("io.realm.kotlin")
 }
 
 val localProperties = Properties().apply {
@@ -108,6 +111,9 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-common:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
+
+    // Realm
+    implementation("io.realm.kotlin:library-base:1.11.0")
 
     // Security
     implementation("androidx.security:security-crypto:1.0.0")

@@ -505,7 +505,7 @@ class ArtikelFragment : Fragment(), PointsRewardSystem {
 
     private fun setupToolbarButton() {
         binding.artikelToolbarButtonBack.setOnClickListener {
-            findNavController().navigateUp()
+            findNavController().popBackStack()
         }
     }
 

@@ -93,8 +93,8 @@ class BerandaFragment : Fragment() {
 
         }
 
-        komunitasViewModel.forum.observe(viewLifecycleOwner) {
-            forumPostAdapter.submitList(it)
+        komunitasViewModel.mostLikes.observe(viewLifecycleOwner) {
+            forumPostAdapter.submitList(listOf(it))
         }
     }
 

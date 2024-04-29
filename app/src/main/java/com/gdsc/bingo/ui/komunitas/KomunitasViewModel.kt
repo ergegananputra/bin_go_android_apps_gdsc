@@ -3,23 +3,92 @@ package com.gdsc.bingo.ui.komunitas
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.gdsc.bingo.BinGoApplication
 import com.gdsc.bingo.model.FireModel
 import com.gdsc.bingo.model.Forums
 import com.gdsc.bingo.model.User
+import com.gdsc.bingo.services.realm.model.ForumsRealm
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Source
+import io.realm.kotlin.UpdatePolicy
+import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.coroutines.suspendCoroutine
 
 class KomunitasViewModel : ViewModel() {
-    private val _forum = MutableLiveData<List<Forums>>()
-    val forum: MutableLiveData<List<Forums>>
-        get() = _forum
+    private val realm = BinGoApplication.realm
+
+    val mostLikes = MutableLiveData<Forums>()
+    val latestUserPost = MutableLiveData<Forums>()
+
+    val forumsRealm  = realm
+        .query<ForumsRealm>()
+        .sort("createdAtMillis", Sort.DESCENDING)
+        .asFlow().map { result ->
+            result.list.toList()
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = emptyList()
+        )
+
+    val forumsRealmReport = realm.
+        query<ForumsRealm>(
+            "type == $0",
+            Forums.ForumType.REPORT.fieldName
+        )
+        .sort("createdAtMillis", Sort.DESCENDING)
+        .asFlow().map { result ->
+            result.list.toList()
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = emptyList()
+        )
+
+    val forumsRealmTricks = realm.
+        query<ForumsRealm>(
+            "type == $0",
+            Forums.ForumType.TIPS_AND_TRICKS.fieldName
+        )
+            .sort("createdAtMillis", Sort.DESCENDING)
+            .asFlow().map { result ->
+                result.list.toList()
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = emptyList()
+            )
+
+    val forumsRealmEducation = realm.
+        query<ForumsRealm>(
+            "type == $0",
+            Forums.ForumType.WASTE_MANAGEMENT_EDUCATION.fieldName
+        )
+            .sort("createdAtMillis", Sort.DESCENDING)
+            .asFlow().map { result ->
+                result.list.toList()
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = emptyList()
+            )
 
     private var lastVisible: DocumentSnapshot? = null
     private var endOfList : DocumentSnapshot? = null
@@ -31,6 +100,110 @@ class KomunitasViewModel : ViewModel() {
     private val baseQuery = firestore.collection(tempObj.table)
         .orderBy(FireModel.Keys.createdAt, Query.Direction.DESCENDING)
         .limit(10)
+
+    fun pullLatestData(limit: Long = 50, formType: Forums.ForumType = Forums.ForumType.ARTICLE) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val query = firestore.collection(tempObj.table)
+                .orderBy(FireModel.Keys.createdAt, Query.Direction.DESCENDING)
+                .limit(limit)
+
+            if (formType != Forums.ForumType.ARTICLE) {
+                query.whereEqualTo(Forums.Keys.type, formType.fieldName)
+            }
+
+            query.get(Source.SERVER)
+                .addOnSuccessListener { result ->
+                    if (result.isEmpty) return@addOnSuccessListener
+
+                    lastVisible = result.documents[result.size() - 1]
+
+                    val forums = Forums().toModels(result)
+
+                    writeUpdateRealm(forums)
+                }
+                .addOnFailureListener {
+                    Log.e("KomunitasViewModel", "Error getting documents: ", it)
+                }
+
+        }
+
+    }
+
+    private suspend fun pullLatestDataCheck(formType: Forums.ForumType) : Boolean {
+        return suspendCoroutine { continuation ->
+            viewModelScope.launch(Dispatchers.IO) {
+                val query = firestore.collection(tempObj.table)
+                    .orderBy(FireModel.Keys.createdAt, Query.Direction.DESCENDING)
+                    .limit(10)
+
+                if (formType != Forums.ForumType.ARTICLE) {
+                    query.whereEqualTo(Forums.Keys.type, formType.fieldName)
+                }
+
+                try {
+                    val result = withContext(Dispatchers.IO) {
+                        withTimeoutOrNull(10_000L) {
+                            query.get(Source.SERVER).await()
+                        }
+                    }
+
+                    if (result == null) {
+                        continuation.resumeWith(Result.success(false))
+                        return@launch
+                    }
+
+
+                    lastVisible = result.documents[result.size() - 1]
+
+                    val forums = Forums().toModels(result)
+
+                    writeUpdateRealm(forums)
+                    continuation.resumeWith(Result.success(true))
+
+                } catch (e: Exception) {
+                    Log.e("KomunitasViewModel", "Error getting documents: ", e)
+                    continuation.resumeWith(Result.failure(e))
+                }
+
+            }
+        }
+    }
+
+    private fun writeUpdateRealm(data: List<Forums>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            realm.write {
+                data.toRealm().forEach {
+                    copyToRealm(it, updatePolicy = UpdatePolicy.ALL)
+                }
+            }
+        }
+    }
+
+    fun deleteBeyondLimit(limit: Int = 50) {
+        viewModelScope.launch(Dispatchers.IO) {
+            pullLatestData(limit.toLong())
+
+            val cursor = forumsRealm.first()
+            // delete data beyond limit
+            if (cursor.size > limit) {
+                val beyondLimit = cursor.drop(limit)
+                realm.write {
+                    beyondLimit.forEach {
+                        it.deleteFromRealm()
+                    }
+                }
+            }
+
+        }
+    }
+
+    private fun ForumsRealm.deleteFromRealm() {
+        viewModelScope.launch(Dispatchers.IO) {
+            realm.write {
+                delete(this@deleteFromRealm)
+            }
+        }
+    }
 
     fun loadEndOfList() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -57,7 +230,7 @@ class KomunitasViewModel : ViewModel() {
             query.get()
                 .addOnSuccessListener { result ->
                     val forums = tempObj.toModels(result)
-                    _forum.value = forums
+                    mostLikes.value = forums.first()
                 }
                 .addOnFailureListener { exception ->
                     Log.e("KomunitasViewModel", "Error getting documents: ", exception)
@@ -75,35 +248,12 @@ class KomunitasViewModel : ViewModel() {
             query.get()
                 .addOnSuccessListener { result ->
                     val forums = tempObj.toModels(result)
-                    _forum.value = forums
+                    latestUserPost.value = forums.first()
                 }
                 .addOnFailureListener { exception ->
                     Log.e("KomunitasViewModel", "Error getting documents: ", exception)
                 }
         }
-    }
-
-    fun refreshRecyclerData(forceUpdate : Boolean = false) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val source = if (forceUpdate) Source.SERVER else Source.DEFAULT
-
-
-            baseQuery.get(source)
-                .addOnSuccessListener { result ->
-                    if (result.isEmpty) return@addOnSuccessListener
-
-                    val forums = tempObj.toModels(result)
-                    _forum.value = forums
-
-                    lastVisible = result.documents[result.size() - 1]
-
-                    Log.i("KomunitasViewModel", "Data refreshed with ${forums.size} items")
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("KomunitasViewModel", "Error getting documents: ", exception)
-                }
-        }
-
     }
 
     /**
@@ -115,13 +265,29 @@ class KomunitasViewModel : ViewModel() {
      *
      * @throws Exception if last visible is null
      */
-    fun loadMoreRecyclerData() {
+    fun loadMoreRecyclerData(forumType: Forums.ForumType) {
         viewModelScope.launch(Dispatchers.IO) {
 
             if (lastVisible == null) {
                 Log.e("KomunitasViewModel", "Last visible is null on loadMoreRecyclerData()")
-                throw Exception("Wrong Action, last visible is null. \nYou should not call this " +
-                        "function before refreshRecyclerData() is called")
+
+                Log.i("KomunitasViewModel", "initiative Refreshing recycler data")
+                val result = withContext(Dispatchers.IO) {
+                    pullLatestDataCheck(forumType)
+                }
+
+                try {
+                    if (result) {
+                        Log.i("KomunitasViewModel", "Data is loaded, retrying loadMoreRecyclerData")
+                        return@launch
+                    } else {
+                        Log.i("KomunitasViewModel", "There is no data to loadMoreRecyclerData")
+                        return@launch
+                    }
+                } catch (e: Exception) {
+                    Log.e("KomunitasViewModel", "Error getting documents: ", e)
+                    return@launch
+                }
             }
 
             if (lastVisible == endOfList) {
@@ -130,12 +296,18 @@ class KomunitasViewModel : ViewModel() {
             }
 
             val query = baseQuery.startAfter(lastVisible!!)
-            val oldList = _forum.asFlow().first()
+
+            if (forumType != Forums.ForumType.ARTICLE) {
+                query.whereEqualTo(Forums.Keys.type, forumType.fieldName)
+            }
+
+            val oldList = forumsRealm.first().toModel()
 
             query.get()
                 .addOnSuccessListener { result ->
                     val forums = tempObj.toModels(result)
-                    _forum.value = oldList.plus(forums)
+                    val newList = oldList.plus(forums)
+                    writeUpdateRealm(newList)
 
                     lastVisible = result.documents[result.size() - 1]
 
@@ -146,4 +318,96 @@ class KomunitasViewModel : ViewModel() {
                 }
         }
     }
+
+    suspend fun searchForums(
+        keyword: String,
+        forumType: String,
+        limitToSearch : Long = 700,
+        autoCancelTime : Long = 10_000L
+    ) : List<Forums>? {
+        return try {
+            val fireQuery = firestore.collection(tempObj.table)
+                .orderBy(FireModel.Keys.createdAt, Query.Direction.DESCENDING)
+                .limit(limitToSearch)
+
+            when(forumType) {
+                Forums.ForumType.REPORT.fieldName -> fireQuery.whereEqualTo(Forums.Keys.type, forumType)
+            }
+
+            withTimeoutOrNull(autoCancelTime) {
+                val result = fireQuery.get(Source.SERVER).await()
+
+                if (result.isEmpty) return@withTimeoutOrNull
+
+                val forums = Forums().toModels(result)
+                writeUpdateRealm(forums)
+            }
+
+            val result = realm.query<ForumsRealm>(
+                "(title LIKE[c] $0 or text TEXT $0) and type == $1",
+                "*$keyword*", forumType
+                )
+                .sort("createdAtMillis", Sort.DESCENDING)
+                .asFlow().map { result ->
+                    result.list.toList()
+                }
+
+            val searchResult = result.first().toModel()
+
+            searchResult.ifEmpty {
+                Log.e("KomunitasViewModel", "No forums found with keyword: $keyword")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("KomunitasViewModel", "Error searching forums: ", e)
+            null
+        }
+    }
+
+    companion object {
+        fun List<ForumsRealm>.toModel() : List<Forums> {
+            return this.map { data ->
+                Forums(
+                    referencePath = data.reference,
+                    title = data.title,
+                    text = data.text,
+                    isUsingTextFile = data.isUsingTextFile,
+                    textFilePath = data.textFilePath,
+                    videoLink = data.videoLink,
+                    likeCount = data.likeCount,
+                    dislikeCount = data.dislikeCount,
+                    commentCount = data.commentCount,
+                    likesReference = data.likesReference,
+                    thumbnailPhotosUrl = data.thumbnailPhotosUrl,
+                    author = data.author,
+                    komentarHub = data.komentarHub,
+                    createdAt = data.createdAt,
+                    type = data.type
+                )
+            }
+        }
+
+        fun List<Forums>.toRealm() : List<ForumsRealm> {
+            return this.map { data ->
+                ForumsRealm().apply {
+                    referencePath = data.referencePath!!.path
+                    title = data.title
+                    text = data.text
+                    isUsingTextFile = data.isUsingTextFile
+                    textFilePath = data.textFilePath
+                    videoLink = data.videoLink
+                    likeCount = data.likeCount
+                    dislikeCount = data.dislikeCount
+                    commentCount = data.commentCount
+                    likesReferencePath = data.likesReference!!.path
+                    thumbnailPhotosUrl = data.thumbnailPhotosUrl
+                    authorPath = data.author!!.path
+                    komentarHubPath = data.komentarHub!!.path
+                    createdAtMillis = data.createdAt!!.toDate().time
+                    type = data.type
+                }
+            }
+        }
+    }
+
 }

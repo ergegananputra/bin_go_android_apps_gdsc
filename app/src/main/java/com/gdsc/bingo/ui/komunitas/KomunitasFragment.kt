@@ -2,22 +2,24 @@ package com.gdsc.bingo.ui.komunitas
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.gdsc.bingo.MainActivity
-import com.gdsc.bingo.adapter.ForumPostAdapter
+import com.gdsc.bingo.adapter.KomunitasTabAdapter
 import com.gdsc.bingo.databinding.FragmentKomunitasBinding
 import com.gdsc.bingo.model.Forums
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -28,19 +30,8 @@ class KomunitasFragment : Fragment() {
     private lateinit var storage: FirebaseStorage
     private lateinit var komunitasViewModel: KomunitasViewModel
 
-    private val binding by lazy {
+    val binding by lazy {
         FragmentKomunitasBinding.inflate(layoutInflater)
-    }
-
-    private val forumPostAdapter by lazy {
-        ForumPostAdapter(
-            context = requireActivity(),
-            storage = storage,
-            actionComment = { forum -> actionComment(forum) },
-            actionLike = { forum -> actionLike(forum) },
-            actionVerticalButton = { forum -> actionVerticalButton(forum) },
-            actionOpenDetail = { forum -> actionOpenDetail(forum) }
-        )
     }
 
     override fun onCreateView(
@@ -52,8 +43,8 @@ class KomunitasFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         storage = FirebaseStorage.getInstance()
         komunitasViewModel = ViewModelProvider(this)[KomunitasViewModel::class.java]
-        setupRecyclerView()
         setupEndOfList()
+        setupViewPager()
         return binding.root
     }
 
@@ -61,14 +52,108 @@ class KomunitasFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         (activity as MainActivity).setStatusAndBottomNavigation(this)
 
+        savedInstanceState?.let {
+            binding.komunitasViewPager.currentItem = it.getInt("current_page")
+        }
+
         setupSearchBar()
 
         setupCreateKomunitasReportFloatingActionButton()
         setupCreateKomunitasExtendedFloatingActionButton()
-        komunitasViewModel.refreshRecyclerData()
-        setupSwipeRefresh()
-        setupPaginationAndScrollingBehaviour()
+        setupCreateKomunitasReportFExtendedFloatingActionButton()
+        komunitasViewModel.pullLatestData()
+
+
     }
+
+    override fun onPause() {
+        super.onPause()
+        komunitasViewModel.deleteBeyondLimit()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.komunitasViewPager.currentItem = 0
+        binding.komunitasTabLayout.selectTab(binding.komunitasTabLayout.getTabAt(0))
+    }
+
+    private fun setupViewPager(isSaveEnabled : Boolean= false) {
+        val viewPager2 = binding.komunitasViewPager
+        val pagerAdapter = KomunitasTabAdapter(
+            childFragmentManager,
+            lifecycle
+        )
+
+        viewPager2.adapter = pagerAdapter
+
+        viewPager2.isSaveEnabled = isSaveEnabled
+
+        binding.komunitasViewPager.currentItem = 0
+        binding.komunitasTabLayout.selectTab(binding.komunitasTabLayout.getTabAt(0))
+
+        TabLayoutMediator(
+            binding.komunitasTabLayout,
+            viewPager2
+        ) { tab, position ->
+            tab.text = pagerAdapter.getPageTitle(position)
+        }.attach()
+
+        binding.komunitasTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                when (tab.position) {
+                    1 -> {
+                        binding.komunitasExtendedFloatingActionButtonReport.apply {
+                            show()
+                            visibility = View.VISIBLE
+                        }
+
+                        binding.komunitasExtendedFloatingActionButton.apply {
+                            hide()
+                            visibility = View.GONE
+                        }
+                        binding.komunitasFloatingActionButtonReport.apply {
+                            hide()
+                            visibility = View.GONE
+                        }
+                    }
+                    else -> {
+                        binding.komunitasExtendedFloatingActionButtonReport.apply {
+                            hide()
+                            visibility = View.GONE
+                        }
+
+                        binding.komunitasExtendedFloatingActionButton.apply {
+                            show()
+                            visibility = View.VISIBLE
+                        }
+                        binding.komunitasFloatingActionButtonReport.apply {
+                            show()
+                            visibility = View.VISIBLE
+                        }
+                    }
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab) {
+                // Handle tab unselected
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab) {
+                // Handle tab reselected
+            }
+        })
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("current_page", binding.komunitasViewPager.currentItem)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        Log.d("KomunitasFragment", "onDestroyView")
+    }
+
 
     private fun setupSearchBar() {
         binding.komunitasOpenSearchButton.visibility = View.VISIBLE
@@ -107,72 +192,19 @@ class KomunitasFragment : Fragment() {
             }
         }
 
-        binding.komunitasTextInputLayoutSearch.editText?.doAfterTextChanged {
-            val query = it.toString().trim()
-            if (query.isNotBlank()) {
-                // TODO : search for query
-                Toast.makeText(requireContext(), "Search for $query", Toast.LENGTH_SHORT).show()
-            } else {
-                // TODO : search for all
-                Toast.makeText(requireContext(), "Search for all", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 
     private fun setupEndOfList() {
         komunitasViewModel.loadEndOfList()
     }
 
-    private fun setupPaginationAndScrollingBehaviour() {
-        binding.komunitasRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-                if (dy > 20) {
-                    binding.komunitasExtendedFloatingActionButton.shrink()
-                    binding.komunitasFloatingActionButtonReport.hide()
-                } else if (dy < 0) {
-                    binding.komunitasExtendedFloatingActionButton.extend()
-                    binding.komunitasFloatingActionButtonReport.show()
-                }
-
-
-                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
-                val totalItemCount = layoutManager.itemCount
-
-                if (lastVisiblePosition >= totalItemCount - 2) {
-                    komunitasViewModel.loadMoreRecyclerData()
-                }
-            }
-        })
-    }
-
-    private fun setupSwipeRefresh() {
-        binding.komunitasSwipeRefreshLayout.setOnRefreshListener {
-            komunitasViewModel.refreshRecyclerData()
-            binding.komunitasSwipeRefreshLayout.isRefreshing = false
-        }
-    }
-
-    private fun setupRecyclerView() {
-        binding.komunitasRecyclerView.apply {
-            adapter = forumPostAdapter
-            layoutManager = LinearLayoutManager(requireActivity())
-        }
-
-        komunitasViewModel.forum.observe(viewLifecycleOwner) {
-            binding.komunitasRecyclerProgressBar.visibility = View.GONE
-            forumPostAdapter.submitList(it)
-        }
-    }
 
 
 
-    private fun actionOpenDetail(forum: Forums) {
+    fun actionOpenDetail(forum: Forums) {
         val destination = with(forum){
             KomunitasFragmentDirections
-                .actionNavigationKomunitasToArtikelFragment(
+                .actionKomunitasFragmentToArtikelFragment(
                     referenecePathDocumentString = referencePath?.path!!,
                     title = title!!,
                     text = text,
@@ -192,20 +224,20 @@ class KomunitasFragment : Fragment() {
         findNavController().navigate(destination)
     }
 
-    private fun actionVerticalButton(forum: Forums) {
+    fun actionVerticalButton(forum: Forums) {
         // TODO : navigate to detail forum
         Toast.makeText(requireContext(), "Vertical button on ${forum.title}", Toast.LENGTH_SHORT).show()
     }
 
-    private fun actionLike(forum: Forums) {
+    fun actionLike(forum: Forums) {
         // TODO : like forum
         Toast.makeText(requireContext(), "Like on ${forum.title}", Toast.LENGTH_SHORT).show()
     }
 
-    private fun actionComment(forum: Forums) {
+    fun actionComment(forum: Forums) {
         val destination = with(forum){
             KomunitasFragmentDirections
-                .actionNavigationKomunitasToArtikelFragment(
+                .actionKomunitasFragmentToArtikelFragment(
                     referenecePathDocumentString = referencePath?.path!!,
                     title = title!!,
                     text = text,
@@ -230,7 +262,7 @@ class KomunitasFragment : Fragment() {
             hideIfUnauthenticated()
 
             val destination = KomunitasFragmentDirections
-                .actionNavigationKomunitasToFormPostFragment(Forums.ForumType.REPORT.fieldName)
+                .actionKomunitasFragmentToFormPostFragment(Forums.ForumType.REPORT.fieldName)
             setOnClickListener {
                 findNavController().navigate(destination)
             }
@@ -242,10 +274,20 @@ class KomunitasFragment : Fragment() {
             hideIfUnauthenticated()
 
             val destination = KomunitasFragmentDirections
-                .actionNavigationKomunitasToFormPostFragment(Forums.ForumType.ARTICLE.fieldName)
+                .actionKomunitasFragmentToFormPostFragment(Forums.ForumType.ARTICLE.fieldName)
 
             setOnClickListener {
                 findNavController().navigate(destination)
+            }
+        }
+    }
+
+    private fun setupCreateKomunitasReportFExtendedFloatingActionButton() {
+        binding.komunitasExtendedFloatingActionButton.apply {
+            hideIfUnauthenticated()
+
+            setOnClickListener {
+                binding.komunitasFloatingActionButtonReport.performClick()
             }
         }
     }
@@ -256,6 +298,44 @@ class KomunitasFragment : Fragment() {
         } else {
             View.VISIBLE
         }
+    }
+
+    fun setupPaginationAndScrollingBehaviour(
+        recyclerView: RecyclerView,
+        viewModel: KomunitasViewModel,
+        forumType: Forums.ForumType
+    ) {
+
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (dy > 20) {
+                    if (forumType == Forums.ForumType.REPORT) {
+                        binding.komunitasExtendedFloatingActionButtonReport.shrink()
+                    } else {
+                        binding.komunitasExtendedFloatingActionButton.shrink()
+                        binding.komunitasFloatingActionButtonReport.hide()
+                    }
+                } else if (dy < 0) {
+                    if (forumType == Forums.ForumType.REPORT) {
+                        binding.komunitasExtendedFloatingActionButtonReport.extend()
+                    } else {
+                        binding.komunitasExtendedFloatingActionButton.extend()
+                        binding.komunitasFloatingActionButtonReport.show()
+                    }
+                }
+
+
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
+                val totalItemCount = layoutManager.itemCount
+
+                if (lastVisiblePosition >= totalItemCount - 2) {
+                    viewModel.loadMoreRecyclerData(forumType)
+                }
+            }
+        })
     }
 
 }

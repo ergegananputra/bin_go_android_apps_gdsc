@@ -51,4 +51,5 @@
     <string name="lokasi_saya">Lokasi saya</string>
     <string name="pilih_lokasi">Pilih Lokasi</string>
     <string name="error_location_required">Mohon pilih lokasi pelaporan terlebih dahulu</string>
+    <string name="Terpilih">Terpilih</string>
 </resources>

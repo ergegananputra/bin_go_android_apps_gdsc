@@ -9,8 +9,10 @@ import com.gdsc.bingo.model.FireModel
 import com.gdsc.bingo.model.Forums
 import com.gdsc.bingo.model.User
 import com.gdsc.bingo.services.realm.model.ForumsRealm
+import com.gdsc.bingo.services.realm.model.GeoPointRealm
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.Source
 import io.realm.kotlin.UpdatePolicy
@@ -382,7 +384,13 @@ class KomunitasViewModel : ViewModel() {
                     author = data.author,
                     komentarHub = data.komentarHub,
                     createdAt = data.createdAt,
-                    type = data.type
+                    type = data.type,
+                    vicinity = if (data.vicinity != null) {
+                        GeoPoint(
+                            data.vicinity!!.latitude,
+                            data.vicinity!!.longitude
+                        )
+                    } else null
                 )
             }
         }
@@ -405,6 +413,12 @@ class KomunitasViewModel : ViewModel() {
                     komentarHubPath = data.komentarHub!!.path
                     createdAtMillis = data.createdAt!!.toDate().time
                     type = data.type
+                    vicinity = if (data.vicinity != null) {
+                        GeoPointRealm().apply {
+                            latitude = data.vicinity!!.latitude
+                            longitude = data.vicinity!!.longitude
+                        }
+                    } else null
                 }
             }
         }

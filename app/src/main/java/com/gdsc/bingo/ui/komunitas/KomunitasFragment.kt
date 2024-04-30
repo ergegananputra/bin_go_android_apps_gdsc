@@ -283,7 +283,7 @@ class KomunitasFragment : Fragment() {
     }
 
     private fun setupCreateKomunitasReportFExtendedFloatingActionButton() {
-        binding.komunitasExtendedFloatingActionButton.apply {
+        binding.komunitasExtendedFloatingActionButtonReport.apply {
             hideIfUnauthenticated()
 
             setOnClickListener {
@@ -336,6 +336,15 @@ class KomunitasFragment : Fragment() {
                 }
             }
         })
+    }
+
+    fun actionOpenRoute(forum: Forums) {
+        val destination = KomunitasFragmentDirections
+            .actionNavigationKomunitasToPinPointActivity(
+                "${forum.vicinity?.latitude!!}",
+                "${forum.vicinity?.longitude!!}"
+            )
+        findNavController().navigate(destination)
     }
 
 }

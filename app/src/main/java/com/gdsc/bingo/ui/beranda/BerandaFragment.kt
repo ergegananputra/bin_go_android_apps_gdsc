@@ -129,7 +129,9 @@ class BerandaFragment : Fragment() {
 
     private fun setupBerandaPinPoint() {
         binding.berandaCardBerandaContainer.setOnClickListener {
-            val destination = BerandaFragmentDirections.actionNavigationBerandaToPinPointActivity()
+            val destination = BerandaFragmentDirections.actionNavigationBerandaToPinPointActivity(
+                null, null
+            )
             findNavController().navigate(destination)
         }
     }

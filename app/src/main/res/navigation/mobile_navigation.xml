@@ -63,7 +63,16 @@
         android:id="@+id/pinPointActivity"
         android:name="com.gdsc.bingo.ui.pinpoint.PinPointActivity"
         android:label="activity_pin_point"
-        tools:layout="@layout/activity_pin_point" />
+        tools:layout="@layout/activity_pin_point" >
+        <argument
+            android:name="latitude"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="longitude"
+            app:argType="string"
+            app:nullable="true" />
+    </activity>
     <fragment
         android:id="@+id/navigation_profil_detail"
         android:name="com.gdsc.bingo.ui.profil.detail.ProfilDetailFragment"
@@ -142,6 +151,9 @@
         <action
             android:id="@+id/action_komunitasFragment_to_formPostFragment"
             app:destination="@id/formPostFragment" />
+        <action
+            android:id="@+id/action_navigation_komunitas_to_pinPointActivity"
+            app:destination="@id/pinPointActivity" />
     </fragment>
 
 </navigation>

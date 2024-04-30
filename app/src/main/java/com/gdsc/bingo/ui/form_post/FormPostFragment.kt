@@ -184,6 +184,7 @@ class FormPostFragment : Fragment() {
         val adapter = ArrayAdapter(requireContext(), R.layout.list_popup_window_item, categoryList)
         categoryPopUpWindow.setAdapter(adapter)
 
+
         // Set list popup item click listener
         categoryPopUpWindow.setOnItemClickListener { parent: AdapterView<*>?, view: View?, position: Int, id: Long ->
             // Respond to list popup window item click.
@@ -321,15 +322,17 @@ class FormPostFragment : Fragment() {
 
             val videoLink = binding.formPostTextInputLayoutVideoLink.getTrimEditText().getYoutubeVideoId()
 
+            val vicinity = formViewModel.vicinity.asFlow().firstOrNull()
+
             val forums = Forums(
                 title = title,
                 author = firestore.collection(User().table).document(auth.uid!!),
                 videoLink = videoLink,
                 createdAt = Timestamp.now(),
-                type = args.type
+                type = args.type,
+                vicinity = vicinity
             )
 
-            val vicinity = formViewModel.vicinity.asFlow().firstOrNull()
             if (args.type == Forums.ForumType.REPORT.fieldName
                 && vicinity == null) {
 
@@ -503,7 +506,9 @@ class FormPostFragment : Fragment() {
                     removeUploadToken()
 
 
+                    // Create BinLocation for report
                     if (args.type == Forums.ForumType.REPORT.fieldName) {
+                        addUploadToken()
                         val placesId = generateIDforPlaces(vicinity!!.latitude, vicinity.longitude)
                         firestore.collection(BinLocation().table).document(placesId)
                             .get(Source.SERVER)
@@ -532,9 +537,11 @@ class FormPostFragment : Fragment() {
                                             executeFailure()
                                         }
                                 }
+                                removeUploadToken()
                             }
                             .addOnFailureListener {
                                 Log.e("FormPostFragment", "uploadForums: ${it.message}")
+                                removeUploadToken()
                                 executeFailure()
                             }
                     }

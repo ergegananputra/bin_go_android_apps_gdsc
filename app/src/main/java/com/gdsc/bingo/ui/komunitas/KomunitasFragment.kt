@@ -52,9 +52,6 @@ class KomunitasFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         (activity as MainActivity).setStatusAndBottomNavigation(this)
 
-        savedInstanceState?.let {
-            binding.komunitasViewPager.currentItem = it.getInt("current_page")
-        }
 
         setupSearchBar()
 
@@ -77,19 +74,15 @@ class KomunitasFragment : Fragment() {
         binding.komunitasTabLayout.selectTab(binding.komunitasTabLayout.getTabAt(0))
     }
 
-    private fun setupViewPager(isSaveEnabled : Boolean= false) {
+    private fun setupViewPager(isSaveEnabled : Boolean= true) {
         val viewPager2 = binding.komunitasViewPager
         val pagerAdapter = KomunitasTabAdapter(
-            childFragmentManager,
-            lifecycle
+            this
         )
 
         viewPager2.adapter = pagerAdapter
 
         viewPager2.isSaveEnabled = isSaveEnabled
-
-        binding.komunitasViewPager.currentItem = 0
-        binding.komunitasTabLayout.selectTab(binding.komunitasTabLayout.getTabAt(0))
 
         TabLayoutMediator(
             binding.komunitasTabLayout,
@@ -144,10 +137,6 @@ class KomunitasFragment : Fragment() {
         })
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt("current_page", binding.komunitasViewPager.currentItem)
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -1,8 +1,6 @@
 package com.gdsc.bingo.adapter
 
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.gdsc.bingo.ui.komunitas.child.KomunitasEducationFragment
 import com.gdsc.bingo.ui.komunitas.child.KomunitasPostFragment
@@ -10,9 +8,8 @@ import com.gdsc.bingo.ui.komunitas.child.KomunitasReportFragment
 import com.gdsc.bingo.ui.komunitas.child.KomunitasTricksFragment
 
 class KomunitasTabAdapter(
-    fragmentManager: FragmentManager,
-    lifecycle: Lifecycle,
-) : FragmentStateAdapter(fragmentManager, lifecycle) {
+    fragment: Fragment
+) : FragmentStateAdapter(fragment) {
 
     private val pages = listOf(
         KomunitasPostFragment(),

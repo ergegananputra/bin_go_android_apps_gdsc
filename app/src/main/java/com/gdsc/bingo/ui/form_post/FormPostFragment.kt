@@ -41,6 +41,7 @@ import com.gdsc.bingo.model.User
 import com.gdsc.bingo.services.api.firebase.MapsDataSyncFirebase.Companion.generateIDforPlaces
 import com.gdsc.bingo.services.textstyling.AddOnSpannableTextStyle
 import com.gdsc.bingo.ui.form_post.viewmodel.FormPostViewModel
+import com.gdsc.bingo.ui.pop_up.SuccesReportPopUp
 import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
@@ -302,8 +303,13 @@ class FormPostFragment : Fragment() {
         binding.formPostHeaderButtonSave.setOnClickListener {
             lifecycleScope.launch {
                 submitForm()
+                showSuccessPopUp()
             }
         }
+    }
+
+    private fun showSuccessPopUp() {
+        startActivity(Intent(requireContext(), SuccesReportPopUp::class.java))
     }
 
     private suspend fun submitForm() {

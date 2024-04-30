@@ -110,6 +110,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-common:2.6.1")
+    implementation("androidx.activity:activity:1.8.0")
     ksp("androidx.room:room-compiler:2.6.1")
 
     // Realm
@@ -171,6 +172,8 @@ dependencies {
     // Swipe Refresh Layout
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
 
+    // Lottie Animation
+    implementation ("com.airbnb.android:lottie:6.4.0")
 
     implementation("androidx.core:core-ktx:1.13.0")
     implementation("androidx.appcompat:appcompat:1.6.1")

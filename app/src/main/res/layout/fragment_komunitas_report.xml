@@ -26,7 +26,7 @@
             android:paddingTop="4dp"
             android:scrollbars="none"
             tools:itemCount="3"
-            tools:listitem="@layout/component_card_komunitas" />
+            tools:listitem="@layout/component_card_report" />
 
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

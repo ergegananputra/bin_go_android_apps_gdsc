@@ -89,34 +89,10 @@ class KomunitasFragment : Fragment() {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 when (tab.position) {
                     1 -> {
-                        binding.komunitasExtendedFloatingActionButtonReport.apply {
-                            show()
-                            visibility = View.VISIBLE
-                        }
-
-                        binding.komunitasExtendedFloatingActionButton.apply {
-                            hide()
-                            visibility = View.GONE
-                        }
-                        binding.komunitasFloatingActionButtonReport.apply {
-                            hide()
-                            visibility = View.GONE
-                        }
+                        viewSetFloatingActionButton(1)
                     }
                     else -> {
-                        binding.komunitasExtendedFloatingActionButtonReport.apply {
-                            hide()
-                            visibility = View.GONE
-                        }
-
-                        binding.komunitasExtendedFloatingActionButton.apply {
-                            show()
-                            visibility = View.VISIBLE
-                        }
-                        binding.komunitasFloatingActionButtonReport.apply {
-                            show()
-                            visibility = View.VISIBLE
-                        }
+                        viewSetFloatingActionButton(0)
                     }
                 }
             }
@@ -129,6 +105,42 @@ class KomunitasFragment : Fragment() {
                 // Handle tab reselected
             }
         })
+    }
+
+    private fun viewSetFloatingActionButton(i: Int) {
+        when (i) {
+            1 -> {
+                binding.komunitasExtendedFloatingActionButtonReport.apply {
+                    show()
+                    visibility = View.VISIBLE
+                }
+
+                binding.komunitasExtendedFloatingActionButton.apply {
+                    hide()
+                    visibility = View.GONE
+                }
+                binding.komunitasFloatingActionButtonReport.apply {
+                    hide()
+                    visibility = View.GONE
+                }
+            }
+            else -> {
+                binding.komunitasExtendedFloatingActionButtonReport.apply {
+                    hide()
+                    visibility = View.GONE
+                }
+
+                binding.komunitasExtendedFloatingActionButton.apply {
+                    show()
+                    visibility = View.VISIBLE
+                }
+                binding.komunitasFloatingActionButtonReport.apply {
+                    show()
+                    visibility = View.VISIBLE
+                }
+            }
+        }
+
     }
 
 
@@ -185,7 +197,7 @@ class KomunitasFragment : Fragment() {
     fun actionOpenDetail(forum: Forums) {
         val destination = with(forum){
             KomunitasFragmentDirections
-                .actionKomunitasFragmentToArtikelFragment(
+                .actionNavigationKomunitasToNavigationArtikelActivity(
                     referenecePathDocumentString = referencePath?.path!!,
                     title = title!!,
                     text = text,
@@ -218,7 +230,7 @@ class KomunitasFragment : Fragment() {
     fun actionComment(forum: Forums) {
         val destination = with(forum){
             KomunitasFragmentDirections
-                .actionKomunitasFragmentToArtikelFragment(
+                .actionNavigationKomunitasToNavigationArtikelActivity(
                     referenecePathDocumentString = referencePath?.path!!,
                     title = title!!,
                     text = text,
@@ -286,6 +298,7 @@ class KomunitasFragment : Fragment() {
         viewModel: KomunitasViewModel,
         forumType: Forums.ForumType
     ) {
+        viewSetFloatingActionButton(if (forumType == Forums.ForumType.REPORT) 1 else 0)
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

@@ -45,6 +45,9 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
+            android:name=".ui.artikel.ArtikelActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.form_post.FormPostActivity"
             android:exported="false" />
         <!--

@@ -5,16 +5,15 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.LinearLayout
 import android.widget.ListPopupWindow
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asFlow
@@ -29,7 +28,6 @@ import com.gdsc.bingo.model.PostImage
 import com.gdsc.bingo.model.User
 import com.gdsc.bingo.services.textstyling.AddOnSpannableTextStyle
 import com.gdsc.bingo.ui.form_post.viewmodel.FormPostViewModel
-import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -47,6 +45,18 @@ class FormPostFragment : Fragment() {
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
+
+    private var forumType : String? = null
+    private val categoryList = hashMapOf(
+        Forums.ForumType.ARTICLE.fieldName to "Article",
+        Forums.ForumType.TIPS_AND_TRICKS.fieldName to "Recycling Tips & Tricks",
+        Forums.ForumType.WASTE_MANAGEMENT_EDUCATION.fieldName to "Waste Management Education"
+    )
+    private val categoryListReversed = hashMapOf(
+        "Article" to Forums.ForumType.ARTICLE.fieldName,
+        "Recycling Tips & Tricks" to Forums.ForumType.TIPS_AND_TRICKS.fieldName,
+        "Waste Management Education" to Forums.ForumType.WASTE_MANAGEMENT_EDUCATION.fieldName
+    )
 
     private val binding by lazy {
         FragmentFormPostBinding.inflate(layoutInflater)
@@ -157,16 +167,15 @@ class FormPostFragment : Fragment() {
         categoryPopUpWindow.anchorView = binding.formPostCardViewCategory
 
         // Set List Popup Content
-        val categoryList = listOf("Plastik", "Kaleng", "Galon", "Kertas", "Minyak Jelantah")
-        val adapter = ArrayAdapter(requireContext(), R.layout.list_popup_window_item, categoryList)
+        val adapter = ArrayAdapter(requireContext(), R.layout.list_popup_window_item, categoryList.values.toTypedArray())
         categoryPopUpWindow.setAdapter(adapter)
 
 
         // Set list popup item click listener
         categoryPopUpWindow.setOnItemClickListener { parent: AdapterView<*>?, view: View?, position: Int, id: Long ->
             // Respond to list popup window item click.
-            val category = categoryList[position]
-            appendChips(category)
+            forumType = categoryList.keys.toList()[position]
+            binding.formPostButtonCategory.text = categoryList.values.toList()[position]
 
             // Dismiss popup.
             categoryPopUpWindow.dismiss()
@@ -178,36 +187,8 @@ class FormPostFragment : Fragment() {
         }
     }
 
-    private fun appendChips(category: String) {
-        checkIfAlreadyExist(category).let { if (it) return }
 
-        val chip = LayoutInflater.from(requireContext()).inflate(R.layout.item_chips_category, null) as Chip
-        chip.text = category
 
-        val params = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.MATCH_PARENT
-        )
-        params.setMargins(4, 4, 4, 4)
-        chip.layoutParams = params
-
-        chip.setOnClickListener { view ->
-            binding.formPostCategoryChipContainer.removeView(view)
-        }
-
-        binding.formPostCategoryChipContainer.addView(chip)
-    }
-
-    private fun checkIfAlreadyExist(category: String) : Boolean {
-        var alreadyExist = false
-        binding.formPostCategoryChipContainer.forEach {
-            if ((it as Chip).text == category) {
-                alreadyExist = true
-                return@forEach
-            }
-        }
-        return alreadyExist
-    }
 
     private fun setupDescriptionText() {
 
@@ -323,12 +304,17 @@ class FormPostFragment : Fragment() {
             formViewModel.vicinity.asFlow().firstOrNull()
         }
 
+        var type = binding.formPostButtonCategory.text.toString()
+        type = categoryListReversed[type] ?: (activity as FormPostActivity).args.type
+
+        Log.d("FormPostFragment", "submitForm: type $type")
+
         val forums = Forums(
             title = title,
             author = firestore.collection(User().table).document(auth.uid!!),
             videoLink = videoLink,
             createdAt = Timestamp.now(),
-            type = (activity as FormPostActivity).args.type,
+            type = type,
             vicinity = vicinity
         )
 

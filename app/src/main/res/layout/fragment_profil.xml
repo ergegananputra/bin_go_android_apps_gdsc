@@ -29,23 +29,23 @@
             android:id="@+id/profil_card_profil_placeholder_image"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintHeight_max="100dp"
-            app:layout_constraintWidth_max="100dp"
-            app:layout_constraintDimensionRatio="1"
             app:cardCornerRadius="1000dp"
             app:layout_constraintBottom_toBottomOf="@+id/profil_card_header"
+            app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="100dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profil_card_header"
+            app:layout_constraintWidth_max="100dp"
             app:strokeColor="?attr/colorPrimary"
             app:strokeWidth="3dp">
 
+            <!-- Foto profil -->
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/profil_card_profil_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:src="@tools:sample/avatars" />
-
 
         </com.google.android.material.card.MaterialCardView>
 
@@ -233,6 +233,21 @@
 
 
         </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <ImageView
+            android:id="@+id/icon_pencil_edit_profile"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="55dp"
+            android:layout_marginLeft="-35dp"
+            android:background="@drawable/bg_circle_radius_border"
+            android:padding="8dp"
+            android:rotation="10"
+            android:src="@drawable/baseline_edit_16"
+            app:layout_constraintBottom_toTopOf="@+id/profil_card_profil_container"
+            app:layout_constraintStart_toEndOf="@+id/profil_card_profil_placeholder_image"
+            app:layout_constraintTop_toTopOf="@+id/profil_card_profil_placeholder_image"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

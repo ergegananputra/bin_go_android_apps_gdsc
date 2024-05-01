@@ -107,6 +107,26 @@ class BerandaFragment : Fragment() {
         setupKomunitasBinGo()
         setupBerandaPinPoint()
         refreshRecyclerMostLikeData()
+        setupBinReportFormButton()
+        setupKomunitasFormButton()
+    }
+
+    private fun setupKomunitasFormButton() {
+        binding.berandaIdeaTilesCardView.setOnClickListener {
+            val destination = BerandaFragmentDirections.actionNavigationBerandaToFormPostActivity(
+                type = Forums.ForumType.ARTICLE.fieldName
+            )
+            findNavController().navigate(destination)
+        }
+    }
+
+    private fun setupBinReportFormButton() {
+        binding.berandaReportTilesCardView.setOnClickListener {
+            val destination = BerandaFragmentDirections.actionNavigationBerandaToFormPostActivity(
+                type = Forums.ForumType.REPORT.fieldName
+            )
+            findNavController().navigate(destination)
+        }
     }
 
     private fun setupGreetings() {

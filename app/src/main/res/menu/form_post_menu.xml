@@ -5,7 +5,7 @@
     <item
         android:id="@+id/form_post_header_button_save"
         android:icon="@drawable/ic_check_24"
-        android:iconTint="?attr/colorPrimary"
+        android:iconTint="?attr/colorOnSurface"
         android:title="@string/simpan"
         app:showAsAction="always"
         />

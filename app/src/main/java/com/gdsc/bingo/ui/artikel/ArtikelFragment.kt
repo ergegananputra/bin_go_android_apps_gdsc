@@ -8,13 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import coil.transform.CircleCropTransformation
 import com.facebook.shimmer.ShimmerFrameLayout
-import com.gdsc.bingo.MainActivity
 import com.gdsc.bingo.R
 import com.gdsc.bingo.adapter.ImagePostAdapter
 import com.gdsc.bingo.adapter.KomentarAdapter
@@ -48,7 +45,9 @@ import java.time.ZoneId
 
 
 class ArtikelFragment : Fragment(), PointsRewardSystem {
-    private val navArgs by navArgs<ArtikelFragmentArgs>()
+    private val navArgs by lazy {
+        (activity as ArtikelActivity).args
+    }
 
     private lateinit var fireStore : FirebaseFirestore
     private lateinit var auth : FirebaseAuth
@@ -109,9 +108,7 @@ class ArtikelFragment : Fragment(), PointsRewardSystem {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as MainActivity).setStatusAndBottomNavigation(this)
 
-        setupToolbarButton()
         lifecycleScope.launch(Dispatchers.Main) {
             this.launch { setupTitle() }
             this.launch { setupProfile() }
@@ -501,12 +498,6 @@ class ArtikelFragment : Fragment(), PointsRewardSystem {
     private fun setupUsername(username: String) {
         binding.artikelTextViewUsername.text = username
         binding.artikelShimmerUsername.stop()
-    }
-
-    private fun setupToolbarButton() {
-        binding.artikelToolbarButtonBack.setOnClickListener {
-            findNavController().popBackStack()
-        }
     }
 
 

@@ -32,6 +32,7 @@ import com.gdsc.bingo.databinding.FragmentSearchMapsBinding
 import com.gdsc.bingo.model.BinLocation
 import com.gdsc.bingo.model.nearby.ModelResults
 import com.gdsc.bingo.model.utils.CustomInfoWindowGoogleMap
+import com.gdsc.bingo.ui.pinpoint.PinPointActivity
 import com.gdsc.bingo.ui.pinpoint.search.viewmodel.SearchMapsViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -87,6 +88,8 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         return binding.root
     }
 
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -131,11 +134,91 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             }
         })
 
-        val btnNavigateRoute = view.findViewById<Button>(R.id.btn_navigate_route)
+        val btnNavigateRoute = view.findViewById<Button>(R.id.component_button_navigate)
         btnNavigateRoute.setOnClickListener {
             // Panggil metode untuk membuka Google Maps dengan arah dari lokasi yang dipilih
             openGoogleMapsDirections()
         }
+
+
+
+    }
+
+    private fun setFirstLocation() {
+        try {
+            val latitude = (requireActivity() as PinPointActivity).args.latitude
+            val longitude = (requireActivity() as PinPointActivity).args.longitude
+
+            if (latitude != null && longitude != null) {
+                val vicinity = GeoPoint(latitude.toDouble(), longitude.toDouble())
+                Log.i("Location", "Location found: $latitude, $longitude")
+
+                googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(vicinity.latitude, vicinity.longitude),
+                    DEFAULT_ZOOM
+                ))
+
+                // Find the marker by its position and open its info window
+                val marker = markerList.find {
+                    it.position.latitude == vicinity.latitude
+                            && it.position.longitude == vicinity.longitude
+                }
+                marker?.showInfoWindow()
+                performMarkerClickAction(marker)
+
+            } else {
+                Log.i("Location", "Location not found: $latitude, $longitude")
+            }
+        } catch (e: Exception) {
+            Log.e("Location", "Error: ${e.message}")
+        }
+
+    }
+
+    private fun performMarkerClickAction(marker: Marker?) : Boolean{
+        // Ambil tag dari marker yang diklik
+        Log.i("MarkerClicked", "Marker clicked")
+        val markerInfoRaw = marker?.tag as? ModelResults ?: return false // Kembalikan false agar default behavior dari marker juga berlaku
+
+        val markerInfo = BinLocation(
+            referencePath = null,
+            name = markerInfoRaw.name,
+            address = markerInfoRaw.vicinity,
+            location = GeoPoint(marker.position.latitude, marker.position.longitude),
+            additionalInfo = mapOf(
+                "place_id" to markerInfoRaw.placeId
+            ),
+            isOpen = markerInfoRaw.isOpen,
+            rating = markerInfoRaw.rating
+        )
+
+        // Perbarui teks pada TextView
+        binding.searchMapsTextViewLokasiTerpilih.text = markerInfo.name
+        binding.searchMapsTextViewAddressLokasiTerpilih.text = markerInfo.address
+
+        // NOTE: Animasi disini
+        TransitionManager.beginDelayedTransition(binding.searchMapsBottomDialogMainConstraintLayout)
+        binding.searchMapsGroupMarkerInfo.visibility = View.VISIBLE
+
+        // Periksa apakah tempat tersebut terbuka atau tutup
+        val isOpen = markerInfo.isOpen ?: true // Defaultnya adalah false jika properti isOpen null
+        if (isOpen) {
+            // Tempat terbuka, tampilkan chip "Buka" dan sembunyikan chip "Tutup"
+            binding.searchMapsChipBuka.visibility = View.VISIBLE
+            binding.searchMapsChipTutup.visibility = View.GONE
+        } else {
+            // Tempat tutup, tampilkan chip "Tutup" dan sembunyikan chip "Buka"
+            binding.searchMapsChipTutup.visibility = View.VISIBLE
+            binding.searchMapsChipBuka.visibility = View.GONE
+        }
+        // Perbarui rating pada TextView
+        binding.searchMapsTextViewLokasiRating.visibility = View.VISIBLE
+
+        val ratingTextString =  "Rating: ${markerInfo.rating ?: "Rating tidak tersedia"}"
+        binding.searchMapsTextViewLokasiRating.text = ratingTextString
+
+        marker.showInfoWindow()
+
+        return true
     }
 
     private fun openGoogleMapsDirections() {
@@ -370,56 +453,16 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
 
         // Tambahkan listener pada marker di luar loop
         googleMap?.setOnMarkerClickListener { marker ->
-            // Ambil tag dari marker yang diklik
-            Log.i("MarkerClicked", "Marker clicked")
-            val markerInfoRaw = marker.tag as? ModelResults ?: return@setOnMarkerClickListener  false // Kembalikan false agar default behavior dari marker juga berlaku
 
-            val markerInfo = BinLocation(
-                referencePath = null,
-                name = markerInfoRaw.name,
-                address = markerInfoRaw.vicinity,
-                location = GeoPoint(marker.position.latitude, marker.position.longitude),
-                additionalInfo = mapOf(
-                    "place_id" to markerInfoRaw.placeId
-                ),
-                isOpen = markerInfoRaw.isOpen,
-                rating = markerInfoRaw.rating
-            )
-
-            // Perbarui teks pada TextView
-            binding.searchMapsTextViewLokasiTerpilih.text = markerInfo.name
-            binding.searchMapsTextViewAddressLokasiTerpilih.text = markerInfo.address
-
-            // NOTE: Animasi disini
-            TransitionManager.beginDelayedTransition(binding.searchMapsBottomDialogMainConstraintLayout)
-            binding.searchMapsGroupMarkerInfo.visibility = View.VISIBLE
-
-            // Periksa apakah tempat tersebut terbuka atau tutup
-            val isOpen = markerInfo.isOpen ?: true // Defaultnya adalah false jika properti isOpen null
-            if (isOpen) {
-                // Tempat terbuka, tampilkan chip "Buka" dan sembunyikan chip "Tutup"
-                binding.searchMapsChipBuka.visibility = View.VISIBLE
-                binding.searchMapsChipTutup.visibility = View.GONE
-            } else {
-                // Tempat tutup, tampilkan chip "Tutup" dan sembunyikan chip "Buka"
-                binding.searchMapsChipTutup.visibility = View.VISIBLE
-                binding.searchMapsChipBuka.visibility = View.GONE
-            }
-            // Perbarui rating pada TextView
-            binding.searchMapsTextViewLokasiRating.visibility = View.VISIBLE
-
-            val ratingTextString =  "Rating: ${markerInfo.rating ?: "Rating tidak tersedia"}"
-            binding.searchMapsTextViewLokasiRating.text = ratingTextString
-
-            marker.showInfoWindow()
-
-            return@setOnMarkerClickListener true
+            return@setOnMarkerClickListener performMarkerClickAction(marker)
         }
 
         googleMap?.setOnMapClickListener {
             TransitionManager.beginDelayedTransition(binding.searchMapsBottomDialogMainConstraintLayout)
             binding.searchMapsGroupMarkerInfo.visibility = View.GONE
         }
+
+        setFirstLocation()
     }
 
     private fun performSearch(searchText: String) {

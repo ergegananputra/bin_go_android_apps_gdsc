@@ -2,6 +2,7 @@ package com.gdsc.bingo
 
 import android.app.Application
 import com.gdsc.bingo.services.realm.model.ForumsRealm
+import com.gdsc.bingo.services.realm.model.GeoPointRealm
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 
@@ -16,7 +17,8 @@ class BinGoApplication : Application() {
         realm = Realm.open(
             configuration = RealmConfiguration.create(
                 schema = setOf(
-                    ForumsRealm::class
+                    ForumsRealm::class,
+                    GeoPointRealm::class
                 )
             )
         )

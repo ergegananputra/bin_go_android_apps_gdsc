@@ -1,8 +1,10 @@
 package com.gdsc.bingo.model
 
+import com.gdsc.bingo.model.modelI.ForumsInterface
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.QuerySnapshot
 
 /**
@@ -26,21 +28,22 @@ import com.google.firebase.firestore.QuerySnapshot
  */
 data class Forums(
     override var referencePath: DocumentReference? = null,
-    var title : String? = null,
-    var text : String? = null,
-    var isUsingTextFile : Boolean = false,
-    var textFilePath : String? = null,
-    var videoLink : String? = null,
-    var likeCount : Long = 0,
-    var dislikeCount : Long = 0,
-    var commentCount : Long = 0,
-    var likesReference: DocumentReference? = null,
-    var thumbnailPhotosUrl : String? = null,
-    var author : DocumentReference? = null,
-    var komentarHub : DocumentReference? = null,
-    var createdAt : Timestamp? = null,
-    var type : String = ForumType.ARTICLE.fieldName
-) : FireModel {
+    override var title : String? = null,
+    override var text : String? = null,
+    override var isUsingTextFile : Boolean = false,
+    override var textFilePath : String? = null,
+    override var videoLink : String? = null,
+    override var likeCount : Long = 0,
+    override var dislikeCount : Long = 0,
+    override var commentCount : Long = 0,
+    override var likesReference: DocumentReference? = null,
+    override var thumbnailPhotosUrl : String? = null,
+    override var author : DocumentReference? = null,
+    override var komentarHub : DocumentReference? = null,
+    override var createdAt : Timestamp? = null,
+    override var type : String = ForumType.ARTICLE.fieldName,
+    var vicinity: GeoPoint? = null
+) : FireModel, ForumsInterface {
 
     override val table: String
         get() = "forums"
@@ -61,6 +64,7 @@ data class Forums(
         const val author = "author"
         const val komentarHub = "komentar_hub"
         const val type = "type"
+        const val vicinity = "vicinity"
     }
 
     enum class ForumFields(val fieldName: String) {
@@ -76,7 +80,8 @@ data class Forums(
         THUMBNAIL_PHOTOS_URL("thumbnail_photos_url"),
         AUTHOR("author"),
         KOMENTAR_HUB("komentar_hub"),
-        TYPE("type")
+        TYPE("type"),
+        VICINITY("vicinity"),
     }
 
     enum class ForumType(val fieldName: String) {
@@ -102,6 +107,7 @@ data class Forums(
         Keys.komentarHub to komentarHub,
         FireModel.Keys.createdAt to createdAt,
         ForumFields.TYPE.fieldName to type,
+        ForumFields.VICINITY.fieldName to vicinity
         )
 
     override fun toModels(querySnapshot: QuerySnapshot): List<Forums> {
@@ -121,7 +127,8 @@ data class Forums(
                 author = data[Keys.author] as? DocumentReference,
                 komentarHub = data[Keys.komentarHub] as? DocumentReference,
                 createdAt = data[FireModel.Keys.createdAt] as? Timestamp,
-                type = data[ForumFields.TYPE.fieldName] as? String ?: ForumType.ARTICLE.fieldName
+                type = data[ForumFields.TYPE.fieldName] as? String ?: ForumType.ARTICLE.fieldName,
+                vicinity = data[ForumFields.VICINITY.fieldName] as? GeoPoint
             )
         }
     }
@@ -142,7 +149,8 @@ data class Forums(
             author = documentSnapshot.getDocumentReference(Keys.author),
             komentarHub = documentSnapshot.getDocumentReference(Keys.komentarHub),
             createdAt = documentSnapshot.getTimestamp(FireModel.Keys.createdAt),
-            type = documentSnapshot.getString(ForumFields.TYPE.fieldName) ?: ForumType.ARTICLE.fieldName
+            type = documentSnapshot.getString(ForumFields.TYPE.fieldName) ?: ForumType.ARTICLE.fieldName,
+            vicinity = documentSnapshot.getGeoPoint(ForumFields.VICINITY.fieldName)
         )
     }
 }

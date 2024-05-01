@@ -202,7 +202,7 @@
 
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_navigate_route"
+                    android:id="@+id/component_button_navigate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"

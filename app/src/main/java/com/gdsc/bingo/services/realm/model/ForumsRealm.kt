@@ -28,6 +28,7 @@ class ForumsRealm : RealmObject, ForumsInterface {
     var komentarHubPath: String? = null
     var createdAtMillis: Long? = null
     override var type: String = Forums.ForumType.ARTICLE.fieldName
+    var vicinity: GeoPointRealm? = null
 
     @Transient
     var reference: DocumentReference? = null

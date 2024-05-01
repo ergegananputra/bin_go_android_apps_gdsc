@@ -140,21 +140,20 @@
 
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_navigate_route"
+            android:id="@+id/component_button_navigate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="220dp"
+            android:minEms="6"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:text="Rute Perjalanan"
-            app:icon="@drawable/baseline_navigation_24"
+            android:text="Rute"
+            app:icon="@drawable/ic_navigation_outline_24"
+            style="@style/Widget.Material3.Button.IconButton.Filled"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/component_card_report_shimmer_title" />
 
         <com.facebook.shimmer.ShimmerFrameLayout
-            android:id="@+id/component_card_report_address"
+            android:id="@+id/component_card_report_shimmer_address"
             style="@style/ShimmerEffect"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -175,11 +174,11 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:ellipsize="marquee"
-            android:maxLines="1"
+            android:maxLines="2"
             android:textAppearance="?attr/textAppearanceLabelLarge"
             android:textColor="?attr/colorOnTertiaryContainer"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_navigate_route"
+            app:layout_constraintEnd_toStartOf="@+id/component_button_navigate"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/component_card_report_shimmer_title" />
 

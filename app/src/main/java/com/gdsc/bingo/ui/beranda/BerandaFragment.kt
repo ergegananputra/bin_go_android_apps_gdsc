@@ -41,7 +41,7 @@ class BerandaFragment : Fragment() {
     private fun actionOpenDetail(forum: Forums) {
         val destination = with(forum){
             BerandaFragmentDirections
-                .actionNavigationBerandaToArtikelFragment(
+                .actionNavigationBerandaToNavigationArtikelActivity(
                     referenecePathDocumentString = referencePath?.path!!,
                     title = title!!,
                     text = text,
@@ -129,7 +129,9 @@ class BerandaFragment : Fragment() {
 
     private fun setupBerandaPinPoint() {
         binding.berandaCardBerandaContainer.setOnClickListener {
-            val destination = BerandaFragmentDirections.actionNavigationBerandaToPinPointActivity()
+            val destination = BerandaFragmentDirections.actionNavigationBerandaToPinPointActivity(
+                null, null
+            )
             findNavController().navigate(destination)
         }
     }

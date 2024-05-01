@@ -67,7 +67,7 @@ class ProfilFragment : Fragment() {
     private fun actionOpenDetail(forum: Forums) {
         val destination = with(forum){
             ProfilFragmentDirections
-                .actionNavigationProfilToArtikelFragment(
+                .actionNavigationProfilToNavigationArtikelActivity(
                     referenecePathDocumentString = referencePath?.path!!,
                     title = title!!,
                     text = text,

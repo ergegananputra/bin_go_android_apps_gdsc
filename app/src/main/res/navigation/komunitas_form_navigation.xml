@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/komunitas_form_navigation"
+    app:startDestination="@id/navigation_form_main">
+
+    <fragment
+        android:id="@+id/navigation_form_main"
+        android:name="com.gdsc.bingo.ui.form_post.FormPostFragment"
+        android:label="fragment_form_post"
+        tools:layout="@layout/fragment_form_post" >
+        <action
+            android:id="@+id/action_formPostFragment2_to_formFullEditorFragment2"
+            app:destination="@id/navigation_form_full_editor" />
+        <action
+            android:id="@+id/action_formPostFragment2_to_reportMapsFragment2"
+            app:destination="@id/navigation_form_maps" />
+        <argument
+            android:name="type"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_form_full_editor"
+        android:name="com.gdsc.bingo.ui.form_post.FormFullEditorFragment"
+        android:label="FormFullEditorFragment" />
+    <fragment
+        android:id="@+id/navigation_form_maps"
+        android:name="com.gdsc.bingo.ui.form_post.ReportMapsFragment"
+        android:label="ReportMapsFragment" />
+</navigation>

@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.gdsc.bingo.adapter.ForumPostAdapter
+import com.gdsc.bingo.adapter.ForumReportAdapter
 import com.gdsc.bingo.databinding.FragmentKomunitasReportBinding
 import com.gdsc.bingo.model.Forums
 import com.gdsc.bingo.ui.komunitas.KomunitasFragment
@@ -34,13 +34,12 @@ class KomunitasReportFragment: Fragment() {
 
     private val forumPostAdapter by lazy {
         val komunitasFragment = parentFragment as KomunitasFragment
-        ForumPostAdapter(
+        ForumReportAdapter(
             context = requireActivity(),
             storage = storage,
-            actionComment = { forum -> komunitasFragment.actionComment(forum) },
-            actionLike = { forum -> komunitasFragment.actionLike(forum) },
             actionVerticalButton = { forum -> komunitasFragment.actionVerticalButton(forum) },
-            actionOpenDetail = { forum -> komunitasFragment.actionOpenDetail(forum) }
+            actionOpenDetail = { forum -> komunitasFragment.actionOpenDetail(forum) },
+            actionOpenRoute = { forum -> komunitasFragment.actionOpenRoute(forum) },
 
         )
     }

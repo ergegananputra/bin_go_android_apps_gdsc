@@ -52,9 +52,6 @@ class KomunitasFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         (activity as MainActivity).setStatusAndBottomNavigation(this)
 
-        savedInstanceState?.let {
-            binding.komunitasViewPager.currentItem = it.getInt("current_page")
-        }
 
         setupSearchBar()
 
@@ -71,25 +68,15 @@ class KomunitasFragment : Fragment() {
         komunitasViewModel.deleteBeyondLimit()
     }
 
-    override fun onResume() {
-        super.onResume()
-        binding.komunitasViewPager.currentItem = 0
-        binding.komunitasTabLayout.selectTab(binding.komunitasTabLayout.getTabAt(0))
-    }
-
-    private fun setupViewPager(isSaveEnabled : Boolean= false) {
+    private fun setupViewPager(isSaveEnabled : Boolean= true) {
         val viewPager2 = binding.komunitasViewPager
         val pagerAdapter = KomunitasTabAdapter(
-            childFragmentManager,
-            lifecycle
+            this
         )
 
         viewPager2.adapter = pagerAdapter
 
         viewPager2.isSaveEnabled = isSaveEnabled
-
-        binding.komunitasViewPager.currentItem = 0
-        binding.komunitasTabLayout.selectTab(binding.komunitasTabLayout.getTabAt(0))
 
         TabLayoutMediator(
             binding.komunitasTabLayout,
@@ -102,34 +89,10 @@ class KomunitasFragment : Fragment() {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 when (tab.position) {
                     1 -> {
-                        binding.komunitasExtendedFloatingActionButtonReport.apply {
-                            show()
-                            visibility = View.VISIBLE
-                        }
-
-                        binding.komunitasExtendedFloatingActionButton.apply {
-                            hide()
-                            visibility = View.GONE
-                        }
-                        binding.komunitasFloatingActionButtonReport.apply {
-                            hide()
-                            visibility = View.GONE
-                        }
+                        viewSetFloatingActionButton(1)
                     }
                     else -> {
-                        binding.komunitasExtendedFloatingActionButtonReport.apply {
-                            hide()
-                            visibility = View.GONE
-                        }
-
-                        binding.komunitasExtendedFloatingActionButton.apply {
-                            show()
-                            visibility = View.VISIBLE
-                        }
-                        binding.komunitasFloatingActionButtonReport.apply {
-                            show()
-                            visibility = View.VISIBLE
-                        }
+                        viewSetFloatingActionButton(0)
                     }
                 }
             }
@@ -144,10 +107,42 @@ class KomunitasFragment : Fragment() {
         })
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt("current_page", binding.komunitasViewPager.currentItem)
+    private fun viewSetFloatingActionButton(i: Int) {
+        when (i) {
+            1 -> {
+                binding.komunitasExtendedFloatingActionButtonReport.apply {
+                    show()
+                    visibility = View.VISIBLE
+                }
+
+                binding.komunitasExtendedFloatingActionButton.apply {
+                    hide()
+                    visibility = View.GONE
+                }
+                binding.komunitasFloatingActionButtonReport.apply {
+                    hide()
+                    visibility = View.GONE
+                }
+            }
+            else -> {
+                binding.komunitasExtendedFloatingActionButtonReport.apply {
+                    hide()
+                    visibility = View.GONE
+                }
+
+                binding.komunitasExtendedFloatingActionButton.apply {
+                    show()
+                    visibility = View.VISIBLE
+                }
+                binding.komunitasFloatingActionButtonReport.apply {
+                    show()
+                    visibility = View.VISIBLE
+                }
+            }
+        }
+
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -199,12 +194,10 @@ class KomunitasFragment : Fragment() {
     }
 
 
-
-
     fun actionOpenDetail(forum: Forums) {
         val destination = with(forum){
             KomunitasFragmentDirections
-                .actionKomunitasFragmentToArtikelFragment(
+                .actionNavigationKomunitasToNavigationArtikelActivity(
                     referenecePathDocumentString = referencePath?.path!!,
                     title = title!!,
                     text = text,
@@ -237,7 +230,7 @@ class KomunitasFragment : Fragment() {
     fun actionComment(forum: Forums) {
         val destination = with(forum){
             KomunitasFragmentDirections
-                .actionKomunitasFragmentToArtikelFragment(
+                .actionNavigationKomunitasToNavigationArtikelActivity(
                     referenecePathDocumentString = referencePath?.path!!,
                     title = title!!,
                     text = text,
@@ -262,7 +255,7 @@ class KomunitasFragment : Fragment() {
             hideIfUnauthenticated()
 
             val destination = KomunitasFragmentDirections
-                .actionKomunitasFragmentToFormPostFragment(Forums.ForumType.REPORT.fieldName)
+                .actionNavigationKomunitasToFormPostActivity(Forums.ForumType.REPORT.fieldName)
             setOnClickListener {
                 findNavController().navigate(destination)
             }
@@ -274,7 +267,7 @@ class KomunitasFragment : Fragment() {
             hideIfUnauthenticated()
 
             val destination = KomunitasFragmentDirections
-                .actionKomunitasFragmentToFormPostFragment(Forums.ForumType.ARTICLE.fieldName)
+                .actionNavigationKomunitasToFormPostActivity(Forums.ForumType.ARTICLE.fieldName)
 
             setOnClickListener {
                 findNavController().navigate(destination)
@@ -283,7 +276,7 @@ class KomunitasFragment : Fragment() {
     }
 
     private fun setupCreateKomunitasReportFExtendedFloatingActionButton() {
-        binding.komunitasExtendedFloatingActionButton.apply {
+        binding.komunitasExtendedFloatingActionButtonReport.apply {
             hideIfUnauthenticated()
 
             setOnClickListener {
@@ -305,26 +298,35 @@ class KomunitasFragment : Fragment() {
         viewModel: KomunitasViewModel,
         forumType: Forums.ForumType
     ) {
+        viewSetFloatingActionButton(if (forumType == Forums.ForumType.REPORT) 1 else 0)
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                if (dy > 20) {
-                    if (forumType == Forums.ForumType.REPORT) {
-                        binding.komunitasExtendedFloatingActionButtonReport.shrink()
-                    } else {
-                        binding.komunitasExtendedFloatingActionButton.shrink()
-                        binding.komunitasFloatingActionButtonReport.hide()
+                if (auth.currentUser != null) {
+                    if (dy > 20) {
+                        if (forumType == Forums.ForumType.REPORT) {
+                            binding.komunitasExtendedFloatingActionButtonReport.shrink()
+                        } else {
+                            binding.komunitasExtendedFloatingActionButton.shrink()
+                            binding.komunitasFloatingActionButtonReport.hide()
+                        }
+                    } else if (dy < 0) {
+                        if (forumType == Forums.ForumType.REPORT) {
+                            binding.komunitasExtendedFloatingActionButtonReport.extend()
+                        } else {
+                            binding.komunitasExtendedFloatingActionButton.extend()
+                            binding.komunitasFloatingActionButtonReport.show()
+                        }
                     }
-                } else if (dy < 0) {
-                    if (forumType == Forums.ForumType.REPORT) {
-                        binding.komunitasExtendedFloatingActionButtonReport.extend()
-                    } else {
-                        binding.komunitasExtendedFloatingActionButton.extend()
-                        binding.komunitasFloatingActionButtonReport.show()
-                    }
+                } else {
+                    binding.komunitasExtendedFloatingActionButton.hide()
+                    binding.komunitasExtendedFloatingActionButtonReport.hide()
+                    binding.komunitasFloatingActionButtonReport.hide()
                 }
+
+
 
 
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
@@ -336,6 +338,15 @@ class KomunitasFragment : Fragment() {
                 }
             }
         })
+    }
+
+    fun actionOpenRoute(forum: Forums) {
+        val destination = KomunitasFragmentDirections
+            .actionNavigationKomunitasToPinPointActivity(
+                "${forum.vicinity?.latitude!!}",
+                "${forum.vicinity?.longitude!!}"
+            )
+        findNavController().navigate(destination)
     }
 
 }

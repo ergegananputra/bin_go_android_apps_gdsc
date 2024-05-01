@@ -6,25 +6,6 @@
     app:startDestination="@id/navigation_beranda">
 
     <fragment
-        android:id="@+id/formPostFragment"
-        android:name="com.gdsc.bingo.ui.form_post.FormPostFragment"
-        android:label="fragment_form_post"
-        tools:layout="@layout/fragment_form_post">
-        <action
-            android:id="@+id/action_formPostFragment_to_formFullEditorFragment"
-            app:destination="@id/formFullEditorFragment" />
-        <argument
-            android:name="type"
-            app:argType="string" />
-        <action
-            android:id="@+id/action_formPostFragment_to_reportMapsFragment"
-            app:destination="@id/reportMapsFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/formFullEditorFragment"
-        android:name="com.gdsc.bingo.ui.form_post.FormFullEditorFragment"
-        android:label="FormFullEditorFragment" />
-    <fragment
         android:id="@+id/navigation_beranda"
         android:name="com.gdsc.bingo.ui.beranda.BerandaFragment"
         android:label="fragment_beranda"
@@ -136,11 +117,6 @@
             app:argType="string" />
     </fragment>
     <fragment
-        android:id="@+id/reportMapsFragment"
-        android:name="com.gdsc.bingo.ui.form_post.ReportMapsFragment"
-        android:label="fragment_report_maps"
-        tools:layout="@layout/fragment_report_maps" />
-    <fragment
         android:id="@+id/navigation_komunitas"
         android:name="com.gdsc.bingo.ui.komunitas.KomunitasFragment"
         android:label="fragment_komunitas"
@@ -149,11 +125,20 @@
             android:id="@+id/action_komunitasFragment_to_artikelFragment"
             app:destination="@id/artikelFragment" />
         <action
-            android:id="@+id/action_komunitasFragment_to_formPostFragment"
-            app:destination="@id/formPostFragment" />
-        <action
             android:id="@+id/action_navigation_komunitas_to_pinPointActivity"
             app:destination="@id/pinPointActivity" />
+        <action
+            android:id="@+id/action_navigation_komunitas_to_formPostActivity"
+            app:destination="@id/formPostActivity" />
     </fragment>
+    <activity
+        android:id="@+id/formPostActivity"
+        android:name="com.gdsc.bingo.ui.form_post.FormPostActivity"
+        android:label="activity_form_post"
+        tools:layout="@layout/activity_form_post" >
+        <argument
+            android:name="type"
+            app:argType="string" />
+    </activity>
 
 </navigation>

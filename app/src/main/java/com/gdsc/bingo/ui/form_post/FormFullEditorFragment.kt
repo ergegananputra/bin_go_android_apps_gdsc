@@ -36,13 +36,13 @@ class FormFullEditorFragment : Fragment() {
         binding.editorJustifyOptions.isVisible = false
         binding.editorMoreOptions.isVisible = false
 
+        (activity as FormPostActivity).setToolbarTitle(this)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupCancelButton()
         setupSaveButton()
 
         with(binding) {
@@ -165,17 +165,13 @@ class FormFullEditorFragment : Fragment() {
     }
 
     private fun setupSaveButton() {
-        binding.formFullEditorHeaderButtonSave.setOnClickListener {
+        (activity as FormPostActivity).setupActionMenu {
             val editor = binding.editor as WYSIWYG
-            formViewModel.description.value = editor.html
+            formViewModel.setDescription(editor.html)
 
             findNavController().navigateUp()
-        }
-    }
 
-    private fun setupCancelButton() {
-        binding.formFullEditorHeaderButtonCancel.setOnClickListener {
-            findNavController().navigateUp()
+            true
         }
     }
 

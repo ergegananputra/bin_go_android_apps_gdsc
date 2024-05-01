@@ -53,5 +53,7 @@
     <string name="error_location_required">Mohon pilih lokasi pelaporan terlebih dahulu</string>
     <string name="Terpilih">Terpilih</string>
     <string name="lapor">Lapor !</string>
+    <string name="simpan">Simpan</string>
+    <string name="error_upload_failed">Gagal mengunggah konten</string>
 
 </resources>

@@ -68,12 +68,6 @@ class KomunitasFragment : Fragment() {
         komunitasViewModel.deleteBeyondLimit()
     }
 
-    override fun onResume() {
-        super.onResume()
-        binding.komunitasViewPager.currentItem = 0
-        binding.komunitasTabLayout.selectTab(binding.komunitasTabLayout.getTabAt(0))
-    }
-
     private fun setupViewPager(isSaveEnabled : Boolean= true) {
         val viewPager2 = binding.komunitasViewPager
         val pagerAdapter = KomunitasTabAdapter(
@@ -188,8 +182,6 @@ class KomunitasFragment : Fragment() {
     }
 
 
-
-
     fun actionOpenDetail(forum: Forums) {
         val destination = with(forum){
             KomunitasFragmentDirections
@@ -251,7 +243,7 @@ class KomunitasFragment : Fragment() {
             hideIfUnauthenticated()
 
             val destination = KomunitasFragmentDirections
-                .actionKomunitasFragmentToFormPostFragment(Forums.ForumType.REPORT.fieldName)
+                .actionNavigationKomunitasToFormPostActivity(Forums.ForumType.REPORT.fieldName)
             setOnClickListener {
                 findNavController().navigate(destination)
             }
@@ -263,7 +255,7 @@ class KomunitasFragment : Fragment() {
             hideIfUnauthenticated()
 
             val destination = KomunitasFragmentDirections
-                .actionKomunitasFragmentToFormPostFragment(Forums.ForumType.ARTICLE.fieldName)
+                .actionNavigationKomunitasToFormPostActivity(Forums.ForumType.ARTICLE.fieldName)
 
             setOnClickListener {
                 findNavController().navigate(destination)
@@ -299,21 +291,29 @@ class KomunitasFragment : Fragment() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                if (dy > 20) {
-                    if (forumType == Forums.ForumType.REPORT) {
-                        binding.komunitasExtendedFloatingActionButtonReport.shrink()
-                    } else {
-                        binding.komunitasExtendedFloatingActionButton.shrink()
-                        binding.komunitasFloatingActionButtonReport.hide()
+                if (auth.currentUser != null) {
+                    if (dy > 20) {
+                        if (forumType == Forums.ForumType.REPORT) {
+                            binding.komunitasExtendedFloatingActionButtonReport.shrink()
+                        } else {
+                            binding.komunitasExtendedFloatingActionButton.shrink()
+                            binding.komunitasFloatingActionButtonReport.hide()
+                        }
+                    } else if (dy < 0) {
+                        if (forumType == Forums.ForumType.REPORT) {
+                            binding.komunitasExtendedFloatingActionButtonReport.extend()
+                        } else {
+                            binding.komunitasExtendedFloatingActionButton.extend()
+                            binding.komunitasFloatingActionButtonReport.show()
+                        }
                     }
-                } else if (dy < 0) {
-                    if (forumType == Forums.ForumType.REPORT) {
-                        binding.komunitasExtendedFloatingActionButtonReport.extend()
-                    } else {
-                        binding.komunitasExtendedFloatingActionButton.extend()
-                        binding.komunitasFloatingActionButtonReport.show()
-                    }
+                } else {
+                    binding.komunitasExtendedFloatingActionButton.hide()
+                    binding.komunitasExtendedFloatingActionButtonReport.hide()
+                    binding.komunitasFloatingActionButtonReport.hide()
                 }
+
+
 
 
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager

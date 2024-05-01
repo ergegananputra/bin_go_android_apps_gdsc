@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="?attr/colorSurface"
 
     tools:context=".ui.pop_up.SuccesReportPopUp">
 
@@ -14,9 +14,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="96dp"
-        android:text="Bin-Go!"
-        android:textColor="#1D6A62"
-        android:textSize="64sp"
+        android:text="BIN-GO!"
+        android:textColor="?attr/colorTertiary"
+        android:textAppearance="?attr/textAppearanceDisplayLarge"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,10 +26,11 @@
         android:id="@+id/textViewSuccess"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="64dp"
-        android:text="LAPORAN BERHASIL DIKIRIM"
-        android:textColor="#840000"
-        android:textSize="24sp"
+        android:layout_marginEnd="32dp"
+        android:text="Laporan Berhasil Dikirim"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/animationView" />
@@ -39,7 +41,6 @@
         android:layout_height="185dp"
         android:layout_marginTop="64dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewBinGo"
         app:lottie_autoPlay="true"

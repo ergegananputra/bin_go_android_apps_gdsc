@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Typeface
 import android.graphics.drawable.BitmapDrawable
 import android.location.Geocoder
 import android.location.Location
@@ -32,6 +33,7 @@ import com.gdsc.bingo.databinding.FragmentSearchMapsBinding
 import com.gdsc.bingo.model.BinLocation
 import com.gdsc.bingo.model.nearby.ModelResults
 import com.gdsc.bingo.model.utils.CustomInfoWindowGoogleMap
+import com.gdsc.bingo.services.textstyling.AddOnSpannableTextStyle
 import com.gdsc.bingo.ui.pinpoint.PinPointActivity
 import com.gdsc.bingo.ui.pinpoint.search.viewmodel.SearchMapsViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -265,7 +267,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
 
         // Perbarui teks pada TextView
         binding.searchMapsTextViewLokasiTerpilih.text = markerInfo.name
-        binding.searchMapsTextViewAddressLokasiTerpilih.text = markerInfo.address
+
 
         // NOTE: Animasi disini
         TransitionManager.beginDelayedTransition(binding.pinPointActivityRootLayout)
@@ -306,20 +308,32 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
                 "\ntype ${markerInfo.type} " +
                 "\nadditional info ${markerInfo.additionalInfo}")
 
+
         if (markerInfo.type == BinLocation.BinTypeCategory.REPORT.fieldName) {
             binding.searchMapsTextViewAddress.apply {
                 visibility = View.VISIBLE
                 text = markerInfo.address
             }
+            val spannableConverter = AddOnSpannableTextStyle()
 
-            binding.searchMapsTextViewAddressLokasiTerpilih.text = markerInfo.additionalInfo
-                ?.get(BinLocation.BinAdditionalInfo.REPORT_DESCRIPTION.fieldName).toString()
+            // Konversi HTML dengan daftar terurut
+            val spanned = spannableConverter.convertHtmlWithOrderedList(
+                markerInfo.additionalInfo
+                    ?.get(BinLocation.BinAdditionalInfo.REPORT_DESCRIPTION.fieldName).toString()
+            )
+
+            binding.searchMapsTextViewAddressLokasiTerpilihUpper.text = spanned
+            val typeface = Typeface.DEFAULT
+            binding.searchMapsTextViewAddressLokasiTerpilihUpper.typeface = typeface
 
             binding.searchMapsTextViewLokasiRating.visibility = View.GONE
             binding.searchMapsChipBuka.visibility = View.GONE
 
         } else {
             binding.searchMapsTextViewAddress.visibility = View.GONE
+
+            // Tampilkan alamat pada TextView
+            binding.searchMapsTextViewAddressLokasiTerpilihUpper.text = markerInfo.address
 
             binding.searchMapsTextViewLokasiRating.visibility = View.VISIBLE
             binding.searchMapsChipBuka.visibility = View.VISIBLE

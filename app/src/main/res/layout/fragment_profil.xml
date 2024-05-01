@@ -26,90 +26,64 @@
             app:strokeWidth="0dp" />
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/profil_card_profil_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            app:cardBackgroundColor="?attr/colorTertiaryContainer"
-            app:cardCornerRadius="16dp"
+            android:id="@+id/profil_card_profil_placeholder_image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_max="100dp"
+            app:layout_constraintWidth_max="100dp"
+            app:layout_constraintDimensionRatio="1"
+            app:cardCornerRadius="1000dp"
             app:layout_constraintBottom_toBottomOf="@+id/profil_card_header"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/profil_card_header"
-            app:strokeWidth="0dp">
+            app:strokeColor="?attr/colorPrimary"
+            app:strokeWidth="3dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/profil_card_profil_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                >
+                tools:src="@tools:sample/avatars" />
 
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/profil_card_profil_text_view_name"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="8dp"
-                    android:ellipsize="marquee"
-                    android:maxLines="1"
-                    android:text="Nama Profile"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="?attr/colorOnTertiaryContainer"
-                    app:layout_constraintBottom_toTopOf="@+id/profil_card_profil_guideline_middle"
-                    app:layout_constraintEnd_toStartOf="@+id/profil_card_profil_placeholder_image"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/profil_card_profil_placeholder_image"
-                    app:layout_constraintVertical_bias="0.8" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/profile_card_profile_text_view_email"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="example@mail.com"
-                    android:textColor="?attr/colorOnTertiaryContainer"
-                    android:textAppearance="?attr/textAppearanceBodyLarge"
-                    android:maxLines="1"
-                    app:layout_constraintBottom_toBottomOf="@+id/profil_card_profil_placeholder_image"
-                    app:layout_constraintEnd_toEndOf="@+id/profil_card_profil_text_view_name"
-                    app:layout_constraintStart_toStartOf="@+id/profil_card_profil_text_view_name"
-                    app:layout_constraintTop_toTopOf="@+id/profil_card_profil_guideline_middle"
-                    app:layout_constraintVertical_bias="0.19999999" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/profil_card_profil_placeholder_image"
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="8dp"
-                    app:cardCornerRadius="1000dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:strokeColor="?attr/colorPrimary"
-                    app:strokeWidth="3dp">
-
-                    <androidx.appcompat.widget.AppCompatImageView
-                        android:id="@+id/profil_card_profil_image"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        tools:src="@tools:sample/avatars" />
-
-
-                </com.google.android.material.card.MaterialCardView>
-
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/profil_card_profil_guideline_middle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintGuide_percent="0.5" />
-
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.google.android.material.card.MaterialCardView>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/profil_card_profil_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="24dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profil_card_profil_placeholder_image">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/profil_card_profil_text_view_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="marquee"
+                android:maxLines="1"
+                android:text="Nama Profile"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnTertiaryContainer" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/profile_card_profile_text_view_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:text="example@mail.com"
+                android:textAppearance="?attr/textAppearanceBodyLarge"
+                android:textColor="?attr/colorOnTertiaryContainer" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
 
         <com.google.android.material.textview.MaterialTextView
@@ -164,6 +138,101 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/materialTextView3" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/materialTextView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="?attr/colorSurfaceContainer"
+            android:padding="16dp"
+            android:text="Tentang Bin-Go"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/profil_recycler_user_latest_post" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/materialTextView4">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/profile_button_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:strokeWidth="0dp"
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:padding="16dp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOutline"
+                        android:text="Versi"/>
+
+                    <TextView
+                        android:padding="16dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="?attr/colorOutline"
+                        android:text="@string/v1_0_0"/>
+
+                </LinearLayout>
+
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/profile_button_panduan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:strokeWidth="0dp"
+                >
+
+                <TextView
+                    android:padding="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOutline"
+                    android:text="Panduan"/>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/profile_button_kebijakan_privasi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="0dp"
+                app:strokeWidth="0dp"
+                >
+
+                <TextView
+                    android:padding="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOutline"
+                    android:text="Kebijakan Privasi Bin-Go"/>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

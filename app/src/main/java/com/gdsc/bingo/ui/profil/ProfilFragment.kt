@@ -221,6 +221,27 @@ class ProfilFragment : Fragment() {
         setupCardProfilPicture()
         setupBinPoints()
         refreshRecyclerUserLatestPost()
+        setupButtonVersion()
+        setupButtonPanduan()
+        setupButtonKebijiakanPrivasi()
+    }
+
+    private fun setupButtonKebijiakanPrivasi() {
+        binding.profileButtonKebijakanPrivasi.setOnClickListener {
+            Toast.makeText(requireContext(), "Kebijakan Privasi", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setupButtonPanduan() {
+        binding.profileButtonPanduan.setOnClickListener {
+            Toast.makeText(requireContext(), "Panduan", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setupButtonVersion() {
+        binding.profileButtonVersion.setOnClickListener {
+            Toast.makeText(requireContext(), getString(R.string.v1_0_0), Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun refreshRecyclerUserLatestPost() {

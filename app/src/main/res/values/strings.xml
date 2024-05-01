@@ -59,5 +59,6 @@
     <string name="bin_locator">Bin-Locator</string>
     <string name="bin_report">Bin-Report</string>
     <string name="rute">Rute</string>
+    <string name="v1_0_0">v1.0.0</string>
 
 </resources>

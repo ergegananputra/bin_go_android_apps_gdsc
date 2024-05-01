@@ -249,14 +249,19 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         val markerInfo = BinLocation(
             referencePath = null,
             name = markerInfoRaw.name,
-            address = markerInfoRaw.vicinity,
+            address = markerInfoRaw.address,
             location = GeoPoint(marker.position.latitude, marker.position.longitude),
-            additionalInfo = mapOf(
-                "place_id" to markerInfoRaw.placeId
-            ),
             isOpen = markerInfoRaw.isOpen,
-            rating = markerInfoRaw.rating
+            rating = markerInfoRaw.rating,
+            type = markerInfoRaw.type,
         )
+        if (markerInfoRaw.type == BinLocation.BinTypeCategory.REPORT.fieldName) {
+            markerInfo.additionalInfo = hashMapOf<String, Any>(
+                BinLocation.BinAdditionalInfo.FORUM_ID.fieldName to (markerInfoRaw.forumId ?: ""),
+                BinLocation.BinAdditionalInfo.REPORT_DESCRIPTION.fieldName to (markerInfoRaw.reportDescription ?: ""),
+                BinLocation.BinAdditionalInfo.REPORT_DATE.fieldName to (markerInfoRaw.reportDate ?: "")
+            )
+        }
 
         // Perbarui teks pada TextView
         binding.searchMapsTextViewLokasiTerpilih.text = markerInfo.name
@@ -281,8 +286,44 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         // Perbarui rating pada TextView
         binding.searchMapsTextViewLokasiRating.visibility = View.VISIBLE
 
-        val ratingTextString =  "Rating: ${markerInfo.rating ?: "Rating tidak tersedia"}"
+        val rating = (markerInfo.rating ?: 0.0).let {
+            if (it == 0.0) {
+                "Rating tidak tersedia"
+            } else {
+                it.toString()
+            }
+        }
+
+        val ratingTextString =  "Rating: $rating"
         binding.searchMapsTextViewLokasiRating.text = ratingTextString
+
+        Log.d("MarkerClicked", "Marker clicked: " +
+                "\nname ${markerInfo.name} " +
+                "\naddress ${markerInfo.address} " +
+                "\nlocation ${markerInfo.location} " +
+                "\nisOpen ${markerInfo.isOpen} " +
+                "\nrating ${markerInfo.rating} " +
+                "\ntype ${markerInfo.type} " +
+                "\nadditional info ${markerInfo.additionalInfo}")
+
+        if (markerInfo.type == BinLocation.BinTypeCategory.REPORT.fieldName) {
+            binding.searchMapsTextViewAddress.apply {
+                visibility = View.VISIBLE
+                text = markerInfo.address
+            }
+
+            binding.searchMapsTextViewAddressLokasiTerpilih.text = markerInfo.additionalInfo
+                ?.get(BinLocation.BinAdditionalInfo.REPORT_DESCRIPTION.fieldName).toString()
+
+            binding.searchMapsTextViewLokasiRating.visibility = View.GONE
+            binding.searchMapsChipBuka.visibility = View.GONE
+
+        } else {
+            binding.searchMapsTextViewAddress.visibility = View.GONE
+
+            binding.searchMapsTextViewLokasiRating.visibility = View.VISIBLE
+            binding.searchMapsChipBuka.visibility = View.VISIBLE
+        }
 
         marker.showInfoWindow()
 
@@ -488,8 +529,8 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             googleMap?.setInfoWindowAdapter(customInfoWindow)
 
             val iconResId = when (binLocation.type) {
-                "bin" -> R.drawable.ic_custom_marker_maps // Gunakan ikon untuk marker bin
-                "report" -> R.drawable.ic_custom_report_marker_maps // Gunakan ikon untuk marker report
+                BinLocation.BinTypeCategory.BIN.fieldName -> R.drawable.ic_custom_marker_maps // Gunakan ikon untuk marker bin
+                BinLocation.BinTypeCategory.REPORT.fieldName -> R.drawable.ic_custom_report_marker_maps // Gunakan ikon untuk marker report
                 else -> R.drawable.ic_custom_marker_maps // Default: Gunakan ikon default
             }
 
@@ -504,11 +545,19 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
                         .icon(bitmapDescriptor)
 
                     val marker = googleMap?.addMarker(markerOptions)
+
+                    val vicinityString = binLocation.location?.latitude.toString() + ", " + binLocation.location?.longitude.toString()
+
                     marker?.tag = ModelResults().apply {
                         name = binLocation.name!!
                         placeId = binLocation.additionalInfo?.get("place_id").toString()
-                        vicinity = binLocation.address!!
+                        vicinity = vicinityString
                         rating = binLocation.rating ?: 0.0
+                        type = binLocation.type ?: BinLocation.BinTypeCategory.BIN.fieldName
+                        forumId = binLocation.additionalInfo?.get(BinLocation.BinAdditionalInfo.FORUM_ID.fieldName).toString()
+                        reportDescription = binLocation.additionalInfo?.get(BinLocation.BinAdditionalInfo.REPORT_DESCRIPTION.fieldName).toString()
+                        reportDate = binLocation.additionalInfo?.get(BinLocation.BinAdditionalInfo.REPORT_DATE.fieldName).toString()
+                        address = binLocation.address
                     }
                     marker?.showInfoWindow()
                     marker?.let { markerList.add(it) }
@@ -569,8 +618,8 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             googleMap?.setInfoWindowAdapter(customInfoWindow)
 
             val iconResId = when (binLocation.type) {
-                "bin" -> R.drawable.ic_custom_marker_maps // Gunakan ikon untuk marker bin
-                "report" -> R.drawable.ic_custom_report_marker_maps // Gunakan ikon untuk marker report
+                BinLocation.BinTypeCategory.BIN.fieldName -> R.drawable.ic_custom_marker_maps // Gunakan ikon untuk marker bin
+                BinLocation.BinTypeCategory.REPORT.fieldName -> R.drawable.ic_custom_report_marker_maps // Gunakan ikon untuk marker report
                 else -> R.drawable.ic_custom_marker_maps // Default: Gunakan ikon default
             }
 
@@ -585,11 +634,19 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
                         .icon(bitmapDescriptor)
 
                     val marker = googleMap?.addMarker(markerOptions)
+
+                    val vicinityString = binLocation.location?.latitude.toString() + ", " + binLocation.location?.longitude.toString()
+
                     marker?.tag = ModelResults().apply {
                         name = binLocation.name!!
                         placeId = binLocation.additionalInfo?.get("place_id").toString()
-                        vicinity = binLocation.address!!
+                        vicinity = vicinityString
                         rating = binLocation.rating ?: 0.0
+                        type = binLocation.type ?: BinLocation.BinTypeCategory.BIN.fieldName
+                        forumId = binLocation.additionalInfo?.get(BinLocation.BinAdditionalInfo.FORUM_ID.fieldName).toString()
+                        reportDescription = binLocation.additionalInfo?.get(BinLocation.BinAdditionalInfo.REPORT_DESCRIPTION.fieldName).toString()
+                        reportDate = binLocation.additionalInfo?.get(BinLocation.BinAdditionalInfo.REPORT_DATE.fieldName).toString()
+                        address = binLocation.address
                     }
                     marker?.showInfoWindow()
                     marker?.let { markerList.add(it) }

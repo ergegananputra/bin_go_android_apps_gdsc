@@ -17,11 +17,14 @@ import com.gdsc.bingo.model.Forums
 import com.gdsc.bingo.model.User
 import com.gdsc.bingo.services.preferences.AppPreferences
 import com.gdsc.bingo.ui.komunitas.KomunitasViewModel
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 
 class BerandaFragment : Fragment() {
     private lateinit var komunitasViewModel: KomunitasViewModel
+    private lateinit var auth: FirebaseAuth
 
     private val binding by lazy {
         FragmentBerandaBinding.inflate(layoutInflater)
@@ -83,6 +86,7 @@ class BerandaFragment : Fragment() {
         // Inflate the layout for this fragment
         komunitasViewModel = ViewModelProvider(this)[KomunitasViewModel::class.java]
         setupRecyclerMostPopular()
+        auth = FirebaseAuth.getInstance()
         return binding.root
     }
 
@@ -112,19 +116,30 @@ class BerandaFragment : Fragment() {
     }
 
     private fun setupKomunitasFormButton() {
+        val destination = BerandaFragmentDirections.actionNavigationBerandaToFormPostActivity(
+            type = Forums.ForumType.ARTICLE.fieldName
+        )
+
         binding.berandaIdeaTilesCardView.setOnClickListener {
-            val destination = BerandaFragmentDirections.actionNavigationBerandaToFormPostActivity(
-                type = Forums.ForumType.ARTICLE.fieldName
-            )
+            if (auth.uid == null) {
+                Snackbar.make(binding.root, "Mohon Login terlebih dahulu!", Snackbar.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
             findNavController().navigate(destination)
         }
     }
 
     private fun setupBinReportFormButton() {
+        val destination = BerandaFragmentDirections.actionNavigationBerandaToFormPostActivity(
+            type = Forums.ForumType.REPORT.fieldName
+        )
+        
         binding.berandaReportTilesCardView.setOnClickListener {
-            val destination = BerandaFragmentDirections.actionNavigationBerandaToFormPostActivity(
-                type = Forums.ForumType.REPORT.fieldName
-            )
+            if (auth.uid == null) {
+                Snackbar.make(binding.root, "Mohon Login terlebih dahulu!", Snackbar.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
             findNavController().navigate(destination)
         }
     }

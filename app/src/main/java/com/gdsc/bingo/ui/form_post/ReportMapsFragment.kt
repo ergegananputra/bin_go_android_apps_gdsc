@@ -78,6 +78,11 @@ class ReportMapsFragment : Fragment(), OnMapReadyCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
+        (activity as FormPostActivity).apply {
+            setToolbarTitle(this@ReportMapsFragment)
+            hideToolbar()
+        }
+
         return binding.root
     }
 
@@ -176,7 +181,7 @@ class ReportMapsFragment : Fragment(), OnMapReadyCallback {
     private fun setupButtonSave() {
         binding.reportMapsButtonSimpan.setOnClickListener {
             lifecycleScope.launch {
-                formViewModel.vicinity.value = vicinity
+                formViewModel.setVicinity(vicinity)
 
                 try {
                     val geocoder = Geocoder(requireContext(), Locale.getDefault())

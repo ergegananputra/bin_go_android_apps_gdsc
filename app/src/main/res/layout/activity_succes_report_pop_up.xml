@@ -9,42 +9,16 @@
 
     tools:context=".ui.pop_up.SuccesReportPopUp">
 
-    <TextView
-        android:id="@+id/textViewBinGo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="96dp"
-        android:text="BIN-GO!"
-        android:textColor="?attr/colorTertiary"
-        android:textAppearance="?attr/textAppearanceDisplayLarge"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textViewSuccess"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="32dp"
-        android:text="Laporan Berhasil Dikirim"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/animationView" />
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/animationView"
-        android:layout_width="166dp"
-        android:layout_height="185dp"
-        android:layout_marginTop="64dp"
+        android:layout_width="300dp"
+        android:layout_height="330dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewBinGo"
+        app:layout_constraintTop_toTopOf="parent"
         app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        app:lottie_rawRes="@raw/logo_bingo_report_animation" />
+        app:lottie_rawRes="@raw/bingo_pop_up_succes_report_animation" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

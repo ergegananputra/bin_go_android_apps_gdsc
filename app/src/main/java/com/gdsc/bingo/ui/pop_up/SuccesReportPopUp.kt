@@ -7,7 +7,7 @@ import com.gdsc.bingo.R
 
 class SuccesReportPopUp : AppCompatActivity() {
     companion object {
-        const val ANIMATION_TIME: Long = 2100
+        const val ANIMATION_TIME: Long = 3000
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

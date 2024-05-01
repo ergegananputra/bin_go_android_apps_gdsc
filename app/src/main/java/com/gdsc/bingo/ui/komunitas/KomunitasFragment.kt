@@ -185,7 +185,7 @@ class KomunitasFragment : Fragment() {
     fun actionOpenDetail(forum: Forums) {
         val destination = with(forum){
             KomunitasFragmentDirections
-                .actionKomunitasFragmentToArtikelFragment(
+                .actionNavigationKomunitasToNavigationArtikelActivity(
                     referenecePathDocumentString = referencePath?.path!!,
                     title = title!!,
                     text = text,
@@ -218,7 +218,7 @@ class KomunitasFragment : Fragment() {
     fun actionComment(forum: Forums) {
         val destination = with(forum){
             KomunitasFragmentDirections
-                .actionKomunitasFragmentToArtikelFragment(
+                .actionNavigationKomunitasToNavigationArtikelActivity(
                     referenecePathDocumentString = referencePath?.path!!,
                     title = title!!,
                     text = text,

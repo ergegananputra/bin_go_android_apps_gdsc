@@ -135,6 +135,10 @@ class FormPostFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        (activity as FormPostActivity).apply {
+            showToolbar()
+        }
+
         setupSaveButton()
         setupImageRecycler()
         setupAddImageButton()
@@ -156,7 +160,7 @@ class FormPostFragment : Fragment() {
 
     private fun setupLocationButton() {
         binding.formPostCardViewLocation.setOnClickListener {
-            val action = FormPostFragmentDirections.actionFormPostFragment2ToReportMapsFragment2()
+            val action = FormPostFragmentDirections.actionFormPostFragmentToReportMapsFragment()
             findNavController().navigate(action)
         }
     }
@@ -210,7 +214,7 @@ class FormPostFragment : Fragment() {
 
     private fun setupButtonEditDescription() {
         binding.formPostButtonEditDescription.setOnClickListener {
-            val action = FormPostFragmentDirections.actionFormPostFragment2ToFormFullEditorFragment2()
+            val action = FormPostFragmentDirections.actionFormPostFragmentToFormFullEditorFragment()
             findNavController().navigate(action)
         }
     }

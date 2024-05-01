@@ -73,6 +73,7 @@ class FormPostActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         val previousBackStackEntry = formNavController.previousBackStackEntry
+        Log.d("FormPostActivity", "onSupportNavigateUp: ${previousBackStackEntry?.destination?.id}")
         return if (previousBackStackEntry?.destination?.id == null) {
             finish()
             true
@@ -84,6 +85,7 @@ class FormPostActivity : AppCompatActivity() {
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         val previousBackStackEntry = formNavController.previousBackStackEntry
+        Log.d("FormPostActivity", "onBackPressed: ${previousBackStackEntry?.destination?.id}")
         if (previousBackStackEntry?.destination?.id == null) {
             finish()
         } else {
@@ -119,6 +121,10 @@ class FormPostActivity : AppCompatActivity() {
 
     fun hideToolbar() {
         binding.formPostToolbar.isVisible = false
+    }
+
+    fun showToolbar() {
+        binding.formPostToolbar.isVisible = true
     }
 
     fun startDoneAnimation(type: String) {

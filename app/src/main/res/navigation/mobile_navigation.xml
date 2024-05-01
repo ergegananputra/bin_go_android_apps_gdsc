@@ -37,6 +37,9 @@
         <action
             android:id="@+id/action_navigation_profil_to_navigation_artikel_activity"
             app:destination="@id/navigation_artikel_activity" />
+        <action
+            android:id="@+id/action_navigation_profil_to_fragment_profil_kebijakan_privasi"
+            app:destination="@id/profilKebijakanPrivasiFragment" />
     </fragment>
     <fragment
         android:id="@+id/pointsHistoryFragment"
@@ -63,6 +66,11 @@
         android:label="fragment_profil_detail"
         tools:layout="@layout/fragment_profil_detail" />
     <fragment
+        android:id="@+id/profilKebijakanPrivasiFragment"
+        android:name="com.gdsc.bingo.ui.profil.kebijakan_privasi.ProfilKebijakanPrivasiFragment"
+        android:label="fragment_profil_kebijakan_privasi"
+        tools:layout="@layout/fragment_profil_kebijakan_privasi"/>
+    <fragment
         android:id="@+id/navigation_komunitas"
         android:name="com.gdsc.bingo.ui.komunitas.KomunitasFragment"
         android:label="fragment_komunitas"
@@ -77,6 +85,7 @@
             android:id="@+id/action_navigation_komunitas_to_navigation_artikel_activity"
             app:destination="@id/navigation_artikel_activity" />
     </fragment>
+
     <activity
         android:id="@+id/formPostActivity"
         android:name="com.gdsc.bingo.ui.form_post.FormPostActivity"

@@ -228,9 +228,10 @@ class ProfilFragment : Fragment() {
 
     private fun setupButtonKebijiakanPrivasi() {
         binding.profileButtonKebijakanPrivasi.setOnClickListener {
-            Toast.makeText(requireContext(), "Kebijakan Privasi", Toast.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.action_navigation_profil_to_fragment_profil_kebijakan_privasi)
         }
     }
+
 
     private fun setupButtonPanduan() {
         binding.profileButtonPanduan.setOnClickListener {

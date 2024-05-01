@@ -157,14 +157,15 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/form_post_button_category"
                         style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawableEnd="@drawable/ic_arrow_drop_down_24"
                         android:drawableTint="?attr/colorOnSurface"
                         android:minHeight="55dp"
                         android:paddingStart="16dp"
-                        android:paddingEnd="0dp"
+                        android:paddingEnd="8dp"
                         android:text="Kategori"
+                        android:textAlignment="viewStart"
                         android:textAppearance="?attr/textAppearanceBodyMedium"
                         android:textColor="?attr/colorOnSurface"
                         app:cornerRadius="0dp"
@@ -172,27 +173,6 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:strokeWidth="0dp" />
-
-                    <HorizontalScrollView
-                        android:id="@+id/form_post_category_horizontal_scroll_view"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:scrollbars="none"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/form_post_button_category"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <com.google.android.material.chip.ChipGroup
-                            android:id="@+id/form_post_category_chip_container"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal"
-                            android:paddingStart="0dp"
-                            android:paddingEnd="16dp" />
-
-                    </HorizontalScrollView>
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -11,10 +11,10 @@
         android:label="fragment_form_post"
         tools:layout="@layout/fragment_form_post" >
         <action
-            android:id="@+id/action_formPostFragment2_to_formFullEditorFragment2"
+            android:id="@+id/action_formPostFragment_to_formFullEditorFragment"
             app:destination="@id/navigation_form_full_editor" />
         <action
-            android:id="@+id/action_formPostFragment2_to_reportMapsFragment2"
+            android:id="@+id/action_formPostFragment_to_reportMapsFragment"
             app:destination="@id/navigation_form_maps" />
         <argument
             android:name="type"

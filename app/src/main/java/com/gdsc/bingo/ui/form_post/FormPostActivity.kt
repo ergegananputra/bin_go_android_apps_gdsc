@@ -1,8 +1,11 @@
 package com.gdsc.bingo.ui.form_post
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -14,7 +17,9 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navArgs
 import com.gdsc.bingo.R
 import com.gdsc.bingo.databinding.ActivityFormPostBinding
+import com.gdsc.bingo.model.Forums
 import com.gdsc.bingo.ui.form_post.viewmodel.FormPostViewModel
+import com.gdsc.bingo.ui.pop_up.SuccesReportPopUp
 
 class FormPostActivity : AppCompatActivity() {
     val args : FormPostActivityArgs by navArgs()
@@ -26,6 +31,11 @@ class FormPostActivity : AppCompatActivity() {
 
     private val formViewModel by lazy {
         ViewModelProvider(this)[FormPostViewModel::class.java]
+    }
+
+    private val animationLottieLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        Log.d("FormPostActivity", "onActivityResult: ${result.resultCode}")
+        finish()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +73,7 @@ class FormPostActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         val previousBackStackEntry = formNavController.previousBackStackEntry
+        Log.d("FormPostActivity", "onSupportNavigateUp: ${previousBackStackEntry?.destination?.id}")
         return if (previousBackStackEntry?.destination?.id == null) {
             finish()
             true
@@ -74,6 +85,7 @@ class FormPostActivity : AppCompatActivity() {
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         val previousBackStackEntry = formNavController.previousBackStackEntry
+        Log.d("FormPostActivity", "onBackPressed: ${previousBackStackEntry?.destination?.id}")
         if (previousBackStackEntry?.destination?.id == null) {
             finish()
         } else {
@@ -109,6 +121,23 @@ class FormPostActivity : AppCompatActivity() {
 
     fun hideToolbar() {
         binding.formPostToolbar.isVisible = false
+    }
+
+    fun showToolbar() {
+        binding.formPostToolbar.isVisible = true
+    }
+
+    fun startDoneAnimation(type: String) {
+        when (type) {
+            Forums.ForumType.REPORT.fieldName -> {
+                val intent = Intent(this, SuccesReportPopUp::class.java)
+                animationLottieLauncher.launch(intent)
+            }
+            else -> {
+                finish()
+            }
+        }
+
     }
 
 

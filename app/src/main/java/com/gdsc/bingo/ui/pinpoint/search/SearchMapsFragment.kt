@@ -100,6 +100,8 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         setupHeaderCard()
 
         locationTextView = binding.pinPointTextViewLocationAddress
+        locationTextView.isSelected = true
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         if (isLocationEnabled()) {

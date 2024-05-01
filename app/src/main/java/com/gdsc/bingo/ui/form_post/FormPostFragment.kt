@@ -29,7 +29,6 @@ import com.gdsc.bingo.model.PostImage
 import com.gdsc.bingo.model.User
 import com.gdsc.bingo.services.textstyling.AddOnSpannableTextStyle
 import com.gdsc.bingo.ui.form_post.viewmodel.FormPostViewModel
-import com.gdsc.bingo.ui.pop_up.SuccesReportPopUp
 import com.google.android.material.chip.Chip
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
@@ -283,10 +282,7 @@ class FormPostFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         }
     }
-    
-    private fun showSuccessPopUp() {
-        startActivity(Intent(requireContext(), SuccesReportPopUp::class.java))
-    }
+
 
     private fun setupSaveButton() {
         (activity as FormPostActivity).setupActionMenu(
@@ -309,7 +305,9 @@ class FormPostFragment : Fragment() {
                     val uploadResult = submitForm(title, caption, videoLink)
 
                     if (uploadResult) {
-                        requireActivity().finish()
+                        (activity as FormPostActivity).let {
+                            it.startDoneAnimation(it.args.type)
+                        }
                     } else {
                         val errMsg = getString(R.string.error_upload_failed)
                         Toast.makeText(requireContext(), errMsg, Toast.LENGTH_LONG).show()

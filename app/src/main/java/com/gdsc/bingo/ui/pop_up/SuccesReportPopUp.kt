@@ -1,11 +1,9 @@
 package com.gdsc.bingo.ui.pop_up
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import com.gdsc.bingo.R
-import com.gdsc.bingo.ui.komunitas.KomunitasFragment
 
 class SuccesReportPopUp : AppCompatActivity() {
     companion object {
@@ -17,7 +15,7 @@ class SuccesReportPopUp : AppCompatActivity() {
         setContentView(R.layout.activity_succes_report_pop_up)
 
         Handler(this.mainLooper).postDelayed({
-            startActivity(Intent(this@SuccesReportPopUp, KomunitasFragment::class.java))
+            setResult(RESULT_OK)
             finish()
         }, ANIMATION_TIME)
     }

@@ -13,7 +13,7 @@ class PinPointActivity : AppCompatActivity() {
 
     val args : PinPointActivityArgs by navArgs()
 
-    private val binding by lazy {
+    val binding by lazy {
         ActivityPinPointBinding.inflate(layoutInflater)
     }
     private lateinit var navController : NavController

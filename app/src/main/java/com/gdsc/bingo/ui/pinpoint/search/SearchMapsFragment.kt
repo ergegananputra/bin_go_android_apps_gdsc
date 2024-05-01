@@ -18,7 +18,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -58,6 +58,10 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         FragmentSearchMapsBinding.inflate(layoutInflater)
     }
 
+    private val bindingPinPointActivity by lazy {
+        (requireActivity() as PinPointActivity).binding
+    }
+
     private val desiredWidth = 144
     private val desiredHeight = 144
 
@@ -95,7 +99,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
 
         setupHeaderCard()
 
-        locationTextView = view.findViewById(R.id.pin_point_front_text_view_current_user_location)
+        locationTextView = binding.pinPointTextViewLocationAddress
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         if (isLocationEnabled()) {
@@ -104,44 +108,105 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             locationTextView.text = "Izinkan lokasi Anda untuk menemukan TPU terdekat"
         }
 
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        val mapFragment = childFragmentManager.findFragmentById(binding.map.id) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
 
         getLastLocation()
 
-        // Dapatkan referensi ke TextInputEditText di dalam TextInputLayout
-        val searchTextInputEditText = binding.searchMapsTextInputLayoutSearch.editText
-
-        // Tambahkan TextWatcher
-        searchTextInputEditText?.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                // Tidak ada aksi yang diperlukan sebelum teks berubah
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // Ketika teks berubah, Anda dapat memicu pencarian disini
-                val searchText = s.toString()
-                if (searchText.isNotEmpty()) {
-                    performSearch(searchText)
-                } else {
-                    // Jika teks pencarian kosong, tampilkan semua marker
-                    getMarker(binLocationList)
-                }
-            }
-
-            override fun afterTextChanged(p0: Editable?) {
-                // Tidak ada aksi yang diperlukan setelah teks berubah
-            }
-        })
-
-        val btnNavigateRoute = view.findViewById<Button>(R.id.component_button_navigate)
-        btnNavigateRoute.setOnClickListener {
+        binding.componentButtonNavigate.setOnClickListener {
             // Panggil metode untuk membuka Google Maps dengan arah dari lokasi yang dipilih
             openGoogleMapsDirections()
         }
 
+        setupSearchBar()
+
+        setupToggleButton()
+
+    }
+
+    private fun setupSearchBar() {
+
+        with(bindingPinPointActivity) {
+            pinPointOpenSearchButton.setOnClickListener {
+                it.visibility = View.GONE
+                pinpointHeaderButtonBack.visibility = View.GONE
+                pinPointTextViewTitle.visibility = View.GONE
+
+                pinPointTextInputLayoutSearch.visibility = View.VISIBLE
+                pinPointTextInputLayoutSearch.editText?.requestFocus()
+
+                val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.showSoftInput(pinPointTextInputLayoutSearch.editText, InputMethodManager.SHOW_IMPLICIT)
+            }
+
+            pinPointTextInputLayoutSearch.setEndIconOnClickListener {
+                val text = pinPointTextInputLayoutSearch.editText?.text.toString()
+                if (text.isNotEmpty()) {
+                    pinPointTextInputLayoutSearch.editText?.setText("")
+                } else {
+                    pinPointOpenSearchButton.visibility = View.VISIBLE
+                    pinpointHeaderButtonBack.visibility = View.VISIBLE
+                    pinPointTextViewTitle.visibility = View.VISIBLE
+
+                    pinPointTextInputLayoutSearch.visibility = View.GONE
+                    pinPointTextInputLayoutSearch.editText?.setText("")
+
+                    pinPointTextInputLayoutSearch.editText?.clearFocus()
+                    val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    inputMethodManager.hideSoftInputFromWindow(pinPointTextInputLayoutSearch.editText?.windowToken, 0)
+                }
+            }
+
+            pinPointTextInputLayoutSearch.editText?.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    // Tidak ada aksi yang diperlukan sebelum teks berubah
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    // Ketika teks berubah, Anda dapat memicu pencarian disini
+                    val searchText = s.toString()
+                    if (searchText.isNotEmpty()) {
+                        performSearch(searchText)
+                    } else {
+                        // Jika teks pencarian kosong, tampilkan semua marker
+                        getMarker(binLocationList)
+                    }
+                }
+
+                override fun afterTextChanged(p0: Editable?) {
+                    // Tidak ada aksi yang diperlukan setelah teks berubah
+                }
+            })
 
 
+        }
+    }
+
+    private fun setupToggleButton() {
+        binding.binPointButtonToggleGroup.addOnButtonCheckedListener { toggleGroup, id, isChecked ->
+            if (isChecked) {
+                when (id) {
+                    binding.pinPointButtonBinLocator.id -> {
+                        // Tampilkan semua marker bin
+                        val filteredResults = binLocationList.filterNot {
+                            it.type == BinLocation.BinTypeCategory.REPORT.fieldName
+                        }
+                        getMarker(filteredResults as ArrayList<BinLocation>)
+                    }
+                    binding.pinPointButtonBinReport.id -> {
+                        // Tampilkan semua marker report
+                        val filteredResults = binLocationList.filter {
+                            it.type == BinLocation.BinTypeCategory.REPORT.fieldName
+                        }
+                        getMarker(filteredResults as ArrayList<BinLocation>)
+                    }
+                    binding.pinPointButtonSemua.id -> {
+                        // Tampilkan semua marker
+                        getMarker(binLocationList)
+                    }
+                }
+            }
+        }
     }
 
     private fun setFirstLocation() {
@@ -196,8 +261,9 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         binding.searchMapsTextViewAddressLokasiTerpilih.text = markerInfo.address
 
         // NOTE: Animasi disini
-        TransitionManager.beginDelayedTransition(binding.searchMapsBottomDialogMainConstraintLayout)
+        TransitionManager.beginDelayedTransition(binding.pinPointActivityRootLayout)
         binding.searchMapsGroupMarkerInfo.visibility = View.VISIBLE
+        binding.pinPointButtonMyLocationCardView.visibility = View.GONE
 
         // Periksa apakah tempat tersebut terbuka atau tutup
         val isOpen = markerInfo.isOpen ?: true // Defaultnya adalah false jika properti isOpen null
@@ -270,7 +336,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupHeaderCard() {
-        binding.searchMapsMyLocation.setOnClickListener {
+        binding.pinPointButtonMyLocationCardView.setOnClickListener {
             showUserLocation()
         }
     }
@@ -458,8 +524,9 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         }
 
         googleMap?.setOnMapClickListener {
-            TransitionManager.beginDelayedTransition(binding.searchMapsBottomDialogMainConstraintLayout)
+            TransitionManager.beginDelayedTransition(binding.pinPointActivityRootLayout)
             binding.searchMapsGroupMarkerInfo.visibility = View.GONE
+            binding.pinPointButtonMyLocationCardView.visibility = View.VISIBLE
         }
 
         setFirstLocation()

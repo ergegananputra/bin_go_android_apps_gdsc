@@ -55,5 +55,9 @@
     <string name="lapor">Lapor !</string>
     <string name="simpan">Simpan</string>
     <string name="error_upload_failed">Gagal mengunggah konten</string>
+    <string name="semua">Semua</string>
+    <string name="bin_locator">Bin-Locator</string>
+    <string name="bin_report">Bin-Report</string>
+    <string name="rute">Rute</string>
 
 </resources>

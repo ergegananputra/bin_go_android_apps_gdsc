@@ -197,7 +197,11 @@ class ReportMapsFragment : Fragment(), OnMapReadyCallback {
 
 
                                 formViewModel.address = address
-                                findNavController().navigateUp()
+                                try {
+                                    findNavController().navigateUp() // EXIT
+                                } catch (e: Exception) {
+                                    (requireActivity() as FormPostActivity).formNavController.navigateUp()
+                                }
                             }
                         }
 

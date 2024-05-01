@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_navigation_beranda_to_navigation_artikel_activity"
             app:destination="@id/navigation_artikel_activity" />
+        <action
+            android:id="@+id/action_navigation_beranda_to_formPostActivity"
+            app:destination="@id/formPostActivity" />
     </fragment>
     <fragment
         android:id="@+id/navigation_profil"

@@ -23,5 +23,17 @@ class ModelResults : Serializable {
     var isOpen: Boolean? = null
 
     @SerializedName("type")
-    lateinit var type: String
+    var type: String? = null
+
+    @SerializedName("forum_id")
+    var forumId: String? = null
+
+    @SerializedName("report_description")
+    var reportDescription: String? = null
+
+    @SerializedName("report_date")
+    var reportDate: String? = null
+
+    @SerializedName("address")
+    var address: String? = null
 }

@@ -23,7 +23,7 @@ import com.gdsc.bingo.ui.pop_up.SuccesReportPopUp
 
 class FormPostActivity : AppCompatActivity() {
     val args : FormPostActivityArgs by navArgs()
-    private lateinit var formNavController : NavController
+    lateinit var formNavController : NavController
 
     private val binding by lazy {
         ActivityFormPostBinding.inflate(layoutInflater)

@@ -75,13 +75,12 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginEnd="8dp"
                     android:ellipsize="marquee"
                     android:text="@string/cek_tempat_sampah_terdekat"
                     android:textAppearance="?attr/textAppearanceHeadlineSmall"
                     android:textColor="?attr/colorOnTertiaryContainer"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/beranda_card_guideline_vertical"
+                    app:layout_constraintEnd_toStartOf="@+id/beranda_card_image_view_illustration_1"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/beranda_card_image_view_illustration_1"
@@ -108,18 +107,14 @@
                     android:layout_height="0dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/image_illustration_1"
+                    app:layout_constraintHeight_min="100dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="@+id/beranda_card_guideline_vertical"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintDimensionRatio="1"
+                    app:layout_constraintWidth_max="200dp" />
 
 
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/beranda_card_guideline_vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.6" />
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guideline2"
@@ -128,6 +123,141 @@
                     android:orientation="vertical"
                     app:layout_constraintGuide_begin="20dp" />
 
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/beranda_report_tiles_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="24dp"
+            app:cardBackgroundColor="@color/fab_background_report"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/beranda_card_beranda_container"
+            app:strokeWidth="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/beranda_report_image"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Menemukan Sampah?"
+                        android:layout_marginBottom="8dp"
+                        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                        android:textColor="?attr/colorOnErrorContainer" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Laporkan sekarang di Bin-Report"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="?attr/colorOnErrorContainer" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/beranda_report_image"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:background="?attr/colorError"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_campaign_24"
+                    android:tint="?attr/colorOnError"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintWidth_min="100dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintHeight_min="110dp"
+                    app:layout_constraintWidth_max="130dp" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/beranda_idea_tiles_card_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="24dp"
+            app:cardBackgroundColor="?attr/colorSecondaryContainer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/beranda_report_tiles_card_view"
+            app:strokeWidth="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:orientation="vertical"
+                    android:gravity="center_vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/beranda_idea_tiles_image_view"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ingin berbagi ide pengalaman?"
+                        android:layout_marginBottom="8dp"
+                        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                        android:textColor="?attr/colorOnSecondaryContainer" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ceritakan di forum komunitas"
+                        android:textAppearance="?attr/textAppearanceLabelSmall"
+                        android:textColor="?attr/colorOnSecondaryContainer" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/beranda_idea_tiles_image_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:background="?attr/colorTertiary"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_share"
+                    android:tint="?attr/colorOnTertiary"
+                    app:layout_constraintBottom_toBottomOf="parent"
+
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHeight_min="110dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_min="100dp"
+                    app:layout_constraintWidth_max="130dp" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -143,7 +273,7 @@
             android:textColor="?attr/colorOnSurface"
             app:layout_constraintEnd_toStartOf="@+id/beranda_button_go_to_komunitas"
             app:layout_constraintStart_toStartOf="@+id/include"
-            app:layout_constraintTop_toBottomOf="@+id/beranda_card_beranda_container" />
+            app:layout_constraintTop_toBottomOf="@+id/beranda_idea_tiles_card_view" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/beranda_text_view_description_komunitas"
@@ -161,11 +291,10 @@
             style="@style/Widget.Material3.Button.IconButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
             android:layout_marginEnd="24dp"
             app:icon="@drawable/ic_chevron_right_24"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/beranda_card_beranda_container" />
+            app:layout_constraintTop_toTopOf="@+id/beranda_text_view_title_komunitas" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/beranda_recycler_most_like_komunitas"

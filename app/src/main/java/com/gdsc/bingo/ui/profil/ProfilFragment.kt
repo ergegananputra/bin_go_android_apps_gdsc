@@ -235,7 +235,8 @@ class ProfilFragment : Fragment() {
 
     private fun setupButtonPanduan() {
         binding.profileButtonPanduan.setOnClickListener {
-            Toast.makeText(requireContext(), "Panduan", Toast.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.action_navigation_profil_to_fragment_profil_panduan)
+
         }
     }
 

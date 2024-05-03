@@ -40,6 +40,9 @@
         <action
             android:id="@+id/action_navigation_profil_to_fragment_profil_kebijakan_privasi"
             app:destination="@id/profilKebijakanPrivasiFragment" />
+        <action
+            android:id="@+id/action_navigation_profil_to_fragment_profil_panduan"
+            app:destination="@id/navigation_profil_panduan" />
     </fragment>
     <fragment
         android:id="@+id/pointsHistoryFragment"
@@ -70,6 +73,11 @@
         android:name="com.gdsc.bingo.ui.profil.kebijakan_privasi.ProfilKebijakanPrivasiFragment"
         android:label="fragment_profil_kebijakan_privasi"
         tools:layout="@layout/fragment_profil_kebijakan_privasi"/>
+    <fragment
+        android:id="@+id/navigation_profil_panduan"
+        android:name="com.gdsc.bingo.ui.profil.panduan.ProfilPanduanFragment"
+        android:label="fragment_profil_panduan"
+        tools:layout="@layout/fragment_profil_panduan" />
     <fragment
         android:id="@+id/navigation_komunitas"
         android:name="com.gdsc.bingo.ui.komunitas.KomunitasFragment"

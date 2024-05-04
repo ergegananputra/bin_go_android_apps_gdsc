@@ -306,6 +306,9 @@ class ProfilFragment : Fragment() {
             Source.DEFAULT
         }
 
+        if (isAdded.not()) return // fragment is not attached to activity
+
+
         firestore.collection(User().table).document(appPreferences.userId).get(source)
             .addOnSuccessListener {
                 lifecycleScope.launch(Dispatchers.IO) {
@@ -313,7 +316,9 @@ class ProfilFragment : Fragment() {
                     val profilePicturePath = user.profilePicturePath
                     if (profilePicturePath.isNullOrEmpty().not()) {
                         val pictureRef = storage.reference.child(profilePicturePath!!)
-                        val localFile = File(requireContext().cacheDir, "user_personal_profile_picture.jpg")
+
+                        if (isAdded.not()) return@launch // fragment is not attached to activity
+                        val localFile = File(requireActivity().cacheDir, "user_personal_profile_picture.jpg")
 
                         if (localFile.exists().not() || forceUpdate) {
                             pictureRef.getFile(localFile).addOnSuccessListener {

@@ -35,6 +35,12 @@ class KomunitasViewModel : ViewModel() {
     val mostLikes = MutableLiveData<Forums>()
     val latestUserPost = MutableLiveData<Forums>()
 
+    private val lastClickTimeMap : HashMap<String, Long> = hashMapOf()
+
+
+
+    private val debounceTime = 1000L
+
     val forumsRealm  = realm
         .query<ForumsRealm>()
         .sort("createdAtMillis", Sort.DESCENDING)
@@ -105,6 +111,14 @@ class KomunitasViewModel : ViewModel() {
 
     fun pullLatestData(limit: Long = 50, formType: Forums.ForumType = Forums.ForumType.ARTICLE) {
         viewModelScope.launch(Dispatchers.IO) {
+            val currentTime = System.currentTimeMillis()
+            val lastClickTime = lastClickTimeMap[formType.fieldName] ?: 0L
+            if (currentTime - lastClickTime < debounceTime) {
+                Log.i("KomunitasViewModel", "Debounce pullLatestData  : Used Time = ${currentTime - lastClickTime}")
+                return@launch
+            }
+            lastClickTimeMap[formType.fieldName] = currentTime
+
             val query = firestore.collection(tempObj.table)
                 .orderBy(FireModel.Keys.createdAt, Query.Direction.DESCENDING)
                 .limit(limit)
@@ -134,6 +148,14 @@ class KomunitasViewModel : ViewModel() {
     private suspend fun pullLatestDataCheck(formType: Forums.ForumType) : Boolean {
         return suspendCoroutine { continuation ->
             viewModelScope.launch(Dispatchers.IO) {
+                val currentTime = System.currentTimeMillis()
+                val lastClickTime = lastClickTimeMap[formType.fieldName] ?: 0L
+                if (currentTime - lastClickTime < debounceTime) {
+                    Log.i("KomunitasViewModel", "Debounce pullLatestData  : Used Time = ${currentTime - lastClickTime}")
+                    return@launch
+                }
+                lastClickTimeMap[formType.fieldName] = currentTime
+
                 val query = firestore.collection(tempObj.table)
                     .orderBy(FireModel.Keys.createdAt, Query.Direction.DESCENDING)
                     .limit(10)
@@ -226,11 +248,21 @@ class KomunitasViewModel : ViewModel() {
 
     fun loadMostLikeData() {
         viewModelScope.launch(Dispatchers.IO) {
+            val currentTime = System.currentTimeMillis()
+            val lastClickTime = lastClickTimeMap["mostLike"] ?: 0L
+            if (currentTime - lastClickTime < debounceTime) {
+                Log.i("KomunitasViewModel", "Debounce pullLatestData  : Used Time = ${currentTime - lastClickTime}")
+                return@launch
+            }
+            lastClickTimeMap["mostLike"] = currentTime
+
             val query = firestore.collection(tempObj.table)
                 .orderBy(Forums.Keys.likeCount, Query.Direction.DESCENDING)
                 .limit(1)
             query.get()
                 .addOnSuccessListener { result ->
+                    if (result.isEmpty) return@addOnSuccessListener
+
                     val forums = tempObj.toModels(result)
                     mostLikes.value = forums.first()
                 }
@@ -242,6 +274,14 @@ class KomunitasViewModel : ViewModel() {
 
     fun loadLatestUserPost(uid: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            val currentTime = System.currentTimeMillis()
+            val lastClickTime = lastClickTimeMap["latestUserPost"] ?: 0L
+            if (currentTime - lastClickTime < debounceTime) {
+                Log.i("KomunitasViewModel", "Debounce pullLatestData  : Used Time = ${currentTime - lastClickTime}")
+                return@launch
+            }
+            lastClickTimeMap["latestUserPost"] = currentTime
+
             val path = "${User().table}/$uid"
             val query = firestore.collection(tempObj.table)
                 .whereEqualTo(Forums.Keys.author, firestore.document(path))
@@ -249,6 +289,8 @@ class KomunitasViewModel : ViewModel() {
                 .limit(1)
             query.get()
                 .addOnSuccessListener { result ->
+                    if (result.isEmpty) return@addOnSuccessListener
+
                     val forums = tempObj.toModels(result)
                     latestUserPost.value = forums.first()
                 }

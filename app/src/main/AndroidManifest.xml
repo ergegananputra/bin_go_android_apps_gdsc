@@ -49,6 +49,7 @@
             android:exported="false" />
         <activity
             android:name=".ui.form_post.FormPostActivity"
+            android:windowSoftInputMode="adjustPan"
             android:exported="false" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.

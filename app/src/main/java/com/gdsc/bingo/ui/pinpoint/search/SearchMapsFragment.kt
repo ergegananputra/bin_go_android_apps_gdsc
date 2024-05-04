@@ -85,6 +85,8 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
     // Properti untuk menyimpan hasil pencarian
     private var binLocationList = ArrayList<BinLocation>()
 
+    private var selectedMarkerPosition : GeoPoint? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -267,6 +269,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
 
         // Perbarui teks pada TextView
         binding.searchMapsTextViewLokasiTerpilih.text = markerInfo.name
+        selectedMarkerPosition = markerInfo.location
 
 
         // NOTE: Animasi disini
@@ -351,7 +354,17 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         // Pastikan ada lokasi yang terpilih
         if (selectedLocationText.isNotEmpty()) {
             // Buat URI Intent untuk membuka Google Maps dengan arah dari lokasi yang dipilih
-            val uri = "https://www.google.com/maps/dir/?api=1&destination=${selectedLocationText}"
+            val lat = selectedMarkerPosition?.latitude
+            val long = selectedMarkerPosition?.longitude
+
+            val isCoordinateReady = !(lat == null || long == null)
+
+            val uri = if (isCoordinateReady) {
+                "https://www.google.com/maps/dir/?api=1&destination=$lat,$long"
+            } else {
+                "https://www.google.com/maps/dir/?api=1&destination=${selectedLocationText}"
+            }
+
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
             // Set flag agar Google Maps dibuka dalam aplikasi yang tersedia
             intent.setPackage("com.google.android.apps.maps")

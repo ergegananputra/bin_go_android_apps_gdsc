@@ -108,6 +108,12 @@ class KomunitasFragment : Fragment() {
     }
 
     private fun viewSetFloatingActionButton(i: Int) {
+        if (auth.currentUser == null) {
+            binding.komunitasExtendedFloatingActionButton.visibility = View.GONE
+            binding.komunitasExtendedFloatingActionButtonReport.visibility = View.GONE
+            binding.komunitasFloatingActionButtonReport.visibility = View.GONE
+            return
+        }
         when (i) {
             1 -> {
                 binding.komunitasExtendedFloatingActionButtonReport.apply {
@@ -321,9 +327,9 @@ class KomunitasFragment : Fragment() {
                         }
                     }
                 } else {
-                    binding.komunitasExtendedFloatingActionButton.hide()
-                    binding.komunitasExtendedFloatingActionButtonReport.hide()
-                    binding.komunitasFloatingActionButtonReport.hide()
+                    binding.komunitasExtendedFloatingActionButton.visibility = View.GONE
+                    binding.komunitasExtendedFloatingActionButtonReport.visibility = View.GONE
+                    binding.komunitasFloatingActionButtonReport.visibility = View.GONE
                 }
 
 

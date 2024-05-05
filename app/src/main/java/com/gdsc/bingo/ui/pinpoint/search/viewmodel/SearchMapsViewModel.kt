@@ -8,6 +8,7 @@ import com.firebase.geofire.GeoFireUtils
 import com.firebase.geofire.GeoLocation
 import com.gdsc.bingo.BuildConfig.MAPS_API_KEY
 import com.gdsc.bingo.model.BinLocation
+import com.gdsc.bingo.model.RemoteSettings
 import com.gdsc.bingo.services.api.firebase.MapsDataSyncFirebase
 import com.gdsc.bingo.services.networking.ApiService
 import com.gdsc.bingo.services.networking.MapsApiInterface
@@ -17,9 +18,11 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.Source
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -31,20 +34,27 @@ class SearchMapsViewModel : ViewModel() {
         get() = _modelResultsMutableLiveData
 
     fun setMarkerLocation(
-        strLocation: String,
-        isCreditAvailable : Boolean = false,
-        isSyncMapsToFirebase : Boolean = false,
-        isDeveloperMode : Boolean = false
+        strLocation: String
     ) {
+        firestore = FirebaseFirestore.getInstance()
         val mapsApiService: MapsApiInterface = ApiService.getMaps()
 
         CoroutineScope(Dispatchers.Default).launch {
+
+            val remoteSettings = firestore.collection("remote_settings")
+                .document(RemoteSettings.DOCUMENT_ID.key)
+                .get(Source.SERVER)
+                .await()
+
+            val isMapsEnabled = remoteSettings.getBoolean(RemoteSettings.IS_MAPS_ENABLED.key) ?: false
+            val isDeveloperMode = remoteSettings.getBoolean(RemoteSettings.IS_DEVELOPER_MODE.key) ?: false
+            val isSyncMapsToFirebase = remoteSettings.getBoolean(RemoteSettings.IS_SYNC_MAPS_TO_FIREBASE.key) ?: false
 
             val queryTempatPembuanganSampah : MutableList<BinLocation> = mutableListOf()
             val queryTPS : MutableList<BinLocation> = mutableListOf()
             val queryBankSampah : MutableList<BinLocation> = mutableListOf()
 
-            if (isCreditAvailable) {
+            if (isMapsEnabled) {
                 withContext(Dispatchers.IO) {
                     queryTempatPembuanganSampah.addAll(
                         searchPlaceMaps(
@@ -95,7 +105,7 @@ class SearchMapsViewModel : ViewModel() {
 
             _modelResultsMutableLiveData.postValue(
                 arrayListOf<BinLocation>().apply {
-                    if (isCreditAvailable) {
+                    if (isMapsEnabled) {
                         addAll(queryTempatPembuanganSampah)
                         addAll(queryTPS)
                         addAll(queryBankSampah)

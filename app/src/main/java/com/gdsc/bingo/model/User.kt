@@ -33,7 +33,7 @@ data class User(
                 referencePath = it[FireModel.Keys.referencePath] as DocumentReference,
                 username = it[Keys.username] as String,
                 score = it[Keys.score] as Long,
-                profilePicturePath = it[Keys.profilePicturePath] as String
+                profilePicturePath = it[Keys.profilePicturePath] as String?
             )
         }
     }

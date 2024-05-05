@@ -4,13 +4,16 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.navArgs
 import com.gdsc.bingo.R
 import com.gdsc.bingo.databinding.ActivityPinPointBinding
 import com.gdsc.bingo.ui.CustomSystemTweak
 
 class PinPointActivity : AppCompatActivity() {
 
-    private val binding by lazy {
+    val args : PinPointActivityArgs by navArgs()
+
+    val binding by lazy {
         ActivityPinPointBinding.inflate(layoutInflater)
     }
     private lateinit var navController : NavController

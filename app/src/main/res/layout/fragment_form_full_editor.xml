@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <com.github.onecode369.wysiwyg.WYSIWYG
+        android:id="@+id/editor"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editor_more_options"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/editor_tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurfaceContainerHighest"
+        android:padding="4dp"
+        app:alignContent="space_between"
+        app:alignItems="stretch"
+        app:flexWrap="wrap"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_undo"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/undo" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_redo"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/redo" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_bold"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/bold" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_italic"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/italic" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_underline"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/underline" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_heading_options"
+            style="@style/button.editor.tools"
+            app:backgroundTint="?attr/colorTertiary"
+            app:icon="@drawable/h1"
+            app:iconTint="?attr/colorOnTertiary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_align_options"
+            style="@style/button.editor.tools"
+            app:backgroundTint="?attr/colorTertiary"
+            app:icon="@drawable/justify_left"
+            app:iconTint="?attr/colorOnTertiary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_more_options"
+            style="@style/button.editor.tools"
+            app:backgroundTint="?attr/colorTertiary"
+            app:icon="@drawable/more_vertical_24"
+            app:iconTint="?attr/colorOnTertiary" />
+
+    </com.google.android.flexbox.FlexboxLayout>
+
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/editor_heading_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurfaceContainerLow"
+        android:padding="4dp"
+        app:alignContent="space_between"
+        app:alignItems="stretch"
+        app:flexWrap="wrap"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editor_tools">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_heading1"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/h1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_heading2"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/h2" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_heading3"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/h3" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_heading4"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/h4" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_heading5"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/h5" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_heading6"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/h6" />
+
+    </com.google.android.flexbox.FlexboxLayout>
+
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/editor_justify_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurfaceContainerLow"
+        android:padding="4dp"
+        app:alignContent="space_between"
+        app:alignItems="stretch"
+        app:flexWrap="wrap"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editor_heading_options">
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/button.editor.tools"
+            app:icon="@drawable/justify_left"
+            android:id="@+id/action_align_left"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/button.editor.tools"
+            app:icon="@drawable/justify_center"
+            android:id="@+id/action_align_center"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/button.editor.tools"
+            app:icon="@drawable/justify_full"
+            android:id="@+id/action_align_justify"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/button.editor.tools"
+            app:icon="@drawable/justify_right"
+            android:id="@+id/action_align_right"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/button.editor.tools"
+            app:icon="@drawable/indent"
+            android:id="@+id/action_indent"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/button.editor.tools"
+            app:icon="@drawable/outdent"
+            android:id="@+id/action_outdent"
+            />
+
+    </com.google.android.flexbox.FlexboxLayout>
+
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/editor_more_options"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurfaceContainerLow"
+        android:padding="4dp"
+        app:alignContent="space_between"
+        app:alignItems="stretch"
+        app:flexWrap="wrap"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editor_justify_options">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_subscript"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/subscript" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_superscript"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/superscript" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/action_strikethrough"
+            style="@style/button.editor.tools"
+            app:icon="@drawable/strikethrough" />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/button.editor.tools"
+            app:icon="@drawable/list_bulleted"
+            android:id="@+id/action_insert_bullets"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/button.editor.tools"
+            app:icon="@drawable/list_numbered"
+            android:id="@+id/action_insert_numbers"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/button.editor.tools"
+            app:icon="@drawable/blockquote"
+            android:id="@+id/action_blockquote"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/button.editor.tools"
+            app:icon="@drawable/ic_check_box"
+            android:id="@+id/action_insert_checkbox"
+            />
+
+    </com.google.android.flexbox.FlexboxLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

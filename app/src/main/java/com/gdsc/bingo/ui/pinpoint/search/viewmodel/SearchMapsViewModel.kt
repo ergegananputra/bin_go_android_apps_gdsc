@@ -4,71 +4,220 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.firebase.geofire.GeoFireUtils
+import com.firebase.geofire.GeoLocation
 import com.gdsc.bingo.BuildConfig.MAPS_API_KEY
-import com.gdsc.bingo.model.nearby.ModelResults
-import com.gdsc.bingo.model.response.ModelResultsNearby
-import com.gdsc.bingo.services.networking.ApiInterface
+import com.gdsc.bingo.model.BinLocation
+import com.gdsc.bingo.model.RemoteSettings
+import com.gdsc.bingo.services.api.firebase.MapsDataSyncFirebase
 import com.gdsc.bingo.services.networking.ApiService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.util.*
+import com.gdsc.bingo.services.networking.MapsApiInterface
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.Source
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+
 class SearchMapsViewModel : ViewModel() {
-    private val modelResultsMutableLiveData = MutableLiveData<ArrayList<ModelResults>>()
-    private val strApiKey = MAPS_API_KEY
+    private val _modelResultsMutableLiveData = MutableLiveData<ArrayList<BinLocation>>()
+    private lateinit var firestore: FirebaseFirestore
+    val modelResultsMutableLiveData: LiveData<ArrayList<BinLocation>>
+        get() = _modelResultsMutableLiveData
 
-    fun setMarkerLocation(strLocation: String) {
-        val apiService: ApiInterface = ApiService.getMaps()
+    fun setMarkerLocation(
+        strLocation: String
+    ) {
+        firestore = FirebaseFirestore.getInstance()
+        val mapsApiService: MapsApiInterface = ApiService.getMaps()
 
-        val combinedResults = ArrayList<ModelResults>()
+        CoroutineScope(Dispatchers.Default).launch {
 
-        // Hitung jumlah panggilan API yang telah selesai
-        var completedCalls = 0
+            val remoteSettings = firestore.collection(RemoteSettings.TABLE_NAME.key)
+                .document(RemoteSettings.DOCUMENT_ID.key)
+                .get(Source.SERVER)
+                .await()
 
-        // Mencari Tempat Pembuangan
-        val callTePeEs = apiService.getDataResult(strApiKey, "Tempat Pembuangan Sampah", strLocation, "distance")
-        callTePeEs.enqueue(object : Callback<ModelResultsNearby> {
-            override fun onResponse(call: Call<ModelResultsNearby>, response: Response<ModelResultsNearby>) {
-                if (response.isSuccessful && response.body() != null) {
-                    combinedResults.addAll(response.body()!!.modelResults)
-                    completedCalls++
+            val isMapsEnabled = remoteSettings.getBoolean(RemoteSettings.IS_MAPS_ENABLED.key) ?: false
+            val isDeveloperMode = remoteSettings.getBoolean(RemoteSettings.IS_DEVELOPER_MODE.key) ?: false
+            val isSyncMapsToFirebase = remoteSettings.getBoolean(RemoteSettings.IS_SYNC_MAPS_TO_FIREBASE.key) ?: false
 
-                    // Jika kedua panggilan telah selesai, maka kita bisa mem-post data ke modelResultsMutableLiveData
-                    if (completedCalls == 2) {
-                        modelResultsMutableLiveData.postValue(combinedResults)
+            val queryTempatPembuanganSampah : MutableList<BinLocation> = mutableListOf()
+            val queryTPS : MutableList<BinLocation> = mutableListOf()
+            val queryBankSampah : MutableList<BinLocation> = mutableListOf()
+
+            if (isMapsEnabled) {
+                withContext(Dispatchers.IO) {
+                    queryTempatPembuanganSampah.addAll(
+                        searchPlaceMaps(
+                            "Tempat Pembuangan Sampah",
+                            mapsApiService,
+                            strLocation
+                        ) ?: emptyList()
+                    )
+                    queryTPS.addAll(
+                        searchPlaceMaps(
+                            "TPS",
+                            mapsApiService,
+                            strLocation
+                        ) ?: emptyList()
+                    )
+                    queryBankSampah.addAll(
+                        searchPlaceMaps(
+                            "Bank Sampah",
+                            mapsApiService,
+                            strLocation
+                        ) ?: emptyList()
+                    )
+                }
+
+                if (isSyncMapsToFirebase) {
+                    withContext(Dispatchers.IO) {
+                        val binLocationList = mutableListOf<BinLocation>()
+                        binLocationList.addAll(queryTempatPembuanganSampah)
+                        binLocationList.addAll(queryTPS)
+                        binLocationList.addAll(queryBankSampah)
+
+                        MapsDataSyncFirebase
+                            .getInstance()
+                            .uploadDataToFirestore(binLocationList)
                     }
-                } else {
-                    Log.e("responseTePeEs", response.toString())
                 }
             }
 
-            override fun onFailure(call: Call<ModelResultsNearby>, t: Throwable) {
-                Log.e("failureTePeEs", t.toString())
+            withContext(Dispatchers.IO) {
+                MapsDataSyncFirebase
+                    .getInstance()
+                    .startGeoHashingForDev(isDeveloperMode)
             }
-        })
 
-        // Mencari TPS
-        val callTPS = apiService.getDataResult(strApiKey, "TPS", strLocation, "distance")
-        callTPS.enqueue(object : Callback<ModelResultsNearby> {
-            override fun onResponse(call: Call<ModelResultsNearby>, response: Response<ModelResultsNearby>) {
-                if (response.isSuccessful && response.body() != null) {
-                    combinedResults.addAll(response.body()!!.modelResults)
-                    completedCalls++
+            val fireBinPoint = withContext(Dispatchers.IO) {
+                fetchBinPointData(strLocation) ?: emptyList()
+            }
 
-                    // Jika kedua panggilan telah selesai, maka kita bisa mem-post data ke modelResultsMutableLiveData
-                    if (completedCalls == 2) {
-                        modelResultsMutableLiveData.postValue(combinedResults)
+            _modelResultsMutableLiveData.postValue(
+                arrayListOf<BinLocation>().apply {
+                    if (isMapsEnabled) {
+                        addAll(queryTempatPembuanganSampah)
+                        addAll(queryTPS)
+                        addAll(queryBankSampah)
                     }
-                } else {
-                    Log.e("responseTPS", response.toString())
+                    addAll(fireBinPoint)
                 }
-            }
+            )
 
-            override fun onFailure(call: Call<ModelResultsNearby>, t: Throwable) {
-                Log.e("failureTPS", t.toString())
-            }
-        })
+
+        }
     }
 
-    fun getMarkerLocation(): LiveData<ArrayList<ModelResults>> = modelResultsMutableLiveData
+
+
+    private suspend fun fetchBinPointData(strLocation: String) : List<BinLocation>? {
+        firestore = FirebaseFirestore.getInstance()
+        val places = firestore.collection(BinLocation().table)
+
+        val locationList = strLocation.split(",")
+        val latitude = locationList[0].toDouble()
+        val longitude = locationList[1].toDouble()
+
+        /**
+         * Get the bounds of the search area
+         * Source : https://firebase.google.com/docs/firestore/solutions/geoqueries#kotlin+ktx_1
+         */
+        val center = GeoLocation(latitude, longitude)
+        val radiusInM = 50.0 * 1000.0
+        val bounds = GeoFireUtils.getGeoHashQueryBounds(center, radiusInM)
+        val tasks : MutableList<Task<QuerySnapshot>> = ArrayList()
+        for (b in bounds) {
+            val q = places
+                .orderBy(BinLocation.BinLocationFields.GEOHASH.fieldName)
+                .startAt(b.startHash)
+                .endAt(b.endHash)
+
+            tasks.add(q.get())
+        }
+
+        return suspendCoroutine { continuation ->
+            Tasks.whenAllComplete(tasks)
+                .addOnCompleteListener {
+                    val matchingDocs: MutableList<DocumentSnapshot> = ArrayList()
+                    for (task in tasks) {
+                        val snap = task.result
+                        for (doc in snap!!.documents) {
+                            val location = doc.getGeoPoint(BinLocation.BinLocationFields.LOCATION.fieldName) ?: continue
+                            val lat = location.latitude
+                            val lng = location.longitude
+
+                            // We have to filter out a few false positives due to GeoHash
+                            // accuracy, but most will match
+                            val docLocation = GeoLocation(lat, lng)
+                            val distanceInM = GeoFireUtils.getDistanceBetween(docLocation, center)
+                            if (distanceInM <= radiusInM) {
+                                matchingDocs.add(doc)
+                            }
+                        }
+                    }
+
+                    Log.i("SearchMapsViewModel", "fetchBinPointData: $matchingDocs")
+
+                    // matchingDocs contains the results
+                    continuation.resume(matchingDocs.mapNotNull {
+                        BinLocation().toModel(it)
+                    })
+                }
+        }
+    }
+
+    private suspend fun searchPlaceMaps(
+        keyword: String,
+        mapsApiInterface: MapsApiInterface,
+        locationString : String,
+        rankBy : String = "distance"
+    ) : List<BinLocation>? {
+        val response = withContext(Dispatchers.IO) {
+            mapsApiInterface.getDataResult(
+                MAPS_API_KEY,
+                keyword,
+                locationString,
+                rankBy
+            ).execute()
+        }
+
+        if (response.isSuccessful.not()) {
+            Log.e("responseApiCall", response.toString())
+            return null
+        }
+
+        val data = response.body()?.modelResults ?: run {
+            Log.e("SeachMapsViewModel", "responseApiCall.body()?.modelResults is null")
+            return null
+        }
+
+        Log.i("SearchMapsViewModel", "searchPlaceMaps: $data done fetching data")
+
+        return data.map { modelResults ->
+            val latitude = modelResults.modelGeometry.modelLocation.lat
+            val longitude = modelResults.modelGeometry.modelLocation.lng
+            BinLocation(
+                referencePath = null,
+                name = modelResults.name,
+                address = modelResults.vicinity,
+                location = GeoPoint(latitude, longitude),
+                additionalInfo = mapOf(
+                    "place_id" to modelResults.placeId
+                ),
+                isOpen = modelResults.isOpen,
+                rating = modelResults.rating,
+                reviewCount = null
+            )
+        }
+    }
 }

@@ -17,11 +17,14 @@ import com.gdsc.bingo.model.Forums
 import com.gdsc.bingo.model.User
 import com.gdsc.bingo.services.preferences.AppPreferences
 import com.gdsc.bingo.ui.komunitas.KomunitasViewModel
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 
 class BerandaFragment : Fragment() {
     private lateinit var komunitasViewModel: KomunitasViewModel
+    private lateinit var auth: FirebaseAuth
 
     private val binding by lazy {
         FragmentBerandaBinding.inflate(layoutInflater)
@@ -41,7 +44,7 @@ class BerandaFragment : Fragment() {
     private fun actionOpenDetail(forum: Forums) {
         val destination = with(forum){
             BerandaFragmentDirections
-                .actionNavigationBerandaToArtikelFragment(
+                .actionNavigationBerandaToNavigationArtikelActivity(
                     referenecePathDocumentString = referencePath?.path!!,
                     title = title!!,
                     text = text,
@@ -83,6 +86,7 @@ class BerandaFragment : Fragment() {
         // Inflate the layout for this fragment
         komunitasViewModel = ViewModelProvider(this)[KomunitasViewModel::class.java]
         setupRecyclerMostPopular()
+        auth = FirebaseAuth.getInstance()
         return binding.root
     }
 
@@ -93,8 +97,8 @@ class BerandaFragment : Fragment() {
 
         }
 
-        komunitasViewModel.forum.observe(viewLifecycleOwner) {
-            forumPostAdapter.submitList(it)
+        komunitasViewModel.mostLikes.observe(viewLifecycleOwner) {
+            forumPostAdapter.submitList(listOf(it))
         }
     }
 
@@ -107,6 +111,37 @@ class BerandaFragment : Fragment() {
         setupKomunitasBinGo()
         setupBerandaPinPoint()
         refreshRecyclerMostLikeData()
+        setupBinReportFormButton()
+        setupKomunitasFormButton()
+    }
+
+    private fun setupKomunitasFormButton() {
+        val destination = BerandaFragmentDirections.actionNavigationBerandaToFormPostActivity(
+            type = Forums.ForumType.ARTICLE.fieldName
+        )
+
+        binding.berandaIdeaTilesCardView.setOnClickListener {
+            if (auth.uid == null) {
+                Snackbar.make(binding.root, "Mohon Login terlebih dahulu!", Snackbar.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            findNavController().navigate(destination)
+        }
+    }
+
+    private fun setupBinReportFormButton() {
+        val destination = BerandaFragmentDirections.actionNavigationBerandaToFormPostActivity(
+            type = Forums.ForumType.REPORT.fieldName
+        )
+        
+        binding.berandaReportTilesCardView.setOnClickListener {
+            if (auth.uid == null) {
+                Snackbar.make(binding.root, "Mohon Login terlebih dahulu!", Snackbar.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            findNavController().navigate(destination)
+        }
     }
 
     private fun setupGreetings() {
@@ -124,12 +159,14 @@ class BerandaFragment : Fragment() {
     }
 
     private fun refreshRecyclerMostLikeData() {
-        komunitasViewModel.loadMostLiketData()
+        komunitasViewModel.loadMostLikeData()
     }
 
     private fun setupBerandaPinPoint() {
         binding.berandaCardBerandaContainer.setOnClickListener {
-            val destination = BerandaFragmentDirections.actionNavigationBerandaToPinPointActivity()
+            val destination = BerandaFragmentDirections.actionNavigationBerandaToPinPointActivity(
+                null, null
+            )
             findNavController().navigate(destination)
         }
     }

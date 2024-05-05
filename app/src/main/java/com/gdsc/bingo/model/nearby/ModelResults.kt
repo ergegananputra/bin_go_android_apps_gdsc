@@ -2,6 +2,7 @@ package com.gdsc.bingo.model.nearby
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
+
 class ModelResults : Serializable {
     @SerializedName("geometry")
     lateinit var modelGeometry: ModelGeometry
@@ -20,4 +21,19 @@ class ModelResults : Serializable {
 
     @SerializedName("is_open")
     var isOpen: Boolean? = null
+
+    @SerializedName("type")
+    var type: String? = null
+
+    @SerializedName("forum_id")
+    var forumId: String? = null
+
+    @SerializedName("report_description")
+    var reportDescription: String? = null
+
+    @SerializedName("report_date")
+    var reportDate: String? = null
+
+    @SerializedName("address")
+    var address: String? = null
 }

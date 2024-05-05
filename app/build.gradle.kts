@@ -17,6 +17,9 @@ plugins {
     // Google
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.gms.google-services")
+
+    // Realm
+    id("io.realm.kotlin")
 }
 
 val localProperties = Properties().apply {
@@ -95,8 +98,8 @@ android {
 
 dependencies {
     // Navigation
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.6")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
 
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
@@ -107,16 +110,23 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-common:2.6.1")
+    implementation("androidx.activity:activity-ktx:1.9.0")
     ksp("androidx.room:room-compiler:2.6.1")
+
+    // Realm
+    implementation("io.realm.kotlin:library-base:1.11.0")
 
     // Security
     implementation("androidx.security:security-crypto:1.0.0")
 
     // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.7.1"))
+    implementation(platform("com.google.firebase:firebase-bom:32.8.1"))
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-storage")
+
+    // Add this to your app/build.gradle
+    implementation("com.firebase:geofire-android-common:3.2.0")
 
     // Coil
     implementation("io.coil-kt:coil:2.5.0")
@@ -125,19 +135,16 @@ dependencies {
     implementation("io.coil-kt:coil-svg:2.5.0")
 
     // Google Maps
-    implementation("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:1.3.0")
+    implementation("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.android.libraries.places:places:3.3.0")
+    implementation("com.google.android.libraries.places:places:3.4.0")
     implementation ("com.github.delight-im:Android-SimpleLocation:v1.1.0")
 
     // Youtube
     implementation("com.pierfrancescosoffritti.androidyoutubeplayer:core:12.1.0")
 
-    // Marker Maps
-    implementation ("com.github.bumptech.glide:glide:4.12.0")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
-
-
+    // Flex Box
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
 
     // Gson
     implementation("com.google.code.gson:gson:2.10.1")
@@ -154,12 +161,25 @@ dependencies {
     // Location & Polyline
     implementation ("com.github.delight-im:Android-SimpleLocation:v1.1.0")
 
-    implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    implementation("androidx.core:core-ktx:1.12.0")
+    // WYSIWYG
+    implementation("com.github.onecode369:WYSIWYG:4.0")
+
+    // HTML Parser
+    val ksoupVersion = "0.3.1"
+    implementation("com.mohamedrejeb.ksoup:ksoup-html:$ksoupVersion")
+    implementation("com.mohamedrejeb.ksoup:ksoup-entities:$ksoupVersion")
+
+    // Swipe Refresh Layout
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
+
+    // Lottie Animation
+    implementation ("com.airbnb.android:lottie:6.4.0")
+
+    implementation("androidx.core:core-ktx:1.13.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("com.google.android.gms:play-services-location:21.1.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.firebase:firebase-storage:20.3.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

@@ -17,20 +17,11 @@
             android:id="@+id/action_navigation_beranda_to_pinPointActivity"
             app:destination="@id/pinPointActivity" />
         <action
-            android:id="@+id/action_navigation_beranda_to_artikelFragment"
-            app:destination="@id/artikelFragment" />
-    </fragment>
-    <fragment
-        android:id="@+id/navigation_komunitas"
-        android:name="com.gdsc.bingo.ui.komunitas.KomunitasFragment"
-        android:label="fragment_komunitas"
-        tools:layout="@layout/fragment_komunitas" >
+            android:id="@+id/action_navigation_beranda_to_navigation_artikel_activity"
+            app:destination="@id/navigation_artikel_activity" />
         <action
-            android:id="@+id/action_navigation_komunitas_to_formPostFragment"
-            app:destination="@id/formPostFragment" />
-        <action
-            android:id="@+id/action_navigation_komunitas_to_artikelFragment"
-            app:destination="@id/artikelFragment" />
+            android:id="@+id/action_navigation_beranda_to_formPostActivity"
+            app:destination="@id/formPostActivity" />
     </fragment>
     <fragment
         android:id="@+id/navigation_profil"
@@ -44,34 +35,80 @@
             android:id="@+id/action_navigation_profil_to_navigation_profil_detail"
             app:destination="@id/navigation_profil_detail" />
         <action
-            android:id="@+id/action_navigation_profil_to_artikelFragment"
-            app:destination="@id/artikelFragment" />
+            android:id="@+id/action_navigation_profil_to_navigation_artikel_activity"
+            app:destination="@id/navigation_artikel_activity" />
+        <action
+            android:id="@+id/action_navigation_profil_to_fragment_profil_kebijakan_privasi"
+            app:destination="@id/profilKebijakanPrivasiFragment" />
+        <action
+            android:id="@+id/action_navigation_profil_to_fragment_profil_panduan"
+            app:destination="@id/navigation_profil_panduan" />
     </fragment>
     <fragment
         android:id="@+id/pointsHistoryFragment"
         android:name="com.gdsc.bingo.ui.points_history.PointsHistoryFragment"
         android:label="fragment_points_history"
         tools:layout="@layout/fragment_points_history" />
-    <fragment
-        android:id="@+id/formPostFragment"
-        android:name="com.gdsc.bingo.ui.form_post.FormPostFragment"
-        android:label="fragment_form_post"
-        tools:layout="@layout/fragment_form_post" />
     <activity
         android:id="@+id/pinPointActivity"
         android:name="com.gdsc.bingo.ui.pinpoint.PinPointActivity"
         android:label="activity_pin_point"
-        tools:layout="@layout/activity_pin_point" />
+        tools:layout="@layout/activity_pin_point" >
+        <argument
+            android:name="latitude"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="longitude"
+            app:argType="string"
+            app:nullable="true" />
+    </activity>
     <fragment
         android:id="@+id/navigation_profil_detail"
         android:name="com.gdsc.bingo.ui.profil.detail.ProfilDetailFragment"
         android:label="fragment_profil_detail"
         tools:layout="@layout/fragment_profil_detail" />
     <fragment
-        android:id="@+id/artikelFragment"
-        android:name="com.gdsc.bingo.ui.artikel.ArtikelFragment"
-        android:label="fragment_artikel"
-        tools:layout="@layout/fragment_artikel" >
+        android:id="@+id/profilKebijakanPrivasiFragment"
+        android:name="com.gdsc.bingo.ui.profil.kebijakan_privasi.ProfilKebijakanPrivasiFragment"
+        android:label="fragment_profil_kebijakan_privasi"
+        tools:layout="@layout/fragment_profil_kebijakan_privasi"/>
+    <fragment
+        android:id="@+id/navigation_profil_panduan"
+        android:name="com.gdsc.bingo.ui.profil.panduan.ProfilPanduanFragment"
+        android:label="fragment_profil_panduan"
+        tools:layout="@layout/fragment_profil_panduan" />
+    <fragment
+        android:id="@+id/navigation_komunitas"
+        android:name="com.gdsc.bingo.ui.komunitas.KomunitasFragment"
+        android:label="fragment_komunitas"
+        tools:layout="@layout/fragment_komunitas" >
+        <action
+            android:id="@+id/action_navigation_komunitas_to_pinPointActivity"
+            app:destination="@id/pinPointActivity" />
+        <action
+            android:id="@+id/action_navigation_komunitas_to_formPostActivity"
+            app:destination="@id/formPostActivity" />
+        <action
+            android:id="@+id/action_navigation_komunitas_to_navigation_artikel_activity"
+            app:destination="@id/navigation_artikel_activity" />
+    </fragment>
+
+    <activity
+        android:id="@+id/formPostActivity"
+        android:name="com.gdsc.bingo.ui.form_post.FormPostActivity"
+        android:label="activity_form_post"
+        tools:layout="@layout/activity_form_post" >
+        <argument
+            android:name="type"
+            app:argType="string" />
+    </activity>
+    <activity
+        android:id="@+id/navigation_artikel_activity"
+        android:name="com.gdsc.bingo.ui.artikel.ArtikelActivity"
+        android:label="activity_artikel"
+        tools:layout="@layout/activity_artikel" >
+
         <argument
             android:name="referenece_path_document_string"
             app:argType="string" />
@@ -123,6 +160,7 @@
         <argument
             android:name="likes_reference"
             app:argType="string" />
-    </fragment>
+
+    </activity>
 
 </navigation>

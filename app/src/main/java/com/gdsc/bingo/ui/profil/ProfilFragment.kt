@@ -67,7 +67,7 @@ class ProfilFragment : Fragment() {
     private fun actionOpenDetail(forum: Forums) {
         val destination = with(forum){
             ProfilFragmentDirections
-                .actionNavigationProfilToArtikelFragment(
+                .actionNavigationProfilToNavigationArtikelActivity(
                     referenecePathDocumentString = referencePath?.path!!,
                     title = title!!,
                     text = text,
@@ -172,8 +172,8 @@ class ProfilFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.HORIZONTAL, false)
         }
 
-        komunitasViewModel.forum.observe(viewLifecycleOwner) {
-            forumPostAdapter.submitList(it)
+        komunitasViewModel.latestUserPost.observe(viewLifecycleOwner) {
+            forumPostAdapter.submitList(listOf(it))
         }
     }
 
@@ -221,6 +221,29 @@ class ProfilFragment : Fragment() {
         setupCardProfilPicture()
         setupBinPoints()
         refreshRecyclerUserLatestPost()
+        setupButtonVersion()
+        setupButtonPanduan()
+        setupButtonKebijiakanPrivasi()
+    }
+
+    private fun setupButtonKebijiakanPrivasi() {
+        binding.profileButtonKebijakanPrivasi.setOnClickListener {
+            findNavController().navigate(R.id.action_navigation_profil_to_fragment_profil_kebijakan_privasi)
+        }
+    }
+
+
+    private fun setupButtonPanduan() {
+        binding.profileButtonPanduan.setOnClickListener {
+            findNavController().navigate(R.id.action_navigation_profil_to_fragment_profil_panduan)
+
+        }
+    }
+
+    private fun setupButtonVersion() {
+        binding.profileButtonVersion.setOnClickListener {
+            Toast.makeText(requireContext(), getString(R.string.v1_0_0), Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun refreshRecyclerUserLatestPost() {
@@ -283,6 +306,9 @@ class ProfilFragment : Fragment() {
             Source.DEFAULT
         }
 
+        if (isAdded.not()) return // fragment is not attached to activity
+
+
         firestore.collection(User().table).document(appPreferences.userId).get(source)
             .addOnSuccessListener {
                 lifecycleScope.launch(Dispatchers.IO) {
@@ -290,7 +316,9 @@ class ProfilFragment : Fragment() {
                     val profilePicturePath = user.profilePicturePath
                     if (profilePicturePath.isNullOrEmpty().not()) {
                         val pictureRef = storage.reference.child(profilePicturePath!!)
-                        val localFile = File(requireContext().cacheDir, "user_personal_profile_picture.jpg")
+
+                        if (isAdded.not()) return@launch // fragment is not attached to activity
+                        val localFile = File(requireActivity().cacheDir, "user_personal_profile_picture.jpg")
 
                         if (localFile.exists().not() || forceUpdate) {
                             pictureRef.getFile(localFile).addOnSuccessListener {

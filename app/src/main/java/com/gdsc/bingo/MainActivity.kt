@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.gdsc.bingo.databinding.ActivityMainBinding
@@ -11,6 +12,7 @@ import com.gdsc.bingo.ui.CustomSystemTweak
 import com.gdsc.bingo.ui.artikel.ArtikelFragment
 import com.gdsc.bingo.ui.beranda.BerandaFragment
 import com.gdsc.bingo.ui.form_post.FormPostFragment
+import com.gdsc.bingo.ui.komunitas.KomunitasViewModel
 import com.gdsc.bingo.ui.points_history.PointsHistoryFragment
 import com.gdsc.bingo.ui.profil.ProfilFragment
 import com.gdsc.bingo.ui.profil.detail.ProfilDetailFragment
@@ -19,6 +21,10 @@ class MainActivity : AppCompatActivity() {
 
     val binding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
+    }
+
+    private val komunitasViewModel by lazy {
+        ViewModelProvider(this)[KomunitasViewModel::class.java]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +36,11 @@ class MainActivity : AppCompatActivity() {
             .customNavigationBarColorSet(com.google.android.material.R.attr.colorSurfaceContainer)
 
         setupBottomNavigation()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        komunitasViewModel.deleteBeyondLimit()
     }
 
     private fun setupBottomNavigation() {

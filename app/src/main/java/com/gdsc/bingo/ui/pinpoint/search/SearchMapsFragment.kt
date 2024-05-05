@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Typeface
+import android.graphics.drawable.BitmapDrawable
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
@@ -13,24 +15,32 @@ import android.os.Bundle
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.transition.TransitionManager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.SimpleTarget
+import coil.Coil
+import coil.request.ImageRequest
 import com.gdsc.bingo.R
 import com.gdsc.bingo.databinding.FragmentSearchMapsBinding
+import com.gdsc.bingo.model.BinLocation
 import com.gdsc.bingo.model.nearby.ModelResults
 import com.gdsc.bingo.model.utils.CustomInfoWindowGoogleMap
+import com.gdsc.bingo.services.textstyling.AddOnSpannableTextStyle
+import com.gdsc.bingo.ui.pinpoint.PinPointActivity
 import com.gdsc.bingo.ui.pinpoint.search.viewmodel.SearchMapsViewModel
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -40,7 +50,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.textview.MaterialTextView
-import java.util.*
+import com.google.firebase.firestore.GeoPoint
+import java.util.Locale
 
 
 class SearchMapsFragment : Fragment(), OnMapReadyCallback {
@@ -49,8 +60,12 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         FragmentSearchMapsBinding.inflate(layoutInflater)
     }
 
-    val desiredWidth = 144
-    val desiredHeight = 144
+    private val bindingPinPointActivity by lazy {
+        (requireActivity() as PinPointActivity).binding
+    }
+
+    private val desiredWidth = 144
+    private val desiredHeight = 144
 
     private lateinit var locationTextView: MaterialTextView
     private var selectedLocationText: String = ""
@@ -68,23 +83,29 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
     private val markerList = mutableListOf<Marker>()
 
     // Properti untuk menyimpan hasil pencarian
-    private var modelResultsArrayList = ArrayList<ModelResults>()
+    private var binLocationList = ArrayList<BinLocation>()
+
+    private var selectedMarkerPosition : GeoPoint? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         selectedLocationText = getString(R.string.belum_ada_lokasi_terpilih)
         return binding.root
     }
+
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setupHeaderCard()
 
-        locationTextView = view.findViewById(R.id.pin_point_front_text_view_current_user_location)
+        locationTextView = binding.pinPointTextViewLocationAddress
+        locationTextView.isSelected = true
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         if (isLocationEnabled()) {
@@ -93,41 +114,237 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
             locationTextView.text = "Izinkan lokasi Anda untuk menemukan TPU terdekat"
         }
 
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        val mapFragment = childFragmentManager.findFragmentById(binding.map.id) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
 
         getLastLocation()
 
-        // Dapatkan referensi ke TextInputEditText di dalam TextInputLayout
-        val searchTextInputEditText = binding.searchMapsTextInputLayoutSearch.editText
-
-        // Tambahkan TextWatcher
-        searchTextInputEditText?.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                // Tidak ada aksi yang diperlukan sebelum teks berubah
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                // Ketika teks berubah, Anda dapat memicu pencarian disini
-                val searchText = s.toString()
-                if (searchText.isNotEmpty()) {
-                    performSearch(searchText)
-                } else {
-                    // Jika teks pencarian kosong, tampilkan semua marker
-                    getMarker(modelResultsArrayList)
-                }
-            }
-
-            override fun afterTextChanged(p0: Editable?) {
-                // Tidak ada aksi yang diperlukan setelah teks berubah
-            }
-        })
-
-        val btnNavigateRoute = view.findViewById<Button>(R.id.btn_navigate_route)
-        btnNavigateRoute.setOnClickListener {
+        binding.componentButtonNavigate.setOnClickListener {
             // Panggil metode untuk membuka Google Maps dengan arah dari lokasi yang dipilih
             openGoogleMapsDirections()
         }
+
+        setupSearchBar()
+
+        setupToggleButton()
+
+    }
+
+    private fun setupSearchBar() {
+
+        with(bindingPinPointActivity) {
+            pinPointOpenSearchButton.setOnClickListener {
+                it.visibility = View.GONE
+                pinpointHeaderButtonBack.visibility = View.GONE
+                pinPointTextViewTitle.visibility = View.GONE
+
+                pinPointTextInputLayoutSearch.visibility = View.VISIBLE
+                pinPointTextInputLayoutSearch.editText?.requestFocus()
+
+                val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.showSoftInput(pinPointTextInputLayoutSearch.editText, InputMethodManager.SHOW_IMPLICIT)
+            }
+
+            pinPointTextInputLayoutSearch.setEndIconOnClickListener {
+                val text = pinPointTextInputLayoutSearch.editText?.text.toString()
+                if (text.isNotEmpty()) {
+                    pinPointTextInputLayoutSearch.editText?.setText("")
+                } else {
+                    pinPointOpenSearchButton.visibility = View.VISIBLE
+                    pinpointHeaderButtonBack.visibility = View.VISIBLE
+                    pinPointTextViewTitle.visibility = View.VISIBLE
+
+                    pinPointTextInputLayoutSearch.visibility = View.GONE
+                    pinPointTextInputLayoutSearch.editText?.setText("")
+
+                    pinPointTextInputLayoutSearch.editText?.clearFocus()
+                    val inputMethodManager = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    inputMethodManager.hideSoftInputFromWindow(pinPointTextInputLayoutSearch.editText?.windowToken, 0)
+                }
+            }
+
+            pinPointTextInputLayoutSearch.editText?.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                    // Tidak ada aksi yang diperlukan sebelum teks berubah
+                }
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    // Ketika teks berubah, Anda dapat memicu pencarian disini
+                    val searchText = s.toString()
+                    if (searchText.isNotEmpty()) {
+                        performSearch(searchText)
+                    } else {
+                        // Jika teks pencarian kosong, tampilkan semua marker
+                        getMarker(binLocationList)
+                    }
+                }
+
+                override fun afterTextChanged(p0: Editable?) {
+                    // Tidak ada aksi yang diperlukan setelah teks berubah
+                }
+            })
+
+
+        }
+    }
+
+    private fun setupToggleButton() {
+        binding.binPointButtonToggleGroup.addOnButtonCheckedListener { toggleGroup, id, isChecked ->
+            if (isChecked) {
+                when (id) {
+                    binding.pinPointButtonBinLocator.id -> {
+                        // Tampilkan semua marker bin
+                        val filteredResults = binLocationList.filterNot {
+                            it.type == BinLocation.BinTypeCategory.REPORT.fieldName
+                        }
+                        getMarker(filteredResults as ArrayList<BinLocation>)
+                    }
+                    binding.pinPointButtonBinReport.id -> {
+                        // Tampilkan semua marker report
+                        val filteredResults = binLocationList.filter {
+                            it.type == BinLocation.BinTypeCategory.REPORT.fieldName
+                        }
+                        getMarker(filteredResults as ArrayList<BinLocation>)
+                    }
+                    binding.pinPointButtonSemua.id -> {
+                        // Tampilkan semua marker
+                        getMarker(binLocationList)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setFirstLocation() {
+        try {
+            val latitude = (requireActivity() as PinPointActivity).args.latitude
+            val longitude = (requireActivity() as PinPointActivity).args.longitude
+
+            if (latitude != null && longitude != null) {
+                val vicinity = GeoPoint(latitude.toDouble(), longitude.toDouble())
+                Log.i("Location", "Location found: $latitude, $longitude")
+
+                googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(vicinity.latitude, vicinity.longitude),
+                    DEFAULT_ZOOM
+                ))
+
+                // Find the marker by its position and open its info window
+                val marker = markerList.find {
+                    it.position.latitude == vicinity.latitude
+                            && it.position.longitude == vicinity.longitude
+                }
+                marker?.showInfoWindow()
+                performMarkerClickAction(marker)
+
+            } else {
+                Log.i("Location", "Location not found: $latitude, $longitude")
+            }
+        } catch (e: Exception) {
+            Log.e("Location", "Error: ${e.message}")
+        }
+
+    }
+
+    private fun performMarkerClickAction(marker: Marker?) : Boolean{
+        // Ambil tag dari marker yang diklik
+        Log.i("MarkerClicked", "Marker clicked")
+        val markerInfoRaw = marker?.tag as? ModelResults ?: return false // Kembalikan false agar default behavior dari marker juga berlaku
+
+        val markerInfo = BinLocation(
+            referencePath = null,
+            name = markerInfoRaw.name,
+            address = markerInfoRaw.address,
+            location = GeoPoint(marker.position.latitude, marker.position.longitude),
+            isOpen = markerInfoRaw.isOpen,
+            rating = markerInfoRaw.rating,
+            type = markerInfoRaw.type,
+        )
+        if (markerInfoRaw.type == BinLocation.BinTypeCategory.REPORT.fieldName) {
+            markerInfo.additionalInfo = hashMapOf<String, Any>(
+                BinLocation.BinAdditionalInfo.FORUM_ID.fieldName to (markerInfoRaw.forumId ?: ""),
+                BinLocation.BinAdditionalInfo.REPORT_DESCRIPTION.fieldName to (markerInfoRaw.reportDescription ?: ""),
+                BinLocation.BinAdditionalInfo.REPORT_DATE.fieldName to (markerInfoRaw.reportDate ?: "")
+            )
+        }
+
+        // Perbarui teks pada TextView
+        binding.searchMapsTextViewLokasiTerpilih.text = markerInfo.name
+        selectedMarkerPosition = markerInfo.location
+
+
+        // NOTE: Animasi disini
+        TransitionManager.beginDelayedTransition(binding.pinPointActivityRootLayout)
+        binding.searchMapsGroupMarkerInfo.visibility = View.VISIBLE
+        binding.pinPointButtonMyLocationCardView.visibility = View.GONE
+
+        // Periksa apakah tempat tersebut terbuka atau tutup
+        val isOpen = markerInfo.isOpen ?: true // Defaultnya adalah false jika properti isOpen null
+        if (isOpen) {
+            // Tempat terbuka, tampilkan chip "Buka" dan sembunyikan chip "Tutup"
+            binding.searchMapsChipBuka.visibility = View.VISIBLE
+            binding.searchMapsChipTutup.visibility = View.GONE
+        } else {
+            // Tempat tutup, tampilkan chip "Tutup" dan sembunyikan chip "Buka"
+            binding.searchMapsChipTutup.visibility = View.VISIBLE
+            binding.searchMapsChipBuka.visibility = View.GONE
+        }
+        // Perbarui rating pada TextView
+        binding.searchMapsTextViewLokasiRating.visibility = View.VISIBLE
+
+        val rating = (markerInfo.rating ?: 0.0).let {
+            if (it == 0.0) {
+                "Rating tidak tersedia"
+            } else {
+                it.toString()
+            }
+        }
+
+        val ratingTextString =  "Rating: $rating"
+        binding.searchMapsTextViewLokasiRating.text = ratingTextString
+
+        Log.d("MarkerClicked", "Marker clicked: " +
+                "\nname ${markerInfo.name} " +
+                "\naddress ${markerInfo.address} " +
+                "\nlocation ${markerInfo.location} " +
+                "\nisOpen ${markerInfo.isOpen} " +
+                "\nrating ${markerInfo.rating} " +
+                "\ntype ${markerInfo.type} " +
+                "\nadditional info ${markerInfo.additionalInfo}")
+
+
+        if (markerInfo.type == BinLocation.BinTypeCategory.REPORT.fieldName) {
+            binding.searchMapsTextViewAddress.apply {
+                visibility = View.VISIBLE
+                text = markerInfo.address
+            }
+            val spannableConverter = AddOnSpannableTextStyle()
+
+            // Konversi HTML dengan daftar terurut
+            val spanned = spannableConverter.convertHtmlWithOrderedList(
+                markerInfo.additionalInfo
+                    ?.get(BinLocation.BinAdditionalInfo.REPORT_DESCRIPTION.fieldName).toString()
+            )
+
+            binding.searchMapsTextViewAddressLokasiTerpilihUpper.text = spanned
+            val typeface = Typeface.DEFAULT
+            binding.searchMapsTextViewAddressLokasiTerpilihUpper.typeface = typeface
+
+            binding.searchMapsTextViewLokasiRating.visibility = View.GONE
+            binding.searchMapsChipBuka.visibility = View.GONE
+
+        } else {
+            binding.searchMapsTextViewAddress.visibility = View.GONE
+
+            // Tampilkan alamat pada TextView
+            binding.searchMapsTextViewAddressLokasiTerpilihUpper.text = markerInfo.address
+
+            binding.searchMapsTextViewLokasiRating.visibility = View.VISIBLE
+            binding.searchMapsChipBuka.visibility = View.VISIBLE
+        }
+
+        marker.showInfoWindow()
+
+        return true
     }
 
     private fun openGoogleMapsDirections() {
@@ -137,7 +354,17 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         // Pastikan ada lokasi yang terpilih
         if (selectedLocationText.isNotEmpty()) {
             // Buat URI Intent untuk membuka Google Maps dengan arah dari lokasi yang dipilih
-            val uri = "https://www.google.com/maps/dir/?api=1&destination=${selectedLocationText}"
+            val lat = selectedMarkerPosition?.latitude
+            val long = selectedMarkerPosition?.longitude
+
+            val isCoordinateReady = !(lat == null || long == null)
+
+            val uri = if (isCoordinateReady) {
+                "https://www.google.com/maps/dir/?api=1&destination=$lat,$long"
+            } else {
+                "https://www.google.com/maps/dir/?api=1&destination=${selectedLocationText}"
+            }
+
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
             // Set flag agar Google Maps dibuka dalam aplikasi yang tersedia
             intent.setPackage("com.google.android.apps.maps")
@@ -179,7 +406,7 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setupHeaderCard() {
-        binding.searchMapsMyLocation.setOnClickListener {
+        binding.pinPointButtonMyLocationCardView.setOnClickListener {
             showUserLocation()
         }
     }
@@ -298,113 +525,106 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-    @SuppressLint("FragmentLiveDataObserve")
     private fun setViewModel() {
         ViewModelMaps = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[SearchMapsViewModel::class.java]
         ViewModelMaps.setMarkerLocation(strCurrentLocation)
-        ViewModelMaps.getMarkerLocation().observe(this) { modelResults: ArrayList<ModelResults> ->
-            if (modelResults.isNotEmpty()) {
-                modelResultsArrayList.clear()
-                modelResultsArrayList.addAll(modelResults)
-                getMarker(modelResults)
-            } else {
+        ViewModelMaps.modelResultsMutableLiveData.observe(requireActivity()) { newBinLocationList ->
+            if (newBinLocationList.isEmpty()) {
                 requestLocationPermission()
+                return@observe
             }
+
+            binLocationList.clear()
+            binLocationList.addAll(newBinLocationList)
+            getMarker(newBinLocationList)
         }
     }
 
-    private fun getMarker(modelResultsArrayList: ArrayList<ModelResults>) {
+    private fun getMarker(binLocationList: ArrayList<BinLocation>) {
         // Hapus semua marker yang ada sebelum menambahkan yang baru
         googleMap?.clear()
         markerList.clear()
 
-        for (i in modelResultsArrayList.indices) {
-            val latLngMarker = LatLng(
-                modelResultsArrayList[i]
-                    .modelGeometry
-                    .modelLocation
-                    .lat, modelResultsArrayList[i]
-                    .modelGeometry
-                    .modelLocation
-                    .lng
-            )
+        for (binLocation in binLocationList) {
+            if (binLocation.location?.latitude == null || binLocation.location?.longitude == null) {
+                continue
+            }
 
-            val info = ModelResults()
-            info.name = modelResultsArrayList[i].name
-            info.placeId = modelResultsArrayList[i].placeId
-            info.vicinity = modelResultsArrayList[i].vicinity
-            info.rating = modelResultsArrayList[i].rating // Menambahkan rating dari model ke info
+            val latLngMarker = LatLng(binLocation.location!!.latitude, binLocation.location!!.longitude)
 
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)
 
-            Glide.with(requireContext())
-                .asBitmap()
-                .load(R.drawable.ic_custom_marker_maps)
-                .into(object : SimpleTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                        val scaledBitmap = Bitmap.createScaledBitmap(resource, desiredWidth, desiredHeight, false)
-                        val bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
-                        val markerOptions = MarkerOptions()
-                            .position(latLngMarker)
-                            .icon(bitmapDescriptor)
-                        val marker = googleMap?.addMarker(markerOptions)
-                        marker?.tag = info
-                        marker?.showInfoWindow()
-                        marker?.let { markerList.add(it) }
+            val iconResId = when (binLocation.type) {
+                BinLocation.BinTypeCategory.BIN.fieldName -> R.drawable.ic_custom_marker_maps // Gunakan ikon untuk marker bin
+                BinLocation.BinTypeCategory.REPORT.fieldName -> R.drawable.ic_custom_report_marker_maps // Gunakan ikon untuk marker report
+                else -> R.drawable.ic_custom_marker_maps // Default: Gunakan ikon default
+            }
+
+            val request = ImageRequest.Builder(requireContext())
+                .data(iconResId)
+                .target { drawable ->
+                    val bitmap = (drawable as BitmapDrawable).bitmap
+                    val scaleBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, false)
+                    val bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(scaleBitmap)
+                    val markerOptions = MarkerOptions()
+                        .position(latLngMarker)
+                        .icon(bitmapDescriptor)
+
+                    val marker = googleMap?.addMarker(markerOptions)
+
+                    val vicinityString = binLocation.location?.latitude.toString() + ", " + binLocation.location?.longitude.toString()
+
+                    marker?.tag = ModelResults().apply {
+                        name = binLocation.name!!
+                        placeId = binLocation.additionalInfo?.get("place_id").toString()
+                        vicinity = vicinityString
+                        rating = binLocation.rating ?: 0.0
+                        type = binLocation.type ?: BinLocation.BinTypeCategory.BIN.fieldName
+                        forumId = binLocation.additionalInfo?.get(BinLocation.BinAdditionalInfo.FORUM_ID.fieldName).toString()
+                        reportDescription = binLocation.additionalInfo?.get(BinLocation.BinAdditionalInfo.REPORT_DESCRIPTION.fieldName).toString()
+                        reportDate = binLocation.additionalInfo?.get(BinLocation.BinAdditionalInfo.REPORT_DATE.fieldName).toString()
+                        address = binLocation.address
                     }
-                })
+                    marker?.showInfoWindow()
+                    marker?.let { markerList.add(it) }
+                }
+                .build()
+
+            val imageLoader = Coil.imageLoader(requireContext())
+            imageLoader.enqueue(request)
         }
+
         // Tambahkan listener pada marker di luar loop
         googleMap?.setOnMarkerClickListener { marker ->
-            // Ambil tag dari marker yang diklik
-            val markerInfo = marker.tag as? ModelResults
-            // Jika tag tidak null
-            if (markerInfo != null) {
-                // Update teks terpilih dengan informasi dari marker yang diklik
-                selectedLocationText = "${markerInfo.name}"
-                // Perbarui teks pada TextView
-                binding.searchMapsTextViewLokasiTerpilih.text = selectedLocationText
-                binding.searchMapsTextViewAddressLokasiTerpilih.text = markerInfo.vicinity
 
-                // NOTE: Animasi disini
-                TransitionManager.beginDelayedTransition(binding.searchMapsBottomDialogMainConstraintLayout)
-                binding.searchMapsGroupMarkerInfo.visibility = View.VISIBLE
-
-                // Periksa apakah tempat tersebut terbuka atau tutup
-                val isOpen = markerInfo.isOpen ?: true // Defaultnya adalah false jika properti isOpen null
-                if (isOpen) {
-                    // Tempat terbuka, tampilkan chip "Buka" dan sembunyikan chip "Tutup"
-                    binding.searchMapsChipBuka.visibility = View.VISIBLE
-                    binding.searchMapsChipTutup.visibility = View.GONE
-                } else {
-                    // Tempat tutup, tampilkan chip "Tutup" dan sembunyikan chip "Buka"
-                    binding.searchMapsChipTutup.visibility = View.VISIBLE
-                    binding.searchMapsChipBuka.visibility = View.GONE
-                }
-                // Perbarui rating pada TextView
-                binding.searchMapsTextViewLokasiRating.visibility = View.VISIBLE
-                binding.searchMapsTextViewLokasiRating.text = "Rating: ${markerInfo.rating ?: "Rating tidak tersedia"}"
-            }
-            // Kembalikan false agar default behavior dari marker juga berlaku
-            false
+            return@setOnMarkerClickListener performMarkerClickAction(marker)
         }
 
         googleMap?.setOnMapClickListener {
-            TransitionManager.beginDelayedTransition(binding.searchMapsBottomDialogMainConstraintLayout)
+            TransitionManager.beginDelayedTransition(binding.pinPointActivityRootLayout)
             binding.searchMapsGroupMarkerInfo.visibility = View.GONE
+            binding.pinPointButtonMyLocationCardView.visibility = View.VISIBLE
         }
+
+        setFirstLocation()
     }
 
     private fun performSearch(searchText: String) {
         // Filter modelResultsArrayList berdasarkan teks pencarian
-        val filteredResults = modelResultsArrayList.filter { it.name.contains(searchText, ignoreCase = true) }
+        val filteredResults = binLocationList.filter {
+            val name = it.name?.contains(searchText, ignoreCase = true) ?: false // not in the list
+            val address = it.address?.contains(searchText, ignoreCase = true) ?: false // not in the list
+
+            name || address
+        }
 
         // Jika ditemukan hasil pencarian yang sesuai
         if (filteredResults.isNotEmpty()) {
             // Ambil lokasi dari hasil pencarian pertama
             val firstResult = filteredResults[0]
-            val latLng = LatLng(firstResult.modelGeometry.modelLocation.lat, firstResult.modelGeometry.modelLocation.lng)
+
+            val latLng = LatLng(firstResult.location!!.latitude, firstResult.location!!.longitude)
 
             // Atur kamera untuk melakukan zoom ke lokasi hasil pencarian pertama
             googleMap?.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17f))
@@ -414,34 +634,54 @@ class SearchMapsFragment : Fragment(), OnMapReadyCallback {
         googleMap?.clear()
 
         // Tambahkan marker untuk hasil pencarian yang sesuai
-        for (result in filteredResults) {
-            val latLngMarker = LatLng(result.modelGeometry.modelLocation.lat, result.modelGeometry.modelLocation.lng)
+        for (binLocation in filteredResults) {
+            if (binLocation.location?.latitude == null || binLocation.location?.longitude == null) {
+                continue
+            }
 
-            val info = ModelResults()
-            info.name = result.name
-            info.placeId = result.placeId
-            info.vicinity = result.vicinity
-            info.rating = result.rating
+            val latLngMarker = LatLng(binLocation.location!!.latitude, binLocation.location!!.longitude)
 
             val customInfoWindow = CustomInfoWindowGoogleMap(requireContext())
             googleMap?.setInfoWindowAdapter(customInfoWindow)
 
-            Glide.with(requireContext())
-                .asBitmap()
-                .load(R.drawable.ic_custom_marker_maps)
-                .into(object : SimpleTarget<Bitmap>() {
-                    override fun onResourceReady(resource: Bitmap, transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?) {
-                        val scaledBitmap = Bitmap.createScaledBitmap(resource, desiredWidth, desiredHeight, false)
-                        val bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(scaledBitmap)
-                        val markerOptions = MarkerOptions()
-                            .position(latLngMarker)
-                            .icon(bitmapDescriptor)
-                        val marker = googleMap?.addMarker(markerOptions)
-                        marker?.tag = info
-                        marker?.showInfoWindow()
-                        marker?.let { markerList.add(it) }
+            val iconResId = when (binLocation.type) {
+                BinLocation.BinTypeCategory.BIN.fieldName -> R.drawable.ic_custom_marker_maps // Gunakan ikon untuk marker bin
+                BinLocation.BinTypeCategory.REPORT.fieldName -> R.drawable.ic_custom_report_marker_maps // Gunakan ikon untuk marker report
+                else -> R.drawable.ic_custom_marker_maps // Default: Gunakan ikon default
+            }
+
+            val request = ImageRequest.Builder(requireContext())
+                .data(iconResId)
+                .target { drawable ->
+                    val bitmap = (drawable as BitmapDrawable).bitmap
+                    val scaleBitmap = Bitmap.createScaledBitmap(bitmap, desiredWidth, desiredHeight, false)
+                    val bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(scaleBitmap)
+                    val markerOptions = MarkerOptions()
+                        .position(latLngMarker)
+                        .icon(bitmapDescriptor)
+
+                    val marker = googleMap?.addMarker(markerOptions)
+
+                    val vicinityString = binLocation.location?.latitude.toString() + ", " + binLocation.location?.longitude.toString()
+
+                    marker?.tag = ModelResults().apply {
+                        name = binLocation.name!!
+                        placeId = binLocation.additionalInfo?.get("place_id").toString()
+                        vicinity = vicinityString
+                        rating = binLocation.rating ?: 0.0
+                        type = binLocation.type ?: BinLocation.BinTypeCategory.BIN.fieldName
+                        forumId = binLocation.additionalInfo?.get(BinLocation.BinAdditionalInfo.FORUM_ID.fieldName).toString()
+                        reportDescription = binLocation.additionalInfo?.get(BinLocation.BinAdditionalInfo.REPORT_DESCRIPTION.fieldName).toString()
+                        reportDate = binLocation.additionalInfo?.get(BinLocation.BinAdditionalInfo.REPORT_DATE.fieldName).toString()
+                        address = binLocation.address
                     }
-                })
+                    marker?.showInfoWindow()
+                    marker?.let { markerList.add(it) }
+                }
+                .build()
+
+            val imageLoader = Coil.imageLoader(requireContext())
+            imageLoader.enqueue(request)
         }
     }
 

@@ -1,5 +1,6 @@
 package com.gdsc.bingo.ui.artikel
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,13 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import coil.transform.CircleCropTransformation
 import com.facebook.shimmer.ShimmerFrameLayout
-import com.gdsc.bingo.MainActivity
 import com.gdsc.bingo.R
 import com.gdsc.bingo.adapter.ImagePostAdapter
 import com.gdsc.bingo.adapter.KomentarAdapter
@@ -26,6 +24,7 @@ import com.gdsc.bingo.model.PostImage
 import com.gdsc.bingo.model.User
 import com.gdsc.bingo.services.points.Points
 import com.gdsc.bingo.services.points.PointsRewardSystem
+import com.gdsc.bingo.services.textstyling.AddOnSpannableTextStyle
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
@@ -46,7 +45,9 @@ import java.time.ZoneId
 
 
 class ArtikelFragment : Fragment(), PointsRewardSystem {
-    private val navArgs by navArgs<ArtikelFragmentArgs>()
+    private val navArgs by lazy {
+        (activity as ArtikelActivity).args
+    }
 
     private lateinit var fireStore : FirebaseFirestore
     private lateinit var auth : FirebaseAuth
@@ -107,9 +108,7 @@ class ArtikelFragment : Fragment(), PointsRewardSystem {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as MainActivity).setStatusAndBottomNavigation(this)
 
-        setupToolbarButton()
         lifecycleScope.launch(Dispatchers.Main) {
             this.launch { setupTitle() }
             this.launch { setupProfile() }
@@ -407,16 +406,30 @@ class ArtikelFragment : Fragment(), PointsRewardSystem {
         usingTextFile: Boolean,
         textFilePathDocumentString: String?,
     ) {
+        val spannableConverter = AddOnSpannableTextStyle()
+
+
         if (usingTextFile.not()) {
-            binding.artikelTextViewContent.text = text
+            val spanned = spannableConverter.convertHtmlWithOrderedList(text ?: "")
+
+            binding.artikelTextViewContent.text = spanned
+            val typeface = Typeface.DEFAULT
+            binding.artikelTextViewContent.typeface = typeface
+
             binding.artikelShimmerContent.stop()
             return
         }
 
+
         storage.getReference(textFilePathDocumentString!!).getBytes(10_000_000)
             .addOnSuccessListener { bytes ->
                 val textData = String(bytes)
-                binding.artikelTextViewContent.text = textData
+                val spanned = spannableConverter.convertHtmlWithOrderedList(textData)
+
+                binding.artikelTextViewContent.text = spanned
+                val typeface = Typeface.DEFAULT
+                binding.artikelTextViewContent.typeface = typeface
+
                 binding.artikelShimmerContent.stop()
 
             }
@@ -485,12 +498,6 @@ class ArtikelFragment : Fragment(), PointsRewardSystem {
     private fun setupUsername(username: String) {
         binding.artikelTextViewUsername.text = username
         binding.artikelShimmerUsername.stop()
-    }
-
-    private fun setupToolbarButton() {
-        binding.artikelToolbarButtonBack.setOnClickListener {
-            findNavController().navigateUp()
-        }
     }
 
 

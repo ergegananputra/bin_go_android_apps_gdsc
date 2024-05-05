@@ -41,7 +41,7 @@ class SearchMapsViewModel : ViewModel() {
 
         CoroutineScope(Dispatchers.Default).launch {
 
-            val remoteSettings = firestore.collection("remote_settings")
+            val remoteSettings = firestore.collection(RemoteSettings.TABLE_NAME.key)
                 .document(RemoteSettings.DOCUMENT_ID.key)
                 .get(Source.SERVER)
                 .await()

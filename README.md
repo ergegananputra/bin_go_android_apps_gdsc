@@ -119,7 +119,10 @@ In addition to the environmental variables mentioned above, if you don't have a 
    ````
 > [!Note]
 If you don't have a balance in google cloud, you can also add a custom location for the `bin-locator` feature based on your nearest location by setting the fields and database contents in firestore like this: 
-<br><br>
+<br>
+<p>
+Set the <b>geohash</b> initial value to <b>null</b>. Then set the set the <b>isDeveloperMode</b> field in <b>remote_settings</b> collection to <b>true</b>. Run the application and open <b>Bin-Locator</b>. After the <b>geohash</b> filled up automatically, set the <b>isDeveloperMode</b> back to <b>false</b>. </p>
+<br>
 <img src="https://github.com/aldyardnsyh/bin_go_android_apps_gdsc/assets/110091451/7d835b76-b526-4560-bae0-8192325de313" alt="field_table_remote_settings" width="550" height="300">
 
 ## Preview 

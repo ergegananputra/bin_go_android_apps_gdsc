@@ -1,5 +1,7 @@
 # BIN-GO!
-<img src="https://github.com/aldyardnsyh/bin_go_android_apps_gdsc/assets/110091451/60de51ad-b687-4201-974d-9b87faa8891e" alt="bin-go_logo" width="200" height="300">
+<p align="center">
+  <img src="https://github.com/aldyardnsyh/bin_go_android_apps_gdsc/assets/110091451/60de51ad-b687-4201-974d-9b87faa8891e" alt="bin-go_logo" width="200" height="300">
+</p>
 
 BIN-GO! is a mobile application developed to address the waste crisis in Yogyakarta. The app integrates the location of waste recycling centers through Google Maps, so users can easily access the nearest recycling facilities. In addition, the app is also equipped with a forum where people can discuss and share insights on waste management topics, thus fostering a sense of shared responsibility.
 

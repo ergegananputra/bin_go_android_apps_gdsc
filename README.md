@@ -151,7 +151,7 @@ Set the <b>geohash</b> initial value to <b>null</b>. Then set the set the <b>isD
 [![Github Naya](https://img.shields.io/badge/SalmaDewiNataya-black.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/salmanataya/)
 [![LinkedIn Naya](https://img.shields.io/badge/LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/salmanataya/)
 <br>
-[![Github Daniel](https://img.shields.io/badge/DanielWinstonMandela-black.svg?style=for-the-badge&logo=github&logoColor=white)](https://www.linkedin.com/in/danielwinstonmandela/)
+[![Github Daniel](https://img.shields.io/badge/DanielWinstonMandela-black.svg?style=for-the-badge&logo=github&logoColor=white)](https://github.com/danielwinstonmandela/)
 [![LinkedIn Daniel](https://img.shields.io/badge/LinkedIn-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/danielwinstonmandela/)
 
 
